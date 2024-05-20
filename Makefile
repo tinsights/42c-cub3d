@@ -1,6 +1,6 @@
 NAME = cub3d
 
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -O3
 LIBFLAGS = -Lmlx -lmlx -lXext -lX11 -lm -Llibft -lft
 INC = -Imlx -Ilibft/includes
 
@@ -18,9 +18,6 @@ all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT) $(MLX)
 	cc $(CFLAGS) $(OBJS) $(LIBFLAGS) $(INC) -o $(NAME)
-
-debug: $(OBJS) $(LIBFT) $(MLX)
-	cc $(CFLAGS) -g -fsanitize=thread $(OBJS) $(LIBFLAGS) $(INC) -o $(NAME)_db
 
 $(OBJS): $(SRCS)
 	cc $(CFLAGS) -c $(SRCS) $(INC)

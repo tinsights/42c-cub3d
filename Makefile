@@ -29,11 +29,13 @@ $(LIBFT):
 	make -C $(LIBDIR)
 
 clean:
+	$(MAKE) -C $(LIBDIR) clean
+	$(MAKE) -C $(MLXDIR) clean
 	rm -f $(OBJS)
 
 fclean: clean
 	$(MAKE) -C $(LIBDIR) fclean
-	$(MAKE) -C $(MLXDIR) clean
+	$(MAKE) -C $(MLXDIR) fclean
 	rm -f $(NAME)
 
 re: fclean all

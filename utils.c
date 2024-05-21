@@ -116,9 +116,8 @@ void strafe_player(t_params *params, int direction)
 
 	int step = 8;
 
-	float right = player->heading + M_PI_2;
-	player->px_location[0] += sin(right) * step * direction;
-	player->px_location[1] += -cos(right) * step * direction;
+	player->px_location[0] += cos(player->heading) * step * direction;
+	player->px_location[1] += -sin(player->heading) * step * direction;
 }
 
 

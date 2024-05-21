@@ -10,7 +10,7 @@ LIBFT = $(LIBDIR)/libft.a
 MLXDIR = mlx/
 MLX =  $(MLXDIR)/libmlx.a
 
-SRCS = main.c
+SRCS = main.c utils.c
 
 OBJS = $(SRCS:.c=.o)
 

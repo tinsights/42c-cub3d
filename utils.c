@@ -99,19 +99,45 @@ void rotate_player(t_params *p, int degrees)
     printf("==============\n");
 }
 
+void move_player(t_params *params, int direction)
+{
+	t_player *player = params->player;
+
+	int step = 8;
+
+	player->px_location[0] += sin(player->heading) * step * direction;
+	player->px_location[1] += -cos(player->heading) * step * direction;
+}
+
+
+void strafe_player(t_params *params, int direction)
+{
+	t_player *player = params->player;
+
+	int step = 8;
+
+	float right = player->heading + M_PI_2;
+	player->px_location[0] += sin(right) * step * direction;
+	player->px_location[1] += -cos(right) * step * direction;
+}
+
+
 int	key_hook(int keycode, t_params *params)
 {
 	if (keycode == XK_Escape)
 		return (close_window(params));
+	else if (keycode == XK_w)
+		move_player(params, 1);
+	else if (keycode == XK_a)
+		strafe_player(params, -1);
+	else if (keycode == XK_s)
+		move_player(params, -1);
+	else if (keycode == XK_d)
+		strafe_player(params, 1);
 	else if (keycode == XK_Left)
-	{
 		rotate_player(params, -3);
-	}
 	else if (keycode == XK_Right)
-	{
 		rotate_player(params, 3);
-
-	}
 	else
 		ft_printf("KEY: %i\n", keycode);
 	return (1);

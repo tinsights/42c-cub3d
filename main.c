@@ -43,11 +43,8 @@ int main(void)
 
 	params.player = &player;
 
-	player.grid_sq[0] = 3;
-	player.grid_sq[1] = 3;
-
-	player.px_location[0] = SIZE / 2;
-	player.px_location[1] = SIZE / 2;
+	player.position[0] = 3.5;
+	player.position[1] = 3.5;
 
 	player.heading = 0;
 

@@ -41,30 +41,25 @@ void draw_grid(t_params p)
 void draw_player(t_params p)
 {
 	t_player *player = p.player;
-	int pl_col = player->px_location[0] - 4;
-	int pl_row = player->px_location[1] - 4;
 
-	for (int row = pl_row; row < pl_row + 8; row++)
-		for (int col = pl_col; col < pl_col + 8; col++)
-            put_pixel(p, row, col, 0xff0000);
+	// get gridsq of player
+	double row = player->position[0];
+	double col = player->position[1];
 
-    
-    /* -------------------------------------------------------------------------- */
+	// multiply by width and height (scale??) to get pixel pos
+	row = row / 6 * SIZE;
+	col = col / 6 * SIZE;
+
+	for (int j = col - 4; j < col + 4; j++)
+		for (int i = row - 4; i < row + 4; i++)
+			put_pixel(p, i, j, 0xffff0000);
+
+	    /* -------------------------------------------------------------------------- */
 	/*                        DRAW LINE POINTING TO HEADING                       */
 	/* -------------------------------------------------------------------------- */
 	// get player coords
 	// draw straight line up until row or col hits limit
-	int player_x = player->px_location[0]; // should probably redo this to specify 
-	int player_y = player->px_location[1]; // player_x and player_y in struct, for clarity
 
-
-	// // take into acount heading
-
-	// for (int row = player_y; row >= 0; row--)
-	// 	put_pixel(*p,row, player_x, 0xffff00);
-
-	double row = player_y;
-	double col = player_x;
 	while ((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
 	{
 		put_pixel(p, row, col, 0xffff00);
@@ -72,7 +67,6 @@ void draw_player(t_params p)
 		row += -cos(player->heading);
 		col += sin(player->heading);
 	}
-
 }
 int	close_window(t_params *params)
 {
@@ -99,14 +93,19 @@ void rotate_player(t_params *p, int degrees)
     printf("==============\n");
 }
 
+
+/** TODO:
+ * 		- convert to singular rotation matrix
+*/
 void move_player(t_params *params, int direction)
 {
 	t_player *player = params->player;
 
-	int step = 8;
+	double step = 0.1;
 
-	player->px_location[0] += sin(player->heading) * step * direction;
-	player->px_location[1] += -cos(player->heading) * step * direction;
+	player->position[0] += cos(player->heading) * step * direction;
+	player->position[1] += -sin(player->heading) * step * direction;
+	printf("player pos: %f %f\n", player->position[0], player->position[1]);
 }
 
 
@@ -114,10 +113,10 @@ void strafe_player(t_params *params, int direction)
 {
 	t_player *player = params->player;
 
-	int step = 8;
+	double step = 0.1;
 
-	player->px_location[0] += cos(player->heading) * step * direction;
-	player->px_location[1] += -sin(player->heading) * step * direction;
+	player->position[0] += sin(player->heading) * step * direction;
+	player->position[1] += cos(player->heading) * step * direction;
 }
 
 
@@ -126,11 +125,11 @@ int	key_hook(int keycode, t_params *params)
 	if (keycode == XK_Escape)
 		return (close_window(params));
 	else if (keycode == XK_w)
-		move_player(params, 1);
+		move_player(params, -1);
 	else if (keycode == XK_a)
 		strafe_player(params, -1);
 	else if (keycode == XK_s)
-		move_player(params, -1);
+		move_player(params, 1);
 	else if (keycode == XK_d)
 		strafe_player(params, 1);
 	else if (keycode == XK_Left)

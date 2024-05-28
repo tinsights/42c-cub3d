@@ -37,8 +37,7 @@ typedef struct s_mlx {
 } t_mlx;
 
 typedef struct s_player {
-	t_uint		grid_sq[2];
-	t_uint		px_location[2];
+	double		position[2];
 
 	double		heading;
 } t_player;

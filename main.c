@@ -31,7 +31,7 @@ int main(void)
 	t_mlx mlx;
 	params.mlx = &mlx;
 	mlx.ptr = mlx_init();
-	mlx.win= mlx_new_window(mlx.ptr, SIZE, SIZE, "cub3d");
+	mlx.win= mlx_new_window(mlx.ptr, SIZE, SIZE, "squar2d");
 	mlx.img = mlx_new_image(mlx.ptr, SIZE, SIZE);
 	if (!mlx.ptr || !mlx.win || !mlx.img)
 		ft_putstr_fd("Errorr initialising mlx\n", 2);
@@ -58,6 +58,7 @@ int main(void)
 	mlx_loop_hook(mlx.ptr, render, &params);
 	mlx_loop(mlx.ptr);
 }
+void draw_ray(t_params *p);
 
 
 int render(t_params *p)
@@ -66,7 +67,7 @@ int render(t_params *p)
 	draw_player(*p);
 
 	// draw one ray
-	// draw_ray(*p);
+	draw_ray(p);
 
 	mlx_put_image_to_window(p->mlx->ptr, p->mlx->win, p->mlx->img, 0, 0);
 	return (1);

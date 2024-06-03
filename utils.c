@@ -124,76 +124,101 @@ void strafe_player(t_params *params, int direction)
 	player->position[1] += cos(player->heading) * step * direction;
 }
 
+double FOV = M_PI / 3; // degrees? 66? 60?
+int WIDTH = 600; // how wide?
+
 void draw_ray(t_params *p)
 {
 	t_player *player = p->player;
 
-	double rayDirX = sin(player->heading);
-	double rayDirY = -cos(player->heading);
-
-	double posX = player->position[1];
-	double posY = player->position[0];
-
-	int mapX = player->position[1];
-	int mapY = player->position[0];
-
-	double sideDistX;
-	double sideDistY;
-
-	double deltaDistX = (rayDirX == 0) ? INFINITY : fabs(1 / rayDirX);
-	double deltaDistY = (rayDirY == 0) ? INFINITY : fabs(1 / rayDirY);
-	// double perpWallDist;
-
-	int stepX;
-	int stepY;
-
-	int hit = 0;
-	int side = 0;
-	
-	if (rayDirX < 0)
+	for (int i = -WIDTH / 2; i < WIDTH / 2; i++)
 	{
-		stepX = -1;
-		sideDistX = (posX - mapX) * deltaDistX;
-	}
-	else
-	{
-		stepX = 1;
-		sideDistX = (1.0 + mapX - posX) * deltaDistX;
-	}
-	if (rayDirY < 0)
-	{
-		stepY = -1;
-		sideDistY = (posY - mapY) * deltaDistY;
-	}
-	else
-	{
-		stepY = 1;
-		sideDistY = (1.0 + mapY - posY) * deltaDistY;
-	}
+		double rayHeading = player->heading;
+		rayHeading += (double) i / WIDTH * FOV;
 
-	while(!hit)
-	{
-		if (sideDistX < sideDistY) //what if equal?
+		// printf("\t\t rayheading %f rad %f deg\n", rayHeading, rayHeading / M_PI * 360);
+		double rayDirX = sin(player->heading + (double) i / WIDTH * FOV ) ;
+		double rayDirY = -cos(player->heading + (double) i / WIDTH * FOV );
+
+		double posX = player->position[1];
+		double posY = player->position[0];
+
+		int mapX = player->position[1];
+		int mapY = player->position[0];
+
+		double sideDistX;
+		double sideDistY;
+
+		double deltaDistX = (rayDirX == 0) ? INFINITY : fabs(1 / rayDirX);
+		double deltaDistY = (rayDirY == 0) ? INFINITY : fabs(1 / rayDirY);
+		double perpWallDist;
+
+		int stepX;
+		int stepY;
+
+		int hit = 0;
+		int side = 0;
+		
+		if (rayDirX < 0)
 		{
-			sideDistX += deltaDistX;
-			mapX += stepX;
-			side = 0;
+			stepX = -1;
+			sideDistX = (posX - mapX) * deltaDistX;
 		}
 		else
 		{
-			sideDistY += deltaDistY;
-			mapY += stepY;
-			side = 1;
+			stepX = 1;
+			sideDistX = (1.0 + mapX - posX) * deltaDistX;
 		}
-		if (map[mapX][mapY] == 1)
+		if (rayDirY < 0)
 		{
-			hit = 1;
-			printf("player in grid %f, %f heading %f is looking at wall at %i %i\n", posX, posY, player->heading, mapX, mapY);
+			stepY = -1;
+			sideDistY = (posY - mapY) * deltaDistY;
+		}
+		else
+		{
+			stepY = 1;
+			sideDistY = (1.0 + mapY - posY) * deltaDistY;
+		}
+
+		while(!hit)
+		{
+			if (sideDistX < sideDistY) //what if equal?
+			{
+				sideDistX += deltaDistX;
+				mapX += stepX;
+				side = 0;
+			}
+			else
+			{
+				sideDistY += deltaDistY;
+				mapY += stepY;
+				side = 1;
+			}
+			if (map[mapY][mapX] == 1)
+			{
+				hit = 1;
+				// printf("player in grid %f, %f heading %f is looking at wall at %i %i\n", posX, posY, player->heading, mapX, mapY);
+			}
+		}
+		double row = player->position[0]; // y
+		double col = player->position[1]; // x
+
+		if (side)
+			perpWallDist = sideDistY - deltaDistY;
+		else
+			perpWallDist = sideDistX - deltaDistX;
+		// multiply by width and height (scale??) to get pixel pos
+		row = row / 6 * SIZE;
+		col = col / 6 * SIZE;
+		while(((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
+		&& ((side && (int) (row / SIZE * 6) != mapY)
+			|| (!side && (int) (col / SIZE * 6) != mapX )))
+		{
+			put_pixel(*p, row, col, 0x00ff00);
+			row += -cos(rayHeading);
+			col += sin(rayHeading);
 		}
 	}
-	
-
-
 }
 
 int	key_hook(int keycode, t_params *params)
@@ -214,6 +239,6 @@ int	key_hook(int keycode, t_params *params)
 		rotate_player(params, 3);
 	else
 		ft_printf("KEY: %i\n", keycode);
-	draw_ray(params);
+	// draw_ray(params);
 	return (1);
 }

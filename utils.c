@@ -63,7 +63,6 @@ void draw_player(t_params p)
 	while ((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
 	{
 		put_pixel(p, row, col, 0xffff00);
-		// row--;
 		row += -cos(player->heading);
 		col += sin(player->heading);
 	}

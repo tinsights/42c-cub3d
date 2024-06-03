@@ -45,8 +45,8 @@ void draw_player(t_params p)
 	// get gridsq of player
 	// this is some f-point number that is bounded by the grid
 	// i.e. [0,0] to say, [6,6]
-	double row = player->position[0];
-	double col = player->position[1];
+	double row = player->position[0]; // y
+	double col = player->position[1]; // x
 
 	// multiply by width and height (scale??) to get pixel pos
 	row = row / 6 * SIZE;
@@ -124,6 +124,77 @@ void strafe_player(t_params *params, int direction)
 	player->position[1] += cos(player->heading) * step * direction;
 }
 
+void draw_ray(t_params *p)
+{
+	t_player *player = p->player;
+
+	double rayDirX = sin(player->heading);
+	double rayDirY = -cos(player->heading);
+
+	double posX = player->position[1];
+	double posY = player->position[0];
+
+	int mapX = player->position[1];
+	int mapY = player->position[0];
+
+	double sideDistX;
+	double sideDistY;
+
+	double deltaDistX = (rayDirX == 0) ? INFINITY : fabs(1 / rayDirX);
+	double deltaDistY = (rayDirY == 0) ? INFINITY : fabs(1 / rayDirY);
+	// double perpWallDist;
+
+	int stepX;
+	int stepY;
+
+	int hit = 0;
+	int side = 0;
+	
+	if (rayDirX < 0)
+	{
+		stepX = -1;
+		sideDistX = (posX - mapX) * deltaDistX;
+	}
+	else
+	{
+		stepX = 1;
+		sideDistX = (1.0 + mapX - posX) * deltaDistX;
+	}
+	if (rayDirY < 0)
+	{
+		stepY = -1;
+		sideDistY = (posY - mapY) * deltaDistY;
+	}
+	else
+	{
+		stepY = 1;
+		sideDistY = (1.0 + mapY - posY) * deltaDistY;
+	}
+
+	while(!hit)
+	{
+		if (sideDistX < sideDistY) //what if equal?
+		{
+			sideDistX += deltaDistX;
+			mapX += stepX;
+			side = 0;
+		}
+		else
+		{
+			sideDistY += deltaDistY;
+			mapY += stepY;
+			side = 1;
+		}
+		if (map[mapX][mapY] == 1)
+		{
+			hit = 1;
+			printf("player in grid %f, %f heading %f is looking at wall at %i %i\n", posX, posY, player->heading, mapX, mapY);
+		}
+	}
+	
+
+
+}
 
 int	key_hook(int keycode, t_params *params)
 {
@@ -143,5 +214,6 @@ int	key_hook(int keycode, t_params *params)
 		rotate_player(params, 3);
 	else
 		ft_printf("KEY: %i\n", keycode);
+	draw_ray(params);
 	return (1);
 }

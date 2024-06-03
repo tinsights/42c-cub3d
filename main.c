@@ -59,10 +59,34 @@ int main(void)
 	mlx_loop(mlx.ptr);
 }
 
+// void draw_ray(t_params p)
+// {
+// 	t_player *player = p.player;
+
+// 	// get gridsq of player
+// 	double row = player->position[0];
+// 	double col = player->position[1];
+
+// 	// multiply by width and height (scale??) to get pixel pos
+// 	row = row / 6 * SIZE;
+// 	col = col / 6 * SIZE;
+
+// 	int mapX = player->position[0];
+// 	int mapY = player->position[1];
+
+	
+
+
+
+// }
+
 int render(t_params *p)
 {
 	draw_grid(*p);
 	draw_player(*p);
+
+	// draw one ray
+	// draw_ray(*p);
 
 	mlx_put_image_to_window(p->mlx->ptr, p->mlx->win, p->mlx->img, 0, 0);
 	return (1);

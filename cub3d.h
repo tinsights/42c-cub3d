@@ -39,7 +39,7 @@ typedef struct s_mlx {
 typedef struct s_player {
 	double		position[2];
 
-	double		heading;
+	double		heading;	// in rads
 } t_player;
 
 typedef struct s_params {

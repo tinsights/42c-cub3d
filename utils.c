@@ -43,6 +43,8 @@ void draw_player(t_params p)
 	t_player *player = p.player;
 
 	// get gridsq of player
+	// this is some f-point number that is bounded by the grid
+	// i.e. [0,0] to say, [6,6]
 	double row = player->position[0];
 	double col = player->position[1];
 
@@ -54,15 +56,19 @@ void draw_player(t_params p)
 		for (int i = row - 4; i < row + 4; i++)
 			put_pixel(p, i, j, 0xffff0000);
 
-	    /* -------------------------------------------------------------------------- */
+	/* -------------------------------------------------------------------------- */
 	/*                        DRAW LINE POINTING TO HEADING                       */
 	/* -------------------------------------------------------------------------- */
 	// get player coords
 	// draw straight line up until row or col hits limit
-
-	while ((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
+	// int pixels = 0;
+	
+	while(((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
+	&& ((int) (row / SIZE * 6) == (int) player->position[0]) 
+	&& ((int) (col / SIZE * 6) == (int) player->position[1]))
 	{
 		put_pixel(p, row, col, 0xffff00);
+		// pixels++;
 		row += -cos(player->heading);
 		col += sin(player->heading);
 	}

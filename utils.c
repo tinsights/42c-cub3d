@@ -19,23 +19,35 @@ void put_pixel(t_params p, t_uint row, t_uint col, int colour)
     char *px = p.mlx->img_addr + row * p.mlx->line_sz + col * (p.mlx->bpp / 8);
     *(t_uint *) px = mlx_get_color_value(p.mlx->ptr, colour);
 }
+#define GRID_HEIGHT SIZE / MHEIGHT
+#define GRID_WIDTH SIZE / MWIDTH
 
 void draw_grid(t_params p)
 {
 	for (int i = 0; i < MHEIGHT; i++)
 		for (int j = 0; j < MWIDTH; j++)
 			if (map[i][j] == 1)
-				for (int row = i * 100; row < (i + 1) * 100; row++)
-					for (int col = j * 100; col < (j + 1) * 100; col++)
-                        put_pixel(p, row, col, 0x888888);
+				for (int row = i * GRID_HEIGHT; row < (i + 1) * GRID_HEIGHT; row++)
+					for (int col = j * GRID_WIDTH; col < (j + 1) * GRID_WIDTH; col++)
+					{
+						if (row == i * GRID_HEIGHT || col == j * GRID_WIDTH)
+			                put_pixel(p, row, col, 0xffffff);
+						else
+                        	put_pixel(p, row, col, 0x888888);
+					}
             else
-                for (int row = i * 100; row < (i + 1) * 100; row++)
-					for (int col = j * 100; col < (j + 1) * 100; col++)
-                        put_pixel(p, row, col, 0x000000);
-	for (int row = 0; row <= SIZE; row++)
-		for (int col = 0; col <= SIZE; col++)
-			if (row % 100 == 0 || col % 100 == 0 || row == SIZE - 1 || col == SIZE - 1)
-                put_pixel(p, row, col, 0xffffff);
+                for (int row = i * GRID_HEIGHT; row < (i + 1) * GRID_HEIGHT; row++)
+					for (int col = j * GRID_WIDTH; col < (j + 1) * GRID_WIDTH; col++)
+					{
+						if (row == i * GRID_HEIGHT || col == j * GRID_WIDTH)
+			                put_pixel(p, row, col, 0xffffff);
+						else
+                        	put_pixel(p, row, col, 0x000000);
+					}
+	// for (int row = 0; row <= SIZE; row++)
+	// 	for (int col = 0; col <= SIZE; col++)
+	// 		if (row % 85 == 0 || col % 85 == 0 || row == SIZE - 1 || col == SIZE - 1)
+    //             put_pixel(p, row, col, 0xffffff);
 }
 
 void draw_player(t_params p)
@@ -86,7 +98,7 @@ int	close_window(t_params *params)
 void rotate_player(t_params *p, int degrees)
 {
     t_player *player = p->player;
-    player->heading += M_PI / 360 * degrees;
+    player->heading += M_PI / 180 * degrees;
     if (degrees > 0)
         printf("turning right, ");
     else
@@ -131,7 +143,7 @@ void draw_ray(t_params *p)
 {
 	t_player *player = p->player;
 
-	for (int i = -WIDTH / 2; i < WIDTH / 2; i++)
+	for (int i = -WIDTH / 2; i <= WIDTH / 2; i++)
 	{
 		double rayHeading = player->heading;
 		rayHeading += (double) i / WIDTH * FOV;
@@ -159,7 +171,7 @@ void draw_ray(t_params *p)
 		int hit = 0;
 		int side = 0;
 		
-		if (rayDirX < 0)
+		if (rayDirX < 0) // looking "left"
 		{
 			stepX = -1;
 			sideDistX = (posX - mapX) * deltaDistX;
@@ -169,7 +181,7 @@ void draw_ray(t_params *p)
 			stepX = 1;
 			sideDistX = (1.0 + mapX - posX) * deltaDistX;
 		}
-		if (rayDirY < 0)
+		if (rayDirY < 0) // looking "up"
 		{
 			stepY = -1;
 			sideDistY = (posY - mapY) * deltaDistY;
@@ -186,18 +198,28 @@ void draw_ray(t_params *p)
 			{
 				sideDistX += deltaDistX;
 				mapX += stepX;
-				side = 0;
+				side = 1;
 			}
 			else
 			{
 				sideDistY += deltaDistY;
 				mapY += stepY;
-				side = 1;
+				side = 0;
 			}
 			if (map[mapY][mapX] == 1)
 			{
 				hit = 1;
-				// printf("player in grid %f, %f heading %f is looking at wall at %i %i\n", posX, posY, player->heading, mapX, mapY);
+				// if (sideDistX != sideDistY)
+				// {
+				// 	printf("player in grid %f, %f heading %f is looking at wall at %i %i ", posX, posY, player->heading / M_PI * 180, mapX, mapY);
+				// 	if (side)
+				// 		printf("from the sides\n");
+				// 	else
+				// 		printf("vertically\n");
+				// 	printf("deltaDistX is %f deltaDistY is %f\n", deltaDistX, deltaDistY);
+				// }
+				// else
+				// 	printf("equal sidedists!\n");
 			}
 		}
 		double row = player->position[0]; // y
@@ -211,8 +233,8 @@ void draw_ray(t_params *p)
 		row = row / MHEIGHT * SIZE;
 		col = col / MWIDTH * SIZE;
 		while(((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
-		&& ((side && (int) (row / SIZE * MHEIGHT) != mapY)
-			|| (!side && (int) (col / SIZE * MWIDTH) != mapX )))
+		&& ((!side && (int) (row / SIZE * MHEIGHT) != mapY)
+			|| (side && (int) (col / SIZE * MWIDTH) != mapX )))
 		{
 			put_pixel(*p, row, col, 0x00ff00);
 			row += -cos(rayHeading);

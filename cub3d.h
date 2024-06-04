@@ -22,8 +22,9 @@
 
 #define SIZE 600
 
-# define MHEIGHT 6
-# define MWIDTH 6
+# define MHEIGHT 8
+# define MWIDTH 8
+extern int map[MHEIGHT][MWIDTH];
 
 typedef unsigned int t_uint;
 typedef unsigned long t_ulong;
@@ -59,6 +60,5 @@ void draw_grid(t_params p);
 int render(t_params *p);
 
 
-extern int map[6][6];
 
 #endif

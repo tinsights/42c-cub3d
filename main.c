@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-int map[6][6] = {
+int map[MHEIGHT][MWIDTH] = {
 {1,1,1,1,1,1},
 {1,0,0,1,0,1},
 {1,0,0,0,0,1},
@@ -64,10 +64,11 @@ void draw_ray(t_params *p);
 int render(t_params *p)
 {
 	draw_grid(*p);
-	draw_player(*p);
 
 	// draw one ray
 	draw_ray(p);
+	draw_player(*p);
+
 
 	mlx_put_image_to_window(p->mlx->ptr, p->mlx->win, p->mlx->img, 0, 0);
 	return (1);

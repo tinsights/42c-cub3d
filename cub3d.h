@@ -22,6 +22,9 @@
 
 #define SIZE 600
 
+# define MHEIGHT 6
+# define MWIDTH 6
+
 typedef unsigned int t_uint;
 typedef unsigned long t_ulong;
 

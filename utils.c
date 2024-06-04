@@ -22,8 +22,8 @@ void put_pixel(t_params p, t_uint row, t_uint col, int colour)
 
 void draw_grid(t_params p)
 {
-	for (int i = 0; i < 6; i++)
-		for (int j = 0; j < 6; j++)
+	for (int i = 0; i < MHEIGHT; i++)
+		for (int j = 0; j < MWIDTH; j++)
 			if (map[i][j] == 1)
 				for (int row = i * 100; row < (i + 1) * 100; row++)
 					for (int col = j * 100; col < (j + 1) * 100; col++)
@@ -49,8 +49,8 @@ void draw_player(t_params p)
 	double col = player->position[1]; // x
 
 	// multiply by width and height (scale??) to get pixel pos
-	row = row / 6 * SIZE;
-	col = col / 6 * SIZE;
+	row = row / MHEIGHT * SIZE;
+	col = col / MWIDTH * SIZE;
 
 	for (int j = col - 4; j < col + 4; j++)
 		for (int i = row - 4; i < row + 4; i++)
@@ -64,8 +64,8 @@ void draw_player(t_params p)
 	// int pixels = 0;
 	
 	while(((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
-	&& ((int) (row / SIZE * 6) == (int) player->position[0]) 
-	&& ((int) (col / SIZE * 6) == (int) player->position[1]))
+	&& ((int) (row / SIZE * MHEIGHT) == (int) player->position[0]) 
+	&& ((int) (col / SIZE * MWIDTH) == (int) player->position[1]))
 	{
 		put_pixel(p, row, col, 0xffff00);
 		// pixels++;
@@ -208,11 +208,11 @@ void draw_ray(t_params *p)
 		else
 			perpWallDist = sideDistX - deltaDistX;
 		// multiply by width and height (scale??) to get pixel pos
-		row = row / 6 * SIZE;
-		col = col / 6 * SIZE;
+		row = row / MHEIGHT * SIZE;
+		col = col / MWIDTH * SIZE;
 		while(((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
-		&& ((side && (int) (row / SIZE * 6) != mapY)
-			|| (!side && (int) (col / SIZE * 6) != mapX )))
+		&& ((side && (int) (row / SIZE * MHEIGHT) != mapY)
+			|| (!side && (int) (col / SIZE * MWIDTH) != mapX )))
 		{
 			put_pixel(*p, row, col, 0x00ff00);
 			row += -cos(rayHeading);
@@ -237,6 +237,10 @@ int	key_hook(int keycode, t_params *params)
 		rotate_player(params, -3);
 	else if (keycode == XK_Right)
 		rotate_player(params, 3);
+	else if (keycode == 65451)
+		FOV += M_PI / 30;
+	else if (keycode == 65453)
+		FOV -= M_PI / 30;
 	else
 		ft_printf("KEY: %i\n", keycode);
 	// draw_ray(params);

@@ -105,8 +105,8 @@ void rotate_player(t_params *p, int degrees)
         printf("turning left, ");
 
     printf("%f %f\n", player->heading, player->heading / M_PI * 360);
-    printf("sine of heading: %f\n", sin(player->heading));
-    printf("cosine of heading: %f\n", cos(player->heading));
+    printf("sine of heading: %f\n", sinf(player->heading));
+    printf("cosine of heading: %f\n", cosf(player->heading));
     printf("==============\n");
 }
 
@@ -120,8 +120,8 @@ void move_player(t_params *params, int direction)
 
 	double step = 0.1;
 
-	player->position[0] += cos(player->heading) * step * direction;
-	player->position[1] += -sin(player->heading) * step * direction;
+	player->position[0] += cosf(player->heading) * step * direction;
+	player->position[1] += -sinf(player->heading) * step * direction;
 	printf("player pos: %f %f\n", player->position[0], player->position[1]);
 }
 
@@ -132,25 +132,24 @@ void strafe_player(t_params *params, int direction)
 
 	double step = 0.1;
 
-	player->position[0] += sin(player->heading) * step * direction;
-	player->position[1] += cos(player->heading) * step * direction;
+	player->position[0] += sinf(player->heading) * step * direction;
+	player->position[1] += cosf(player->heading) * step * direction;
 }
 
 double FOV = M_PI / 3; // degrees? 66? 60?
-int WIDTH = 600; // how wide?
 
 void draw_ray(t_params *p)
 {
 	t_player *player = p->player;
 
-	for (int i = -WIDTH / 2; i <= WIDTH / 2; i++)
+	for (int i = -SIZE / 2; i <= SIZE / 2; i++)
 	{
 		double rayHeading = player->heading;
-		rayHeading += (double) i / WIDTH * FOV;
+		rayHeading += (double) i / SIZE * FOV;
 
-		// printf("\t\t rayheading %f rad %f deg\n", rayHeading, rayHeading / M_PI * 360);
-		double rayDirX = sin(player->heading + (double) i / WIDTH * FOV ) ;
-		double rayDirY = -cos(player->heading + (double) i / WIDTH * FOV );
+		// printf("\t\t rayheading %f rad %f deg\n", rayHeading, rayHeading / M_PI * 180);
+		double rayDirX = sinf(rayHeading) ;
+		double rayDirY = -cosf(rayHeading);
 
 		double posX = player->position[1];
 		double posY = player->position[0];
@@ -222,23 +221,56 @@ void draw_ray(t_params *p)
 				// 	printf("equal sidedists!\n");
 			}
 		}
-		double row = player->position[0]; // y
-		double col = player->position[1]; // x
 
-		if (side)
+
+		if (!side)
 			perpWallDist = sideDistY - deltaDistY;
 		else
 			perpWallDist = sideDistX - deltaDistX;
-		// multiply by width and height (scale??) to get pixel pos
-		row = row / MHEIGHT * SIZE;
-		col = col / MWIDTH * SIZE;
-		while(((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
-		&& ((!side && (int) (row / SIZE * MHEIGHT) != mapY)
-			|| (side && (int) (col / SIZE * MWIDTH) != mapX )))
+		// printf("pwd before: %f\n", perpWallDist);
+		perpWallDist *= cosf(i * FOV / SIZE); // - 30 to 30
+		// printf("factor: %f\n", cosf(i * FOV / SIZE));
+		// printf("pwd after: %f\n", perpWallDist);
+		/* -------------------------------------------------------------------------- */
+		/*                         Drawing 2d Rays for minimap                        */
+		/* -------------------------------------------------------------------------- */
+		// double row = player->position[0]; // y
+		// double col = player->position[1]; // x
+		// // multiply by width and height (scale??) to get pixel pos
+		// row = row / MHEIGHT * SIZE;
+		// col = col / MWIDTH * SIZE;
+		// while(((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
+		// && ((!side && (int) (row / SIZE * MHEIGHT) != mapY)
+		// 	|| (side && (int) (col / SIZE * MWIDTH) != mapX )))
+		// {
+		// 	put_pixel(*p, row, col, 0x00ff00);
+		// 	row += -cos(rayHeading);
+		// 	col += sin(rayHeading);
+		// }
+
+		int unit_height = SIZE * 0.5; // a wall 1 unit grid away will take up 80% of my screen height
+		int lineHeight = unit_height / perpWallDist;
+
+		int bottomOfWall = SIZE / 2 + lineHeight / 2;
+		if (bottomOfWall >= SIZE)
+			bottomOfWall = SIZE - 1;
+		int topOfWall = SIZE / 2 - lineHeight / 2;
+		if (topOfWall < 0)
+			topOfWall = 0;
+
+		// printf("unit height is %i, perpWallDist is %f\n", unit_height, perpWallDist);
+		// printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottomOfWall, topOfWall);
+		int color = 0x0000ff;
+		if (side)
+			color /= 2;
+		for (int px = 0; px < SIZE; px++)
 		{
-			put_pixel(*p, row, col, 0x00ff00);
-			row += -cos(rayHeading);
-			col += sin(rayHeading);
+			if (px <= topOfWall)
+				put_pixel(*p, px, i + SIZE / 2, 0x888888);
+			else if (px >= bottomOfWall)
+				put_pixel(*p, px, i + SIZE / 2, 0x333333);
+			else
+				put_pixel(*p, px, i + SIZE / 2, color);
 		}
 	}
 }

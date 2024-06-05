@@ -20,7 +20,7 @@
 #include <X11/keysym.h>
 #include <X11/X.h>
 
-#define SIZE 600
+#define SIZE 1000
 
 # define MHEIGHT 8
 # define MWIDTH 8

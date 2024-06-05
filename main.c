@@ -13,14 +13,14 @@
 #include "cub3d.h"
 
 int map[MHEIGHT][MWIDTH] = {
-{1,1,1,1,1,1,1,1},
-{1,0,0,1,0,0,0,1},
-{1,0,0,0,0,1,0,1},
-{1,1,0,0,0,0,0,1},
-{1,0,0,0,0,0,0,1},
-{1,0,0,0,1,0,0,1},
-{1,0,0,0,0,0,0,1},
-{1,1,1,1,1,1,1,1},
+{2,2,2,2,2,2,2,2},
+{2,0,0,1,0,0,0,2},
+{2,0,0,0,0,1,0,2},
+{2,1,0,0,0,0,0,2},
+{2,0,0,0,0,0,0,2},
+{2,0,0,0,1,0,0,2},
+{2,0,0,0,0,0,0,2},
+{2,2,2,2,2,2,2,2},
 };
 
 int main(void)
@@ -33,8 +33,8 @@ int main(void)
 	t_mlx mlx;
 	params.mlx = &mlx;
 	mlx.ptr = mlx_init();
-	mlx.win= mlx_new_window(mlx.ptr, SIZE, SIZE, "cub3d");
-	mlx.img = mlx_new_image(mlx.ptr, SIZE, SIZE);
+	mlx.win= mlx_new_window(mlx.ptr, WIN_WIDTH, WIN_HEIGHT, "cub3d");
+	mlx.img = mlx_new_image(mlx.ptr, WIN_WIDTH, WIN_HEIGHT);
 	if (!mlx.ptr || !mlx.win || !mlx.img)
 		ft_putstr_fd("Error initialising mlx\n", 2);
 

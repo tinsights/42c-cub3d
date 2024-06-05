@@ -19,8 +19,8 @@ void put_pixel(t_params p, t_uint row, t_uint col, int colour)
     char *px = p.mlx->img_addr + row * p.mlx->line_sz + col * (p.mlx->bpp / 8);
     *(t_uint *) px = mlx_get_color_value(p.mlx->ptr, colour);
 }
-#define GRID_HEIGHT SIZE / MHEIGHT
-#define GRID_WIDTH SIZE / MWIDTH
+#define GRID_HEIGHT WIN_HEIGHT / MHEIGHT
+#define GRID_WIDTH WIN_WIDTH / MWIDTH
 
 void draw_grid(t_params p)
 {
@@ -61,8 +61,8 @@ void draw_player(t_params p)
 	double col = player->position[1]; // x
 
 	// multiply by width and height (scale??) to get pixel pos
-	row = row / MHEIGHT * SIZE;
-	col = col / MWIDTH * SIZE;
+	row = row / MHEIGHT * WIN_HEIGHT;
+	col = col / MWIDTH * WIN_WIDTH;
 
 	for (int j = col - 4; j < col + 4; j++)
 		for (int i = row - 4; i < row + 4; i++)
@@ -75,9 +75,9 @@ void draw_player(t_params p)
 	// draw straight line up until row or col hits limit
 	// int pixels = 0;
 	
-	while(((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
-	&& ((int) (row / SIZE * MHEIGHT) == (int) player->position[0]) 
-	&& ((int) (col / SIZE * MWIDTH) == (int) player->position[1]))
+	while(((row >= 0 && row < WIN_HEIGHT) && (col >= 0 && col < WIN_WIDTH))
+	&& ((int) (row / WIN_HEIGHT * MHEIGHT) == (int) player->position[0]) 
+	&& ((int) (col / WIN_WIDTH * MWIDTH) == (int) player->position[1]))
 	{
 		put_pixel(p, row, col, 0xffff00);
 		// pixels++;
@@ -138,14 +138,17 @@ void strafe_player(t_params *params, int direction)
 
 double FOV = M_PI / 3; // degrees? 66? 60?
 
+int centerOfScreen = 0;
+int playerHeight = 0;
+
 void draw_ray(t_params *p)
 {
 	t_player *player = p->player;
 
-	for (int i = -SIZE / 2; i <= SIZE / 2; i++)
+	for (int i = -WIN_WIDTH / 2; i <= WIN_WIDTH / 2; i++)
 	{
 		double rayHeading = player->heading;
-		rayHeading += (double) i / SIZE * FOV;
+		rayHeading += (double) i / WIN_WIDTH * FOV;
 
 		// printf("\t\t rayheading %f rad %f deg\n", rayHeading, rayHeading / M_PI * 180);
 		double rayDirX = sinf(rayHeading) ;
@@ -205,7 +208,7 @@ void draw_ray(t_params *p)
 				mapY += stepY;
 				side = 0;
 			}
-			if (map[mapY][mapX] == 1)
+			if (map[mapY][mapX] != 0)
 			{
 				hit = 1;
 				// if (sideDistX != sideDistY)
@@ -228,8 +231,8 @@ void draw_ray(t_params *p)
 		else
 			perpWallDist = sideDistX - deltaDistX;
 		// printf("pwd before: %f\n", perpWallDist);
-		perpWallDist *= cosf(i * FOV / SIZE); // - 30 to 30
-		// printf("factor: %f\n", cosf(i * FOV / SIZE));
+		perpWallDist *= cosf(i * FOV / WIN_WIDTH); // - 30 to 30
+		// printf("factor: %f\n", cosf(i * FOV / WIN_WIDTH));
 		// printf("pwd after: %f\n", perpWallDist);
 		/* -------------------------------------------------------------------------- */
 		/*                         Drawing 2d Rays for minimap                        */
@@ -237,41 +240,44 @@ void draw_ray(t_params *p)
 		// double row = player->position[0]; // y
 		// double col = player->position[1]; // x
 		// // multiply by width and height (scale??) to get pixel pos
-		// row = row / MHEIGHT * SIZE;
-		// col = col / MWIDTH * SIZE;
-		// while(((row >= 0 && row < SIZE) && (col >= 0 && col < SIZE))
-		// && ((!side && (int) (row / SIZE * MHEIGHT) != mapY)
-		// 	|| (side && (int) (col / SIZE * MWIDTH) != mapX )))
+		// row = row / MHEIGHT * WIN_HEIGHT;
+		// col = col / MWIDTH * WIN_WIDTH;
+		// while(((row >= 0 && row < WIN_HEIGHT) && (col >= 0 && col < WIN_WIDTH))
+		// && ((!side && (int) (row / WIN_HEIGHT * MHEIGHT) != mapY)
+		// 	|| (side && (int) (col / WIN_WIDTH * MWIDTH) != mapX )))
 		// {
 		// 	put_pixel(*p, row, col, 0x00ff00);
 		// 	row += -cos(rayHeading);
 		// 	col += sin(rayHeading);
 		// }
 
-		int unit_height = SIZE * 0.5; // a wall 1 unit grid away will take up 80% of my screen height
-		int lineHeight = unit_height / perpWallDist;
+		// int unit_height = WIN_HEIGHT * 0.5; // a wall 1 unit grid away will take up 80% of my screen height
+		// int lineHeight = unit_height / perpWallDist;
 
-		int bottomOfWall = SIZE / 2 + lineHeight / 2;
-		if (bottomOfWall >= SIZE)
-			bottomOfWall = SIZE - 1;
-		int topOfWall = SIZE / 2 - lineHeight / 2;
-		if (topOfWall < 0)
-			topOfWall = 0;
+		// int trueBottomOfWall = (WIN_HEIGHT / 2) + centerOfScreen + lineHeight / 2;
+		// int bottomOfWall = trueBottomOfWall;
+		// if (bottomOfWall >= WIN_HEIGHT)
+		// 	bottomOfWall = WIN_HEIGHT - 1;
+		// int trueTopOfWall = (WIN_HEIGHT / 2) + centerOfScreen - lineHeight / 2;
+		// int topOfWall = trueTopOfWall;
+		// if (topOfWall < 0)
+		// 	topOfWall = 0;
 
-		// printf("unit height is %i, perpWallDist is %f\n", unit_height, perpWallDist);
-		// printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottomOfWall, topOfWall);
-		int color = 0x0000ff;
-		if (side)
-			color /= 2;
-		for (int px = 0; px < SIZE; px++)
-		{
-			if (px <= topOfWall)
-				put_pixel(*p, px, i + SIZE / 2, 0x888888);
-			else if (px >= bottomOfWall)
-				put_pixel(*p, px, i + SIZE / 2, 0x333333);
-			else
-				put_pixel(*p, px, i + SIZE / 2, color);
-		}
+		// // printf("unit height is %i, perpWallDist is %f\n", unit_height, perpWallDist);
+		// // printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottomOfWall, topOfWall);
+		// int color = map[mapY][mapX] == 1? 0x0000ff : 0x880000;
+		// if (side)
+		// 	color /= 2;
+		// for (int px = 0; px < WIN_HEIGHT; px++)
+		// {
+		// 	// color = color *(1 - ((double) px / (trueBottomOfWall)))
+		// 	if (px <= topOfWall )
+		// 		put_pixel(*p, px, i + WIN_WIDTH / 2, 0x888888);
+		// 	else if (px>= bottomOfWall )
+		// 		put_pixel(*p, px, i + WIN_WIDTH / 2, 0x333333);
+		// 	else
+		// 		put_pixel(*p, px, i + WIN_WIDTH / 2, color);
+		// }
 	}
 }
 
@@ -295,6 +301,20 @@ int	key_hook(int keycode, t_params *params)
 		FOV += M_PI / 30;
 	else if (keycode == 65453)
 		FOV -= M_PI / 30;
+	else if (keycode == XK_Up)
+		centerOfScreen += WIN_HEIGHT / 10;
+	else if (keycode == XK_Down)
+		centerOfScreen -= WIN_HEIGHT / 10;
+	else if (keycode == XK_Control_L)
+	{
+		playerHeight -= WIN_HEIGHT / 10;
+		centerOfScreen -= WIN_HEIGHT / 10;
+	}
+	else if (keycode == XK_space)
+	{
+		playerHeight += WIN_HEIGHT / 10;
+		centerOfScreen += WIN_HEIGHT / 10;
+	}
 	else
 		ft_printf("KEY: %i\n", keycode);
 	// draw_ray(params);

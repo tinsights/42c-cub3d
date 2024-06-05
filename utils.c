@@ -136,7 +136,7 @@ void strafe_player(t_params *params, int direction)
 	player->position[1] += cosf(player->heading) * step * direction;
 }
 
-double FOV = M_PI / 3; // degrees? 66? 60?
+double FOV = M_PI / (180.0 / 66.0); // degrees? 66? 60?
 
 int centerOfScreen = 0;
 int playerHeight = 0;
@@ -251,33 +251,33 @@ void draw_ray(t_params *p)
 		// 	col += sin(rayHeading);
 		// }
 
-		// int unit_height = WIN_HEIGHT * 0.5; // a wall 1 unit grid away will take up 80% of my screen height
-		// int lineHeight = unit_height / perpWallDist;
+		int unit_height = WIN_HEIGHT * 0.5; // a wall 1 unit grid away will take up 80% of my screen height
+		int lineHeight = unit_height / perpWallDist;
 
-		// int trueBottomOfWall = (WIN_HEIGHT / 2) + centerOfScreen + lineHeight / 2;
-		// int bottomOfWall = trueBottomOfWall;
-		// if (bottomOfWall >= WIN_HEIGHT)
-		// 	bottomOfWall = WIN_HEIGHT - 1;
-		// int trueTopOfWall = (WIN_HEIGHT / 2) + centerOfScreen - lineHeight / 2;
-		// int topOfWall = trueTopOfWall;
-		// if (topOfWall < 0)
-		// 	topOfWall = 0;
+		int trueBottomOfWall = (WIN_HEIGHT / 2) + centerOfScreen + lineHeight / 2;
+		int bottomOfWall = trueBottomOfWall;
+		if (bottomOfWall >= WIN_HEIGHT)
+			bottomOfWall = WIN_HEIGHT - 1;
+		int trueTopOfWall = (WIN_HEIGHT / 2) + centerOfScreen - lineHeight / 2;
+		int topOfWall = trueTopOfWall;
+		if (topOfWall < 0)
+			topOfWall = 0;
 
-		// // printf("unit height is %i, perpWallDist is %f\n", unit_height, perpWallDist);
-		// // printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottomOfWall, topOfWall);
-		// int color = map[mapY][mapX] == 1? 0x0000ff : 0x880000;
-		// if (side)
-		// 	color /= 2;
-		// for (int px = 0; px < WIN_HEIGHT; px++)
-		// {
-		// 	// color = color *(1 - ((double) px / (trueBottomOfWall)))
-		// 	if (px <= topOfWall )
-		// 		put_pixel(*p, px, i + WIN_WIDTH / 2, 0x888888);
-		// 	else if (px>= bottomOfWall )
-		// 		put_pixel(*p, px, i + WIN_WIDTH / 2, 0x333333);
-		// 	else
-		// 		put_pixel(*p, px, i + WIN_WIDTH / 2, color);
-		// }
+		// printf("unit height is %i, perpWallDist is %f\n", unit_height, perpWallDist);
+		// printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottomOfWall, topOfWall);
+		int color = map[mapY][mapX] == 1? 0x0000ff : 0x880000;
+		if (side)
+			color /= 2;
+		for (int px = 0; px < WIN_HEIGHT; px++)
+		{
+			// color = color *(1 - ((double) px / (trueBottomOfWall)))
+			if (px <= topOfWall )
+				put_pixel(*p, px, i + WIN_WIDTH / 2, 0x888888);
+			else if (px>= bottomOfWall )
+				put_pixel(*p, px, i + WIN_WIDTH / 2, 0x333333);
+			else
+				put_pixel(*p, px, i + WIN_WIDTH / 2, color);
+		}
 	}
 }
 

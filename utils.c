@@ -136,7 +136,7 @@ void strafe_player(t_params *params, int direction)
 	player->position[1] += cosf(player->heading) * step * direction;
 }
 
-double FOV = M_PI / (180.0 / 66.0); // degrees? 66? 60?
+double FOV = M_PI / 3; // degrees? 66? 60?
 
 int centerOfScreen = 0;
 int playerHeight = 0;
@@ -231,7 +231,7 @@ void draw_ray(t_params *p)
 		else
 			perpWallDist = sideDistX - deltaDistX;
 		// printf("pwd before: %f\n", perpWallDist);
-		perpWallDist *= cosf(i * FOV / WIN_WIDTH); // - 30 to 30
+		perpWallDist *= cosf((double) i * FOV / WIN_WIDTH); // - 30 to 30
 		// printf("factor: %f\n", cosf(i * FOV / WIN_WIDTH));
 		// printf("pwd after: %f\n", perpWallDist);
 		/* -------------------------------------------------------------------------- */

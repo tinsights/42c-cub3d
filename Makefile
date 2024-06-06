@@ -11,15 +11,16 @@ MLXDIR = mlx/
 MLX =  $(MLXDIR)/libmlx.a
 
 SRCS = main.c utils.c
+HDRS = cub3d.h
 
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(LIBFT) $(MLX)
+$(NAME): $(OBJS) $(LIBFT) $(MLX) $(HDRS) Makefile
 	cc $(CFLAGS) $(OBJS) $(LIBFLAGS) $(INC) -o $(NAME)
 
-$(OBJS): $(SRCS)
+$(OBJS): $(SRCS) $(HDRS)
 	cc $(CFLAGS) -c $(SRCS) $(INC)
 
 $(MLX):

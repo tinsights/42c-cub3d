@@ -21,10 +21,10 @@
 #include <X11/X.h>
 
 #define WIN_WIDTH 1280
-#define WIN_HEIGHT 1024
+#define WIN_HEIGHT 960
 
 # define MHEIGHT 8
-# define MWIDTH 8
+# define MWIDTH 24
 extern int map[MHEIGHT][MWIDTH];
 
 typedef unsigned int t_uint;

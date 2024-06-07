@@ -110,6 +110,9 @@ void rotate_player(t_params *p, int degrees)
     printf("==============\n");
 }
 
+int centerOfScreen = WIN_HEIGHT / 2;
+double playerHeight = 0.5;
+double playerVertAngle = 0;
 
 /** TODO:
  * 		- convert to singular rotation matrix
@@ -118,10 +121,13 @@ void move_player(t_params *params, int direction)
 {
 	t_player *player = params->player;
 
-	double step = 0.1;
+	double horizStep = 0.1 * cos(playerVertAngle);
+	double vertStep = 0.1 * sin(playerVertAngle);
 
-	player->position[0] += cos(player->heading) * step * direction;
-	player->position[1] += -sin(player->heading) * step * direction;
+	playerHeight += vertStep;
+
+	player->position[0] += cos(player->heading) * horizStep * direction;
+	player->position[1] += -sin(player->heading) * horizStep * direction;
 	printf("player pos: %f %f\n", player->position[0], player->position[1]);
 }
 
@@ -132,27 +138,41 @@ void strafe_player(t_params *params, int direction)
 
 	double step = 0.1;
 
+	// double vertAngle = WIN_HEIGHT / 2 - centerOfScreen;
+
 	player->position[0] += sin(player->heading) * step * direction;
 	player->position[1] += cos(player->heading) * step * direction;
 }
 
-double FOV = (66.0 / 180.0 * M_PI); // degrees? 66? 60?
+double FOV = (76.0 / 180.0 * M_PI); // degrees? 66? 60?
 
-int centerOfScreen = 0;
-int playerHeight = 0;
+
 
 void draw_ray(t_params *p)
 {
 	t_player *player = p->player;
 
+	double forwardX = sin(player->heading);
+	double forwardY = -cos(player->heading);
+	double projection_plane_width = tan(FOV / 2.0);
+	// printf("ppw: %f\n", projection_plane_width);
+
+	double rightX = -forwardY * projection_plane_width;
+	double rightY = forwardX * projection_plane_width;
+
 	for (int i = -WIN_WIDTH / 2; i < WIN_WIDTH / 2; i++)
 	{
-		double rayHeading = player->heading;
-		rayHeading += (double) i / WIN_WIDTH * FOV;
+		double progress = ((double) i + WIN_WIDTH / 2) / WIN_WIDTH - 0.5;
 
+		// double rayHeading = player->heading;
+		// rayHeading += (double) i / WIN_WIDTH * FOV;
 		// printf("\t\t rayheading %f rad %f deg\n", rayHeading, rayHeading / M_PI * 180);
-		double rayDirX = sin(rayHeading);
-		double rayDirY = -cos(rayHeading);
+
+		double rayDirX = forwardX + progress * rightX;
+		double rayDirY = forwardY + progress * rightY;
+
+
+		// double rayHeading = sqrt(rayDirX * rayDirX + rayDirY * rayDirY);
 
 		double posX = player->position[1];
 		double posY = player->position[0];
@@ -163,8 +183,8 @@ void draw_ray(t_params *p)
 		double sideDistX;
 		double sideDistY;
 
-		double deltaDistX = (rayDirX == 0) ? INFINITY :sqrt(1 / (rayDirX * rayDirX));
-		double deltaDistY = (rayDirY == 0) ? INFINITY :sqrt(1 / (rayDirY * rayDirY));
+		double deltaDistX = (rayDirX == 0) ? INFINITY : fabs(1 / rayDirX );
+		double deltaDistY = (rayDirY == 0) ? INFINITY : fabs(1 / rayDirY );
 		double perpWallDist;
 
 		int stepX;
@@ -242,19 +262,19 @@ void draw_ray(t_params *p)
 		// 	printf("pwd before: %f\n", perpWallDist);
 		// }
 
-		long double factor = fabs(cos((double) (i + 1) * FOV / WIN_WIDTH));
-		perpWallDist *= factor; // - 30 to 30
+		// long double factor = fabs(cos((double) (i) * FOV / WIN_WIDTH));
+		// perpWallDist *= factor; // - 30 to 30
 		// if (i == 0)
 		// 	printf("direct perp wall dist: %f\n", perpWallDist);
-		if (i == WIN_WIDTH / 2 - 1)
-		{
-			// printf("pwd before: %f\n", perpWallDist);
-			printf("FOV: %f %f\n", FOV, FOV * 180 / M_PI);
-			double angle = (double) (i + 1) * FOV / WIN_WIDTH;
-			printf("angle: %f %f\n", angle, angle / M_PI * 180);
-			// printf("factor: %Lf\n", factor);
-			printf("pwd after: %f\n", perpWallDist);
-		}
+		// if (i == WIN_WIDTH / 2 - 1)
+		// {
+		// 	// printf("pwd before: %f\n", perpWallDist);
+		// 	printf("FOV: %f %f\n", FOV, FOV * 180 / M_PI);
+		// 	double angle = (double) (i + 1) * FOV / WIN_WIDTH;
+		// 	printf("angle: %f %f\n", angle, angle / M_PI * 180);
+		// 	// printf("factor: %Lf\n", factor);
+		// 	printf("pwd after: %f\n", perpWallDist);
+		// }
 		/* -------------------------------------------------------------------------- */
 		/*                         Drawing 2d Rays for minimap                        */
 		/* -------------------------------------------------------------------------- */
@@ -272,16 +292,19 @@ void draw_ray(t_params *p)
 		// 	col += sin(rayHeading);
 		// }
 
-		double distToProjectionPlane = (WIN_WIDTH / 2) / (tan(FOV / 2));
+		double distToProjectionPlane = (WIN_WIDTH) / (tan(FOV / 2));
+		
+		double ratio = distToProjectionPlane / perpWallDist;
 
-		double unit_height = (double)1; // a wall 1 unit grid away will take up 80% of my screen height
-		double lineHeight = (double)unit_height / perpWallDist * distToProjectionPlane;
+		// double unit_height = (double)1; // a wall 1 unit grid away will take up 80% of my screen height
+		// double lineHeight = (double)unit_height / perpWallDist;
 
-		int trueBottomOfWall = (WIN_HEIGHT / 2) + centerOfScreen + lineHeight / 2;
+		int trueBottomOfWall = ratio * playerHeight + centerOfScreen;
+		int trueTopOfWall = trueBottomOfWall - ratio;
+
 		int bottomOfWall = trueBottomOfWall;
 		if (bottomOfWall >= WIN_HEIGHT)
 			bottomOfWall = WIN_HEIGHT - 1;
-		int trueTopOfWall = (WIN_HEIGHT / 2) + centerOfScreen - lineHeight / 2;
 		int topOfWall = trueTopOfWall;
 		if (topOfWall < 0)
 			topOfWall = 0;
@@ -325,18 +348,25 @@ int	key_hook(int keycode, t_params *params)
 	else if (keycode == 65453)
 		FOV -= M_PI / 30;
 	else if (keycode == XK_Up)
-		centerOfScreen += WIN_HEIGHT / 10;
+	{
+		playerVertAngle += M_PI / 180; // 2 degs
+		// printf("%f %f\n", playerVertAngle, cos(playerVertAngle));
+		centerOfScreen += 10;
+	}
 	else if (keycode == XK_Down)
-		centerOfScreen -= WIN_HEIGHT / 10;
+	{
+		playerVertAngle -= M_PI / 180; // 2degs
+		centerOfScreen -= 10;
+	}
 	else if (keycode == XK_Control_L)
 	{
-		playerHeight -= WIN_HEIGHT / 10;
-		centerOfScreen -= WIN_HEIGHT / 10;
+		playerHeight -= 0.1;
+		// centerOfScreen += WIN_HEIGHT / 20;	
 	}
 	else if (keycode == XK_space)
 	{
-		playerHeight += WIN_HEIGHT / 10;
-		centerOfScreen += WIN_HEIGHT / 10;
+		playerHeight += 0.1;
+		// centerOfScreen -= WIN_HEIGHT / 20;
 	}
 	else
 		ft_printf("KEY: %i\n", keycode);

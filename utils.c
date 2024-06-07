@@ -314,6 +314,15 @@ void draw_ray(t_params *p)
 		int color = map[mapY][mapX] == 1 ? 0x0000ff : 0x880000;
 		if (side)
 			color /= 2;
+		
+		double flashAngle = perpWallDist + cos((double) (i / WIN_WIDTH * FOV));
+		if (flashAngle > 8)
+			color /= 2;
+		else if (flashAngle > 12)
+			color /= 4;
+
+			
+
 		for (int px = 0; px < WIN_HEIGHT; px++)
 		{
 			// color = color *(1 - ((double) px / (trueBottomOfWall)))

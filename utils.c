@@ -163,8 +163,8 @@ void draw_ray(t_params *p)
 		double sideDistX;
 		double sideDistY;
 
-		double deltaDistX = (rayDirX == 0) ? INFINITY : fabs(1 / rayDirX);
-		double deltaDistY = (rayDirY == 0) ? INFINITY : fabs(1 / rayDirY);
+		double deltaDistX = (rayDirX == 0) ? INFINITY :sqrt(1 / (rayDirX * rayDirX));
+		double deltaDistY = (rayDirY == 0) ? INFINITY :sqrt(1 / (rayDirY * rayDirY));
 		double perpWallDist;
 
 		int stepX;
@@ -244,17 +244,17 @@ void draw_ray(t_params *p)
 
 		long double factor = fabs(cos((double) (i + 1) * FOV / WIN_WIDTH));
 		perpWallDist *= factor; // - 30 to 30
-		if (i == 0)
-			printf("direct perp wall dist: %f\n", perpWallDist);
-		// if (i == WIN_WIDTH / 2 - 1)
-		// {
-		// 	// printf("pwd before: %f\n", perpWallDist);
-		// 	printf("FOV: %f %f\n", FOV, FOV * 180 / M_PI);
-		// 	double angle = (double) (i + 1) * FOV / WIN_WIDTH;
-		// 	printf("angle: %f %f\n", angle, angle / M_PI * 180);
-		// 	// printf("factor: %Lf\n", factor);
-		// 	printf("pwd after: %f\n", perpWallDist);
-		// }
+		// if (i == 0)
+		// 	printf("direct perp wall dist: %f\n", perpWallDist);
+		if (i == WIN_WIDTH / 2 - 1)
+		{
+			// printf("pwd before: %f\n", perpWallDist);
+			printf("FOV: %f %f\n", FOV, FOV * 180 / M_PI);
+			double angle = (double) (i + 1) * FOV / WIN_WIDTH;
+			printf("angle: %f %f\n", angle, angle / M_PI * 180);
+			// printf("factor: %Lf\n", factor);
+			printf("pwd after: %f\n", perpWallDist);
+		}
 		/* -------------------------------------------------------------------------- */
 		/*                         Drawing 2d Rays for minimap                        */
 		/* -------------------------------------------------------------------------- */

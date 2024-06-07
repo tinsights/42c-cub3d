@@ -20,8 +20,8 @@
 #include <X11/keysym.h>
 #include <X11/X.h>
 
-#define WIN_WIDTH 1280
-#define WIN_HEIGHT 960
+#define WIN_WIDTH 1600
+#define WIN_HEIGHT 800
 
 # define MHEIGHT 8
 # define MWIDTH 24

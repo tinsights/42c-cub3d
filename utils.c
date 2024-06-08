@@ -136,7 +136,7 @@ void strafe_player(t_params *params, int direction)
 {
 	t_player *player = params->player;
 
-	double step = 0.1;
+	double step = 0.25;
 
 	// double vertAngle = WIN_HEIGHT / 2 - centerOfScreen;
 
@@ -154,7 +154,7 @@ void draw_ray(t_params *p)
 
 	double forwardX = sin(player->heading);
 	double forwardY = -cos(player->heading);
-	double projection_plane_width = tan(FOV / 2.0);
+	double projection_plane_width = 2.0 * tan(FOV / 2.0);
 	// printf("ppw: %f\n", projection_plane_width);
 
 	double rightX = -forwardY * projection_plane_width;
@@ -162,7 +162,7 @@ void draw_ray(t_params *p)
 
 	for (int i = -WIN_WIDTH / 2; i < WIN_WIDTH / 2; i++)
 	{
-		double progress = ((double) i + WIN_WIDTH / 2) / WIN_WIDTH - 0.5;
+		double progress = ((double) i + WIN_WIDTH / 2) / WIN_WIDTH - 0.5; // goes from -0.5 to 0.5. can normalise to -1 to 1
 
 		// double rayHeading = player->heading;
 		// rayHeading += (double) i / WIN_WIDTH * FOV;
@@ -292,14 +292,15 @@ void draw_ray(t_params *p)
 		// 	col += sin(rayHeading);
 		// }
 
-		double distToProjectionPlane = (WIN_WIDTH) / (tan(FOV / 2));
+		double distToProjectionPlane = (WIN_WIDTH / 2.0) / (tan(FOV / 2.0));
 		
 		double ratio = distToProjectionPlane / perpWallDist;
 
+		double verticalShear = tan(playerVertAngle) * distToProjectionPlane;
 		// double unit_height = (double)1; // a wall 1 unit grid away will take up 80% of my screen height
 		// double lineHeight = (double)unit_height / perpWallDist;
 
-		int trueBottomOfWall = ratio * playerHeight + centerOfScreen;
+		int trueBottomOfWall = ratio * playerHeight + centerOfScreen + verticalShear;
 		int trueTopOfWall = trueBottomOfWall - ratio;
 
 		int bottomOfWall = trueBottomOfWall;
@@ -349,32 +350,29 @@ int	key_hook(int keycode, t_params *params)
 	else if (keycode == XK_d)
 		strafe_player(params, 1);
 	else if (keycode == XK_Left)
-		rotate_player(params, -3);
+		rotate_player(params, -6);
 	else if (keycode == XK_Right)
-		rotate_player(params, 3);
+		rotate_player(params, 6);
 	else if (keycode == 65451)
 		FOV += M_PI / 30;
 	else if (keycode == 65453)
 		FOV -= M_PI / 30;
 	else if (keycode == XK_Up)
 	{
-		playerVertAngle += M_PI / 180; // 2 degs
-		// printf("%f %f\n", playerVertAngle, cos(playerVertAngle));
-		centerOfScreen += 10;
+		playerVertAngle += M_PI / 60; // 12 degs
 	}
 	else if (keycode == XK_Down)
 	{
-		playerVertAngle -= M_PI / 180; // 2degs
-		centerOfScreen -= 10;
+		playerVertAngle -= M_PI / 60; // 12degs
 	}
 	else if (keycode == XK_Control_L)
 	{
-		playerHeight -= 0.1;
+		playerHeight -= 0.25;
 		// centerOfScreen += WIN_HEIGHT / 20;	
 	}
 	else if (keycode == XK_space)
 	{
-		playerHeight += 0.1;
+		playerHeight += 0.25;
 		// centerOfScreen -= WIN_HEIGHT / 20;
 	}
 	else

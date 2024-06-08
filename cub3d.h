@@ -50,6 +50,8 @@ typedef struct s_player {
 typedef struct s_params {
 	t_mlx		*mlx;
 	t_player	*player;
+
+	int			clicked_px[2];
 } t_params;
 
 int	key_hook(int keycode, t_params *params);

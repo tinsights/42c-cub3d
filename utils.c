@@ -228,7 +228,12 @@ void draw_ray(t_params *p)
 				mapY += stepY;
 				side = 0;
 			}
-			if (map[mapY][mapX] != 0)
+			if (side && map[mapY][mapX] == -1)
+			{
+				mapX = 12;
+				mapY = 5;
+			}
+			else if (map[mapY][mapX] != 0)
 			{
 				hit = 1;
 				// if (sideDistX != sideDistY)
@@ -312,7 +317,7 @@ void draw_ray(t_params *p)
 
 		// printf("unit height is %i, perpWallDist is %f\n", unit_height, perpWallDist);
 		// printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottomOfWall, topOfWall);
-		int color = map[mapY][mapX] == 1 ? 0x0000ff : 0x880000;
+		int color = abs(map[mapY][mapX]) == 1 ? 0x0000ff : 0x880000;
 		if (side)
 			color /= 2;
 		

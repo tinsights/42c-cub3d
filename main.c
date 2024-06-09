@@ -26,16 +26,29 @@ int map[MHEIGHT][MWIDTH] = {
 
 int mouse_click(int button, int x, int y, t_params *params)
 {
-	params->clicked_px[0] = x;
-	params->clicked_px[1] = y;
 	printf("button: %i | mouseX: %i | mouseY: %i\n", button, x, y);
+
+	if (button == 2)
+	{
+		params->clicked_px[0] = x;
+		params->clicked_px[1] = y;
+	}
+	else if (button == 4)
+	{
+		printf("zooming in\n");
+	}
+	else if (button == 5)
+	{
+		printf("zooming out\n");
+	}
 	return (1);
 }
 
 int mouse_move(int x, int y, t_params *params)
 {
 	extern double FOV;
-	extern double playerVertAngle;
+
+	t_player *player = params->player;
 
 	int xDelta = x - params->clicked_px[0];
 	int yDelta = y - params->clicked_px[1];
@@ -54,7 +67,7 @@ int mouse_move(int x, int y, t_params *params)
 	double vertAngInc = (double) yDelta / WIN_HEIGHT * tan(vertFov / 2.0);
 	params->player->heading += 4.0 * 1.6 * headingInc;
 
-	playerVertAngle -= 4.0 * vertAngInc;
+	player->vertAngle -= 4.0 * vertAngInc;
 	// printf(" mouseX: %i | mouseY: %i | xDelta: %i | ydelta: %i | headingInc: %f vertAngInc: %f\n",  x, y, xDelta, yDelta, headingInc, vertAngInc);
 	params->clicked_px[0] = x;
 	params->clicked_px[1] = y;
@@ -101,12 +114,16 @@ int main(void)
 
 	player.heading = 0;
 
+	player.height = 0.5;
+	player.vertAngle = 0.0;
+	player.speed = 1.0;
+
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */
 	
 	mlx_hook(mlx.win, ButtonPress, ButtonPressMask, &mouse_click, &params);
-	mlx_hook(mlx.win, KeyRelease, ButtonPressMask, &key_release_hook, &params);
+	// mlx_hook(mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook, &params);
 
 	mlx_hook(mlx.win, MotionNotify, Button2MotionMask, &mouse_move, &params);
 	// mlx_key_hook(mlx.win, &key_hook, (void *) &params);

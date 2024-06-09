@@ -111,8 +111,6 @@ void rotate_player(t_params *p, int degrees)
 }
 
 int centerOfScreen = WIN_HEIGHT / 2;
-double playerHeight = 0.5;
-double playerVertAngle = 0;
 
 /** TODO:
  * 		- convert to singular rotation matrix
@@ -121,11 +119,11 @@ void move_player(t_params *params, double direction)
 {
 	t_player *player = params->player;
 
-	double horizStep = 0.1 * cos(playerVertAngle);
-	double vertStep = 0.1 * -sin(playerVertAngle);
+	double horizStep = 0.1 * cos(player->vertAngle);
+	double vertStep = 0.1 * -sin(player->vertAngle);
 
-	printf("player vert angle: %f | vertStep: %f\n", playerVertAngle, vertStep);
-	playerHeight += vertStep * direction;
+	printf("player vert angle: %f | vertStep: %f\n", player->vertAngle, vertStep);
+	player->height += vertStep * direction;
 
 	player->position[0] += cos(player->heading) * horizStep * direction;
 	player->position[1] += -sin(player->heading) * horizStep * direction;
@@ -228,17 +226,6 @@ void draw_ray(t_params *p)
 				side = 0;
 			}
 			hit = 1;
-			// if (sideDistX != sideDistY)
-			// {
-			// 	printf("player in grid %f, %f heading %f is looking at wall at %i %i ", posX, posY, player->heading / M_PI * 180, mapX, mapY);
-			// 	if (side)
-			// 		printf("from the sides\n");
-			// 	else
-			// 		printf("vertically\n");
-			// 	printf("deltaDistX is %f deltaDistY is %f\n", deltaDistX, deltaDistY);
-			// }
-			// else
-			// 	printf("equal sidedists!\n");
 		}
 
 
@@ -259,17 +246,6 @@ void draw_ray(t_params *p)
 			if (map[mapY][mapX] != 0)
 			{
 				hit = 1;
-				// if (sideDistX != sideDistY)
-				// {
-				// 	printf("player in grid %f, %f heading %f is looking at wall at %i %i ", posX, posY, player->heading / M_PI * 180, mapX, mapY);
-				// 	if (side)
-				// 		printf("from the sides\n");
-				// 	else
-				// 		printf("vertically\n");
-				// 	printf("deltaDistX is %f deltaDistY is %f\n", deltaDistX, deltaDistY);
-				// }
-				// else
-				// 	printf("equal sidedists!\n");
 			}
 		}
 
@@ -324,11 +300,11 @@ void draw_ray(t_params *p)
 		
 		double ratio = distToProjectionPlane / perpWallDist;
 
-		double verticalShear = tan(playerVertAngle) * distToProjectionPlane;
+		double verticalShear = tan(player->vertAngle) * distToProjectionPlane;
 		// double unit_height = (double)1; // a wall 1 unit grid away will take up 80% of my screen height
 		// double lineHeight = (double)unit_height / perpWallDist;
 
-		int trueBottomOfWall = ratio * playerHeight + centerOfScreen + verticalShear;
+		int trueBottomOfWall = ratio * player->height + centerOfScreen + verticalShear;
 		int trueTopOfWall = trueBottomOfWall - ratio;
 
 		int bottomOfWall = trueBottomOfWall;
@@ -367,19 +343,13 @@ void draw_ray(t_params *p)
 
 int	key_hook(int keycode, t_params *params)
 {
-
+	t_player *player = params->player;
 	static double speed = 1.0;
 
 	if (keycode == XK_Escape)
 		return (close_window(params));
 	else if (keycode == XK_w)
-	{
-		// if (speed < 4)
-		// {
-		// 	speed = (4.0 - speed) * 0.1;
-		// }
 		move_player(params, -speed);
-	}
 	else if (keycode == XK_a)
 		strafe_player(params, -1);
 	else if (keycode == XK_s)
@@ -390,31 +360,28 @@ int	key_hook(int keycode, t_params *params)
 		rotate_player(params, -6);
 	else if (keycode == XK_Right)
 		rotate_player(params, 6);
-	else if (keycode == 65451)
+	else if (keycode == XK_KP_Add)
 		FOV += M_PI / 30;
-	else if (keycode == 65453)
+	else if (keycode == XK_KP_Subtract)
 		FOV -= M_PI / 30;
 	else if (keycode == XK_Up)
 	{
-		playerVertAngle += M_PI / 60; // 12 degs
+		player->vertAngle += M_PI / 60; // 12 degs
 	}
 	else if (keycode == XK_Down)
 	{
-		playerVertAngle -= M_PI / 60; // 12degs
+		player->vertAngle -= M_PI / 60; // 12degs
 	}
 	else if (keycode == XK_Control_L)
 	{
-		playerHeight -= 0.25;
-		// centerOfScreen += WIN_HEIGHT / 20;	
+		player->height -= 0.25;
 	}
 	else if (keycode == XK_space)
 	{
-		playerHeight += 0.25;
-		// centerOfScreen -= WIN_HEIGHT / 20;
+		player->height += 0.25;
 	}
 	else
 		ft_printf("KEY: %i\n", keycode);
-	// draw_ray(params);
 	render(params);
 	return (1);
 }

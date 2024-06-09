@@ -45,6 +45,9 @@ typedef struct s_player {
 	double		position[2];
 
 	double		heading;	// in rads
+	double 		speed;
+	double		height;
+	double		vertAngle;
 } t_player;
 
 typedef struct s_params {

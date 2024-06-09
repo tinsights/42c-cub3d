@@ -23,6 +23,10 @@
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 800
 
+#ifndef FOV
+#define FOV 100.0
+#endif
+
 # define MHEIGHT 8
 # define MWIDTH 24
 extern int map[MHEIGHT][MWIDTH];
@@ -47,7 +51,7 @@ typedef struct s_player {
 	double		heading;	// in rads
 	double 		speed;
 	double		height;
-	double		vertAngle;
+	double		vert_angle;
 } t_player;
 
 typedef struct s_params {
@@ -55,15 +59,17 @@ typedef struct s_params {
 	t_player	*player;
 
 	int			clicked_px[2];
+
+	double		fov;
 } t_params;
 
 int	key_hook(int keycode, t_params *params);
 int	close_window(t_params *params);
 
-void put_pixel(t_params p, t_uint row, t_uint col, int colour);
-void draw_player(t_params p);
-void draw_grid(t_params p);
-int render(t_params *p);
+void	put_pixel(t_params p, t_uint row, t_uint col, int colour);
+void	draw_player(t_params p);
+void	draw_grid(t_params p);
+int		render(t_params *p);
 
 
 

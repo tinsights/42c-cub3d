@@ -46,29 +46,27 @@ int mouse_click(int button, int x, int y, t_params *params)
 
 int mouse_move(int x, int y, t_params *params)
 {
-	extern double FOV;
-
 	t_player *player = params->player;
 
 	int xDelta = x - params->clicked_px[0];
 	int yDelta = y - params->clicked_px[1];
 
-	// double projection_plane_width = 2.0 * tan(FOV / 2.0);
+	// double projection_plane_width = 2.0 * tan(params->fov / 2.0);
 
 	//2∗atan(tan(h/2)∗AR)
-	// printf("FOV: %f\n", FOV);
+	// printf("FOV: %f\n", params->fov);
 
-	double ratio = tan(FOV / 2) * 1.6;
+	double ratio = tan(params->fov / 2) * 1.6;
 	printf("ratio: %f\n", ratio);
 	double vertFov = 2.0 * atan(ratio);
 	printf("vertFov: %f\n", vertFov);
 
-	double headingInc = (double) xDelta / WIN_WIDTH * tan(FOV / 2.0);
-	double vertAngInc = (double) yDelta / WIN_HEIGHT * tan(vertFov / 2.0);
-	params->player->heading += 4.0 * 1.6 * headingInc;
+	double heading_delta = (double) xDelta / WIN_WIDTH * tan(params->fov / 2.0);
+	double vert_delta = (double) yDelta / WIN_WIDTH * tan(params->fov / 2.0);
+	params->player->heading += 4.0 * heading_delta;
 
-	player->vertAngle -= 4.0 * vertAngInc;
-	// printf(" mouseX: %i | mouseY: %i | xDelta: %i | ydelta: %i | headingInc: %f vertAngInc: %f\n",  x, y, xDelta, yDelta, headingInc, vertAngInc);
+	player->vert_angle -= 4.0 * vert_delta;
+	// printf(" mouseX: %i | mouseY: %i | xDelta: %i | ydelta: %i | heading_delta: %f vert_delta: %f\n",  x, y, xDelta, yDelta, heading_delta, vert_delta);
 	params->clicked_px[0] = x;
 	params->clicked_px[1] = y;
 	render(params);
@@ -104,7 +102,9 @@ int main(void)
 
 	mlx.img_addr = mlx_get_data_addr(mlx.img, &mlx.bpp, &mlx.line_sz, &mlx.endian);
 
-	// put player on screen, curr centered in middle
+
+	params.fov = FOV / 180.0 * M_PI;
+	// put player on screen, curr _centered in middle
 	t_player player;
 
 	params.player = &player;
@@ -115,7 +115,7 @@ int main(void)
 	player.heading = 0;
 
 	player.height = 0.5;
-	player.vertAngle = 0.0;
+	player.vert_angle = 0.0;
 	player.speed = 1.0;
 
 	/* -------------------------------------------------------------------------- */
@@ -135,33 +135,29 @@ int main(void)
 	// mlx_loop_hook(mlx.ptr, render, &params);
 	mlx_loop(mlx.ptr);
 }
-void draw_ray(t_params *p);
 
 
-void draw_crosshair(t_params *p)
+void draw_crosshair(t_params p)
 {
-	int vertCenter = WIN_HEIGHT / 2;
-	int horizCenter = WIN_WIDTH / 2;
+	int vert_center = WIN_HEIGHT / 2;
+	int horiz_center = WIN_WIDTH / 2;
 
-	int halfCrosshairLength = 8;
+	int half_crosshair_length = 8;
 
-	for (int i = vertCenter - halfCrosshairLength; i < vertCenter + halfCrosshairLength; i++)
-		put_pixel(*p, i, horizCenter, 0x888800);
-	for (int i = horizCenter - halfCrosshairLength; i < horizCenter + halfCrosshairLength; i++)
-		put_pixel(*p, vertCenter, i, 0x888800);
-
-	
+	for (int i = vert_center - half_crosshair_length; i < vert_center + half_crosshair_length; i++)
+		put_pixel(p, i, horiz_center, 0x888800);
+	for (int i = horiz_center - half_crosshair_length; i < horiz_center + half_crosshair_length; i++)
+		put_pixel(p, vert_center, i, 0x888800);
 }
+void draw_walls(t_params *p);
 
 int render(t_params *p)
 {
 	// draw_grid(*p);
-
-	// draw one ray
-	draw_ray(p);
 	// draw_player(*p);
 
-	draw_crosshair(p);
+	draw_walls(p);
+	draw_crosshair(*p);
 
 	mlx_put_image_to_window(p->mlx->ptr, p->mlx->win, p->mlx->img, 0, 0);
 	return (1);

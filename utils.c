@@ -246,59 +246,14 @@ void draw_walls(t_params *params)
 		}
 
 
-
 		if (!side)
 			perp_wall_distance = dist_y - delta_dist_y;
 		else
 			perp_wall_distance = dist_x - delta_dist_x;
-		
-		// if (i == WIN_WIDTH / 2 - 1)
-		// {
-		// 	if (!side)
-		// 		printf("Side Dist Y: %f, ddy: %f\n", dist_y, delta_dist_y);
-		// 	else
-		// 		printf("Side Dist X: %f, ddX: %f\n", dist_x, delta_dist_x);
-
-		// 	printf("pwd before: %f\n", perp_wall_distance);
-		// }
-
-		// long double factor = fabs(cos((double) (i) * params->fov / WIN_WIDTH));
-		// perp_wall_distance *= factor; // - 30 to 30
-		// if (i == 0)
-		// 	printf("direct perp wall dist: %f\n", perp_wall_distance);
-		// if (i == WIN_WIDTH / 2 - 1)
-		// {
-		// 	// printf("pwd before: %f\n", perp_wall_distance);
-		// 	printf("params->fov: %f %f\n", params->fov, params->fov * 180 / M_PI);
-		// 	double angle = (double) (i + 1) * params->fov / WIN_WIDTH;
-		// 	printf("angle: %f %f\n", angle, angle / M_PI * 180);
-		// 	// printf("factor: %Lf\n", factor);
-		// 	printf("pwd after: %f\n", perp_wall_distance);
-		// }
-		/* -------------------------------------------------------------------------- */
-		/*                         Drawing 2d Rays for minimap                        */
-		/* -------------------------------------------------------------------------- */
-		// double row = player->position[0]; // y
-		// double col = player->position[1]; // x
-		// // multiply by width and height (scale??) to get pixel pos
-		// row = row / MHEIGHT * WIN_HEIGHT;
-		// col = col / MWIDTH * WIN_WIDTH;
-		// while(((row >= 0 && row < WIN_HEIGHT) && (col >= 0 && col < WIN_WIDTH))
-		// && ((!side && (int) (row / WIN_HEIGHT * MHEIGHT) != mapY)
-		// 	|| (side && (int) (col / WIN_WIDTH * MWIDTH) != mapX )))
-		// {
-		// 	put_pixel(*p, row, col, 0x00ff00);
-		// 	row += -cos(rayHeading);
-		// 	col += sin(rayHeading);
-		// }
 
 		double dist_to_projection_plane = (WIN_WIDTH / 2.0) / (tan(params->fov / 2.0));
-		
 		double ratio = dist_to_projection_plane / perp_wall_distance;
-
 		double vert_shear = tan(player->vert_angle) * dist_to_projection_plane;
-		// double unit_height = (double)1; // a wall 1 unit grid away will take up 80% of my screen height
-		// double lineHeight = (double)unit_height / perp_wall_distance;
 
 		int actual_bottom = ratio * player->height + centerOfScreen + vert_shear;
 		int actual_top = actual_bottom - ratio;
@@ -312,19 +267,12 @@ void draw_walls(t_params *params)
 
 		// printf("unit height is %i, perp_wall_distance is %f\n", unit_height, perp_wall_distance);
 		// printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottom_of_wall, top_of_wall);
-		int color = map[mapY][mapX] == 1 ? 0x0000ff : 0x880000;
-		if (side)
+		int color = map[mapY][mapX] == 1 ? 0x000088 : 0x880000;
+				if (side)
 			color /= 2;
-		
-		// double flashAngle = perp_wall_distance + cos((double) (i / WIN_WIDTH * params->fov));
-		// if (flashAngle > 8)
-		// 	color /= 2;
-		// else if (flashAngle > 12)
-		// 	color /= 4;
-
 		for (int px = 0; px < WIN_HEIGHT; px++)
 		{
-			// color = color *(1 - ((double) px / (true_bottom)))
+			
 			if (px < top_of_wall )
 				put_pixel(*params, px, i + WIN_WIDTH / 2, 0x888888);
 			else if (px> bottom_of_wall )

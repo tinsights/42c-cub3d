@@ -58,7 +58,19 @@ int mouse_move(int x, int y, t_params *params)
 	// printf(" mouseX: %i | mouseY: %i | xDelta: %i | ydelta: %i | headingInc: %f vertAngInc: %f\n",  x, y, xDelta, yDelta, headingInc, vertAngInc);
 	params->clicked_px[0] = x;
 	params->clicked_px[1] = y;
+	render(params);
 
+	return (1);
+}
+
+
+int key_release_hook(int keycode, t_params *params)
+{
+	printf("keycode: %i\n", keycode);
+	if (keycode == XK_w && params)
+	{
+		printf("hello\n");
+	}
 	return (1);
 }
 
@@ -92,13 +104,18 @@ int main(void)
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */
-	mlx_do_key_autorepeaton(mlx.ptr);
+	
 	mlx_hook(mlx.win, ButtonPress, ButtonPressMask, &mouse_click, &params);
+	mlx_hook(mlx.win, KeyRelease, ButtonPressMask, &key_release_hook, &params);
+
 	mlx_hook(mlx.win, MotionNotify, Button2MotionMask, &mouse_move, &params);
 	// mlx_key_hook(mlx.win, &key_hook, (void *) &params);
 	mlx_hook(mlx.win, KeyPress, KeyPressMask, &key_hook, (void *) &params);
 	mlx_hook(mlx.win, DestroyNotify, 0L, &close_window, (void *) &params);
-	mlx_loop_hook(mlx.ptr, render, &params);
+	mlx_do_key_autorepeaton(mlx.ptr); // does this do anything?
+
+	render(&params);
+	// mlx_loop_hook(mlx.ptr, render, &params);
 	mlx_loop(mlx.ptr);
 }
 void draw_ray(t_params *p);

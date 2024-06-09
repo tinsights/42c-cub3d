@@ -117,14 +117,15 @@ double playerVertAngle = 0;
 /** TODO:
  * 		- convert to singular rotation matrix
 */
-void move_player(t_params *params, int direction)
+void move_player(t_params *params, double direction)
 {
 	t_player *player = params->player;
 
 	double horizStep = 0.1 * cos(playerVertAngle);
-	double vertStep = 0.1 * sin(playerVertAngle);
+	double vertStep = 0.1 * -sin(playerVertAngle);
 
-	playerHeight += vertStep;
+	printf("player vert angle: %f | vertStep: %f\n", playerVertAngle, vertStep);
+	playerHeight += vertStep * direction;
 
 	player->position[0] += cos(player->heading) * horizStep * direction;
 	player->position[1] += -sin(player->heading) * horizStep * direction;
@@ -136,7 +137,7 @@ void strafe_player(t_params *params, int direction)
 {
 	t_player *player = params->player;
 
-	double step = 0.25;
+	double step = 0.1;
 
 	// double vertAngle = WIN_HEIGHT / 2 - centerOfScreen;
 
@@ -144,7 +145,7 @@ void strafe_player(t_params *params, int direction)
 	player->position[1] += cos(player->heading) * step * direction;
 }
 
-double FOV = (76.0 / 180.0 * M_PI); // degrees? 66? 60?
+double FOV = (100.0 / 180.0 * M_PI); // degrees? 66? 60?
 
 
 
@@ -214,9 +215,36 @@ void draw_ray(t_params *p)
 			sideDistY = (1.0 + mapY - posY) * deltaDistY;
 		}
 
+		if (map[mapY][mapX] != 0)
+		{
+			if (sideDistX < sideDistY) // what if equal?
+			{
+				sideDistX += deltaDistX;
+				side = 1;
+			}
+			else
+			{
+				sideDistY += deltaDistY;
+				side = 0;
+			}
+			hit = 1;
+			// if (sideDistX != sideDistY)
+			// {
+			// 	printf("player in grid %f, %f heading %f is looking at wall at %i %i ", posX, posY, player->heading / M_PI * 180, mapX, mapY);
+			// 	if (side)
+			// 		printf("from the sides\n");
+			// 	else
+			// 		printf("vertically\n");
+			// 	printf("deltaDistX is %f deltaDistY is %f\n", deltaDistX, deltaDistY);
+			// }
+			// else
+			// 	printf("equal sidedists!\n");
+		}
+
+
 		while(!hit)
 		{
-			if (sideDistX < sideDistY) //what if equal?
+			if (sideDistX < sideDistY) // what if equal?
 			{
 				sideDistX += deltaDistX;
 				mapX += stepX;
@@ -339,14 +367,23 @@ void draw_ray(t_params *p)
 
 int	key_hook(int keycode, t_params *params)
 {
+
+	static double speed = 1.0;
+
 	if (keycode == XK_Escape)
 		return (close_window(params));
 	else if (keycode == XK_w)
-		move_player(params, -1);
+	{
+		// if (speed < 4)
+		// {
+		// 	speed = (4.0 - speed) * 0.1;
+		// }
+		move_player(params, -speed);
+	}
 	else if (keycode == XK_a)
 		strafe_player(params, -1);
 	else if (keycode == XK_s)
-		move_player(params, 1);
+		move_player(params, speed);
 	else if (keycode == XK_d)
 		strafe_player(params, 1);
 	else if (keycode == XK_Left)
@@ -378,5 +415,6 @@ int	key_hook(int keycode, t_params *params)
 	else
 		ft_printf("KEY: %i\n", keycode);
 	// draw_ray(params);
+	render(params);
 	return (1);
 }

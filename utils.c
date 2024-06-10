@@ -71,6 +71,7 @@ void strafe_player(t_params *params, int direction)
 
 	player->position[0] += sin(player->heading) * step * direction;
 	player->position[1] += cos(player->heading) * step * direction;
+	printf("player pos: %f %f\n", player->position[0], player->position[1]);
 }
 
 int	key_hook(int keycode, t_params *params)
@@ -144,10 +145,10 @@ int mouse_move(int x, int y, t_params *params)
 	//2∗atan(tan(h/2)∗AR)
 	// printf("FOV: %f\n", params->fov);
 
-	double ratio = tan(params->fov / 2) * 1.6;
-	printf("ratio: %f\n", ratio);
-	double vertFov = 2.0 * atan(ratio);
-	printf("vertFov: %f\n", vertFov);
+	// double ratio = tan(params->fov / 2) * 1.6;
+	// printf("ratio: %f\n", ratio);
+	// double vertFov = 2.0 * atan(ratio);
+	// printf("vertFov: %f\n", vertFov);
 
 	double heading_delta = (double) xDelta / WIN_WIDTH * tan(params->fov / 2.0);
 	double vert_delta = (double) yDelta / WIN_WIDTH * tan(params->fov / 2.0);

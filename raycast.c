@@ -18,6 +18,8 @@ void draw_walls(t_params *params)
 
 	double forward_x = sin(player->heading);
 	double forward_y = -cos(player->heading);
+
+	// half projection plane width helps to get rid of warping
 	double half_projection_plane_width = tan(params->fov / 2.0);
 	// printf("ppw: %f\n", half_projection_plane_width);
 
@@ -34,6 +36,9 @@ void draw_walls(t_params *params)
 		double rayDir_x = forward_x + relative_distance_along_projection_plane * right_x;
 		double rayDir_y = forward_y + relative_distance_along_projection_plane * right_y;
 
+
+		// using some math shortcuts
+		// mostly from lodev
 		double delta_dist_x = (rayDir_x == 0) ? INFINITY : fabs(1 / rayDir_x);
 		double delta_dist_y = (rayDir_y == 0) ? INFINITY : fabs(1 / rayDir_y);
 

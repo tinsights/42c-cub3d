@@ -48,10 +48,10 @@ int main(void)
 	params.player = &player;
 	params.fov = FOV / 180.0 * M_PI;
 	
-	player.position[0] = 3.0;
-	player.position[1] = 3.5;
+	player.position[0] = 3.0; // 300
+	player.position[1] = 3.9; // 390
 	player.heading = 0;
-	player.height = 0.5;
+	player.height = 0.1; // 10
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
 

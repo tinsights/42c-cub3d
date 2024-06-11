@@ -26,10 +26,6 @@ void draw_walls(t_params *params)
 
     double pos_x = player->position[1];
     double pos_y = player->position[0];
-
-	// int width;
-	// int height;
-	// void *image = mlx_xpm_file_to_image(params->mlx->ptr, "jerlim.xpm", &width, &height);
 	
 	for (int col = 0; col < WIN_WIDTH; col++)
 	{
@@ -179,8 +175,6 @@ void draw_walls(t_params *params)
         /*                             Painting the walls                             */
         /* -------------------------------------------------------------------------- */
 
-		// char tex_pixel = image->data
-		// int red_value = 
 		int color = map[map_y][map_x] == 1 ? 0x000088 : 0x880000;
 		
 		int tex_col = texture_slice * (double) image->width;
@@ -209,7 +203,7 @@ void draw_walls(t_params *params)
 				double row_slice = (double) (px - actual_top) / true_line_height;
 				// printf("row slice %f\n", row_slice);
 				int tex_row = row_slice * (double) image->height;
-				put_pixel(*params, px, col, (img_data[(tex_row * image->size_line)/4 + tex_col]));
+				put_pixel(*params, px, col, (img_data[(tex_row * image->size_line)/(image->bpp /8) + tex_col]));
 			}
 		}
 	}

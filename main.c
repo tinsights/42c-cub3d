@@ -65,7 +65,7 @@ int main(void)
 	params.inner = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height);
 	params.north = mlx_xpm_file_to_image(mlx.ptr, "cooi.xpm", &width, &height);
 	params.south = mlx_xpm_file_to_image(mlx.ptr, "jerlim.xpm", &width, &height);
-	params.east = mlx_xpm_file_to_image(mlx.ptr, "agan.xpm", &width, &height);
+	params.east = mlx_xpm_file_to_image(mlx.ptr, "achak.xpm", &width, &height);
 	params.west = mlx_xpm_file_to_image(mlx.ptr, "so-leary.xpm", &width, &height);
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
@@ -88,7 +88,7 @@ int main(void)
 
 
 	render(&params);
-	// mlx_loop_hook(mlx.ptr, render, &params);
+	mlx_loop_hook(mlx.ptr, render, &params);
 	mlx_loop(mlx.ptr);
 }
 

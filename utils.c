@@ -109,7 +109,7 @@ int	key_hook(int keycode, t_params *params)
 		player->height += 0.25;
 	else
 		ft_printf("KEY: %i\n", keycode);
-	render(params);
+	// render(params);
 	return (1);
 }
 
@@ -135,13 +135,11 @@ int mouse_click(int button, int x, int y, t_params *params)
 	{
 		params->fov -= M_PI / 30;
 		printf("zooming in\n");
-		render(params);
 	}
 	else if (button == 5)
 	{
 		params->fov += M_PI / 30;
 		printf("zooming out\n");
-		render(params);
 	}
 	return (1);
 }
@@ -171,7 +169,7 @@ int mouse_move(int x, int y, t_params *params)
 	// printf(" mouseX: %i | mouseY: %i | xDelta: %i | ydelta: %i | heading_delta: %f vert_delta: %f\n",  x, y, xDelta, yDelta, heading_delta, vert_delta);
 	params->clicked_px[0] = x;
 	params->clicked_px[1] = y;
-	render(params);
+	// render(params);
 
 	return (1);
 }

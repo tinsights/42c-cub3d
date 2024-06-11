@@ -30,8 +30,6 @@ void draw_walls(t_params *params)
 	// int width;
 	// int height;
 	// void *image = mlx_xpm_file_to_image(params->mlx->ptr, "jerlim.xpm", &width, &height);
-	t_img *image = params->north;
-	unsigned int *img_data = (unsigned int *)image->data;
 	
 	for (int col = 0; col < WIN_WIDTH; col++)
 	{
@@ -58,6 +56,7 @@ void draw_walls(t_params *params)
 		int step_y = 0;
 		double dist_x = 0.0;
 		double dist_y = 0.0;
+		t_img *image;
 
 		if (ray_dir_x < 0) // looking "west"
 		{
@@ -121,8 +120,23 @@ void draw_walls(t_params *params)
 			if (map[map_y][map_x] != 0)
 			{
 				hit = true;
+				if (side_x)
+				{
+					if (ray_dir_x > 0)
+						image = params->east;
+					else
+						image = params->west;
+				}
+				else
+				{
+					if (ray_dir_y > 0)
+						image = params->south;
+					else
+						image = params->north;
+				}
 			}
 		}
+		unsigned int *img_data = (unsigned int *)image->data;
 
 		if (side_x)
 			perp_wall_distance = dist_x - delta_dist_x;
@@ -173,13 +187,14 @@ void draw_walls(t_params *params)
 		if (col == WIN_WIDTH / 2)
 		{
 			printf("looking at wall %i %i, at slice %f\n", map_x, map_y, texture_slice);
+			printf("ray dir x: %f | ray diry: %f\n", ray_dir_x, ray_dir_y);
 			printf("%d %x\n", ((unsigned int*)image->data)[0], ((unsigned int*)image->data)[0]);
 			printf("image bpp: %i, image width: %i, image height: %i, image line_sz: %i\n", image->bpp, image->width, image->height, image->size_line);
 			printf("tex col is %i\n", tex_col);
 		}
 
 
-		double line_height = top_of_wall - bottom_of_wall;
+		double true_line_height = actual_bottom - actual_top;
         if (side_x)
 			color /= 2;
 		for (int px = 0; px < WIN_HEIGHT; px++)
@@ -190,7 +205,8 @@ void draw_walls(t_params *params)
 				put_pixel(*params, px, col, 0x333333);
 			else
 			{
-				double row_slice = (double) (top_of_wall - px) / line_height;
+				double row_slice = (double) (px - actual_top) / true_line_height;
+				// printf("row slice %f\n", row_slice);
 				int tex_row = row_slice * (double) image->height;
 				put_pixel(*params, px, col, (img_data[(tex_row * image->size_line)/4 + tex_col]));
 			}

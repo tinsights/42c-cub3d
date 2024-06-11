@@ -63,6 +63,9 @@ int main(void)
 	int width;
 	int height;
 	params.north = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height);
+	params.south = mlx_xpm_file_to_image(mlx.ptr, "jerlim.xpm", &width, &height);
+	params.east = mlx_xpm_file_to_image(mlx.ptr, "achak.xpm", &width, &height);
+	params.west = mlx_xpm_file_to_image(mlx.ptr, "so-leary.xpm", &width, &height);
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */

@@ -108,6 +108,16 @@ int	key_hook(int keycode, t_params *params)
 	render(params);
 	return (1);
 }
+
+int key_release_hook(int keycode, t_params *params)
+{
+	printf("keycode: %i\n", keycode);
+	if (keycode == XK_w && params)
+	{
+		// printf("hello\n");
+	}
+	return (1);
+}
 int mouse_click(int button, int x, int y, t_params *params)
 {
 	printf("button: %i | mouseX: %i | mouseY: %i\n", button, x, y);
@@ -162,16 +172,6 @@ int mouse_move(int x, int y, t_params *params)
 	return (1);
 }
 
-
-int key_release_hook(int keycode, t_params *params)
-{
-	printf("keycode: %i\n", keycode);
-	if (keycode == XK_w && params)
-	{
-		printf("hello\n");
-	}
-	return (1);
-}
 
 void draw_crosshair(t_params p)
 {

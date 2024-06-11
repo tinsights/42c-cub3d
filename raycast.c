@@ -27,22 +27,28 @@ void draw_walls(t_params *params)
     double pos_x = player->position[1];
     double pos_y = player->position[0];
 
+	// int width;
+	// int height;
+	// void *image = mlx_xpm_file_to_image(params->mlx->ptr, "jerlim.xpm", &width, &height);
+	t_img *image = params->north;
+	unsigned int *img_data = (unsigned int *)image->data;
+	
 	for (int col = 0; col < WIN_WIDTH; col++)
 	{
 		double relative_distance_along_projection_plane = 2.0 * ((double) col) / (WIN_WIDTH - 1) - 1; // goes from -1 to 1.
 
-		double rayDir_x = forward_x + relative_distance_along_projection_plane * right_x;
-		double rayDir_y = forward_y + relative_distance_along_projection_plane * right_y;
+		double ray_dir_x = forward_x + relative_distance_along_projection_plane * right_x;
+		double ray_dir_y = forward_y + relative_distance_along_projection_plane * right_y;
 
-		double delta_dist_x = (rayDir_x == 0) ? INFINITY : fabs(1 / rayDir_x);
-		double delta_dist_y = (rayDir_y == 0) ? INFINITY : fabs(1 / rayDir_y);
+		double delta_dist_x = (ray_dir_x == 0) ? INFINITY : fabs(1 / ray_dir_x);
+		double delta_dist_y = (ray_dir_y == 0) ? INFINITY : fabs(1 / ray_dir_y);
 
         int map_x = (int) pos_x;
         int map_y = (int) pos_y;
 
         bool hit = false;
 
-		int side = 0;
+		int side_x = 0;
         double perp_wall_distance = 0.0;
 		
         /**
@@ -53,7 +59,7 @@ void draw_walls(t_params *params)
 		double dist_x = 0.0;
 		double dist_y = 0.0;
 
-		if (rayDir_x < 0) // looking "west"
+		if (ray_dir_x < 0) // looking "west"
 		{
 			step_x = -1;
 			dist_x = (pos_x - map_x) * delta_dist_x;
@@ -63,7 +69,7 @@ void draw_walls(t_params *params)
 			step_x = 1;
 			dist_x = (1.0 + map_x - pos_x) * delta_dist_x;
 		}
-		if (rayDir_y < 0) // looking "north"
+		if (ray_dir_y < 0) // looking "north"
 		{
 			step_y = -1;
 			dist_y = (pos_y - map_y) * delta_dist_y;
@@ -85,12 +91,12 @@ void draw_walls(t_params *params)
 			if (dist_x < dist_y) // what if equal?
 			{
 				dist_x += delta_dist_x;
-				side = 1;
+				side_x = 1;
 			}
 			else
 			{
 				dist_y += delta_dist_y;
-				side = 0;
+				side_x = 0;
 			}
 			hit = true;
 		}
@@ -104,13 +110,13 @@ void draw_walls(t_params *params)
 			{
 				dist_x += delta_dist_x;
 				map_x += step_x;
-				side = 1;
+				side_x = 1;
 			}
 			else
 			{
 				dist_y += delta_dist_y;
 				map_y += step_y;
-				side = 0;
+				side_x = 0;
 			}
 			if (map[map_y][map_x] != 0)
 			{
@@ -118,7 +124,7 @@ void draw_walls(t_params *params)
 			}
 		}
 
-		if (side)
+		if (side_x)
 			perp_wall_distance = dist_x - delta_dist_x;
 		else
 			perp_wall_distance = dist_y - delta_dist_y;
@@ -140,11 +146,41 @@ void draw_walls(t_params *params)
 		// printf("unit height is %i, perp_wall_distance is %f\n", unit_height, perp_wall_distance);
 		// printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottom_of_wall, top_of_wall);
 
+		double texture_slice;
+		if (side_x)
+		{
+			texture_slice = pos_y + ray_dir_y * perp_wall_distance - map_y;
+			if (ray_dir_x < 0)
+				texture_slice = 1.0 - texture_slice;
+		}
+		else
+		{
+			texture_slice = pos_x + ray_dir_x * perp_wall_distance - map_x;
+			if (ray_dir_y > 0)
+				texture_slice = 1.0 - texture_slice;
+		}
+		
         /* -------------------------------------------------------------------------- */
         /*                             Painting the walls                             */
         /* -------------------------------------------------------------------------- */
+
+		// char tex_pixel = image->data
+		// int red_value = 
 		int color = map[map_y][map_x] == 1 ? 0x000088 : 0x880000;
-        if (side)
+		
+		int tex_col = texture_slice * (double) image->width;
+
+		if (col == WIN_WIDTH / 2)
+		{
+			printf("looking at wall %i %i, at slice %f\n", map_x, map_y, texture_slice);
+			printf("%d %x\n", ((unsigned int*)image->data)[0], ((unsigned int*)image->data)[0]);
+			printf("image bpp: %i, image width: %i, image height: %i, image line_sz: %i\n", image->bpp, image->width, image->height, image->size_line);
+			printf("tex col is %i\n", tex_col);
+		}
+
+
+		double line_height = top_of_wall - bottom_of_wall;
+        if (side_x)
 			color /= 2;
 		for (int px = 0; px < WIN_HEIGHT; px++)
 		{
@@ -153,7 +189,11 @@ void draw_walls(t_params *params)
 			else if (px> bottom_of_wall )
 				put_pixel(*params, px, col, 0x333333);
 			else
-				put_pixel(*params, px, col, color);
+			{
+				double row_slice = (double) (top_of_wall - px) / line_height;
+				int tex_row = row_slice * (double) image->height;
+				put_pixel(*params, px, col, (img_data[(tex_row * image->size_line)/4 + tex_col]));
+			}
 		}
 	}
 }

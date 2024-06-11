@@ -18,6 +18,7 @@
 # include <X11/keysym.h>
 # include <math.h>
 # include <mlx.h>
+# include <mlx_int.h>
 # include <stdbool.h>
 # include <stdio.h> // printf
 
@@ -71,7 +72,10 @@ typedef struct s_params
 	t_player			*player;
 
 	int					clicked_px[2];
-
+	t_img				*north;
+	t_img				*south;
+	t_img				*east;
+	t_img				*west;
 	double				fov;
 }						t_params;
 
@@ -84,6 +88,7 @@ void					draw_player(t_params p);
 void					draw_grid(t_params p);
 int						mouse_move(int x, int y, t_params *params);
 int						mouse_click(int button, int x, int y, t_params *params);
+int						key_release_hook(int keycode, t_params *params);
 void					draw_crosshair(t_params p);
 int						render(t_params *p);
 

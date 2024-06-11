@@ -55,18 +55,33 @@ int main(void)
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
 
+
+	/* -------------------------------------------------------------------------- */
+	/*                                Texture Init                                */
+	/* -------------------------------------------------------------------------- */
+
+	int width;
+	int height;
+	params.north = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height);
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */
 	
 	mlx_hook(mlx.win, ButtonPress, ButtonPressMask, &mouse_click, &params);
-	// mlx_hook(mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook, &params);
+	mlx_hook(mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook, &params);
 
 	mlx_hook(mlx.win, MotionNotify, Button2MotionMask, &mouse_move, &params);
-	// mlx_key_hook(mlx.win, &key_hook, (void *) &params);
 	mlx_hook(mlx.win, KeyPress, KeyPressMask, &key_hook, (void *) &params);
 	mlx_hook(mlx.win, DestroyNotify, 0L, &close_window, (void *) &params);
 	mlx_do_key_autorepeaton(mlx.ptr); // does this do anything?
+
+
+
+	/* -------------------------------------------------------------------------- */
+	/*                                  textures                                  */
+	/* -------------------------------------------------------------------------- */
+
+
 
 	render(&params);
 	// mlx_loop_hook(mlx.ptr, render, &params);

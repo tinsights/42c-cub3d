@@ -96,9 +96,13 @@ int	key_hook(int keycode, t_params *params)
 	else if (keycode == XK_KP_Subtract)
 		params->fov -= M_PI / 30;
 	else if (keycode == XK_Up)
+	{
 		player->vert_angle += M_PI / 60; // 12 degs
+	}
 	else if (keycode == XK_Down)
+	{
 		player->vert_angle -= M_PI / 60; // 12degs
+	}
 	else if (keycode == XK_Control_L)
 		player->height -= 0.25;
 	else if (keycode == XK_space)
@@ -154,10 +158,10 @@ int mouse_move(int x, int y, t_params *params)
 	//2∗atan(tan(h/2)∗AR)
 	// printf("FOV: %f\n", params->fov);
 
-	double ratio = tan(params->fov / 2) * 1.6;
-	printf("ratio: %f\n", ratio);
-	double vertFov = 2.0 * atan(ratio);
-	printf("vertFov: %f\n", vertFov);
+	// double ratio = tan(params->fov / 2) * 1.6;
+	// printf("ratio: %f\n", ratio);
+	// double vertFov = 2.0 * atan(ratio);
+	// printf("vertFov: %f\n", vertFov);
 
 	double heading_delta = (double) xDelta / WIN_WIDTH * tan(params->fov / 2.0);
 	double vert_delta = (double) yDelta / WIN_WIDTH * tan(params->fov / 2.0);

@@ -72,6 +72,8 @@ typedef struct s_params
 	t_player			*player;
 
 	int					clicked_px[2];
+
+	t_img				*inner;
 	t_img				*north;
 	t_img				*south;
 	t_img				*east;

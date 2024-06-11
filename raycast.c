@@ -98,6 +98,7 @@ void draw_walls(t_params *params)
 				side_x = 0;
 			}
 			hit = true;
+			image = params->inner;
 		}
 
         /* -------------------------------------------------------------------------- */
@@ -184,14 +185,14 @@ void draw_walls(t_params *params)
 		
 		int tex_col = texture_slice * (double) image->width;
 
-		if (col == WIN_WIDTH / 2)
-		{
-			printf("looking at wall %i %i, at slice %f\n", map_x, map_y, texture_slice);
-			printf("ray dir x: %f | ray diry: %f\n", ray_dir_x, ray_dir_y);
-			printf("%d %x\n", ((unsigned int*)image->data)[0], ((unsigned int*)image->data)[0]);
-			printf("image bpp: %i, image width: %i, image height: %i, image line_sz: %i\n", image->bpp, image->width, image->height, image->size_line);
-			printf("tex col is %i\n", tex_col);
-		}
+		// if (col == WIN_WIDTH / 2)
+		// {
+		// 	printf("looking at wall %i %i, at slice %f\n", map_x, map_y, texture_slice);
+		// 	printf("ray dir x: %f | ray diry: %f\n", ray_dir_x, ray_dir_y);
+		// 	printf("%d %x\n", ((unsigned int*)image->data)[0], ((unsigned int*)image->data)[0]);
+		// 	printf("image bpp: %i, image width: %i, image height: %i, image line_sz: %i\n", image->bpp, image->width, image->height, image->size_line);
+		// 	printf("tex col is %i\n", tex_col);
+		// }
 
 
 		double true_line_height = actual_bottom - actual_top;

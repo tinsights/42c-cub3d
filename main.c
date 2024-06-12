@@ -41,7 +41,7 @@ int main(void)
 	mlx.img_addr = mlx_get_data_addr(mlx.img, &mlx.bpp, &mlx.line_sz, &mlx.endian);
 
 	/* -------------------------------------------------------------------------- */
-	/*                           Player and Params init                           */
+	/*                           PLAYER AND PARAMS INIT                           */
 	/* -------------------------------------------------------------------------- */
 	t_player player;
 
@@ -57,7 +57,7 @@ int main(void)
 
 
 	/* -------------------------------------------------------------------------- */
-	/*                                Texture Init                                */
+	/*                                TEXTURE INIT                                */
 	/* -------------------------------------------------------------------------- */
 
 	int width;
@@ -78,14 +78,6 @@ int main(void)
 	mlx_hook(mlx.win, KeyPress, KeyPressMask, &key_hook, (void *) &params);
 	mlx_hook(mlx.win, DestroyNotify, 0L, &close_window, (void *) &params);
 	mlx_do_key_autorepeaton(mlx.ptr); // does this do anything?
-
-
-
-	/* -------------------------------------------------------------------------- */
-	/*                                  textures                                  */
-	/* -------------------------------------------------------------------------- */
-
-
 
 	render(&params);
 	mlx_loop_hook(mlx.ptr, render, &params);

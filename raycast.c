@@ -33,31 +33,35 @@ typedef struct s_ray
 
 	bool hit;
 	bool side_x;
+
+	t_img *img;
+	char	*img_data;
 } t_ray;
 
 void draw_walls(t_params *params)
 {
 	t_player *player = params->player;
+	t_ray ray;
 
-	double forward_x = sin(player->heading);
-	double forward_y = -cos(player->heading);
+
+	player->heading_x = sin(player->heading);
+	player->heading_y = -cos(player->heading);
 	double half_projection_plane_width = tan(params->fov / 2.0);
 	// printf("ppw: %f\n", half_projection_plane_width);
 
-	double right_x = -forward_y * half_projection_plane_width;
-	double right_y = forward_x * half_projection_plane_width;
+	double right_x = -player->heading_y * half_projection_plane_width;
+	double right_y = player->heading_x * half_projection_plane_width;
 
     double pos_x = player->position[1];
     double pos_y = player->position[0];
 	
 	t_img *image;
-	t_ray ray;
 	for (int col = 0; col < WIN_WIDTH; col++)
 	{
 		ray.projection_plane_x = 2.0 * ((double) col) / (WIN_WIDTH - 1) - 1; // goes from -1 to 1.
 
-		ray.dir_x = forward_x + ray.projection_plane_x * right_x;
-		ray.dir_y = forward_y + ray.projection_plane_x * right_y;
+		ray.dir_x = player->heading_x + ray.projection_plane_x * right_x;
+		ray.dir_y = player->heading_y + ray.projection_plane_x * right_y;
 
 		ray.delta_dist_x = (ray.dir_x == 0) ? INFINITY : fabs(1 / ray.dir_x);
 		ray.delta_dist_y = (ray.dir_y == 0) ? INFINITY : fabs(1 / ray.dir_y);

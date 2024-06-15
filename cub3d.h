@@ -61,6 +61,8 @@ typedef struct s_player
 	double				position[2];
 
 	double				heading; // in rads
+	double				heading_x;
+	double				heading_y;
 	double				speed;
 	double				height;
 	double				vert_angle;

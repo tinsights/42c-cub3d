@@ -37,9 +37,9 @@
  * to be replaced by input validation
  */
 # define MHEIGHT 8
-# define MWIDTH 24
+# define MWIDTH 11
 
-extern int				map[MHEIGHT][MWIDTH];
+extern char				map[MHEIGHT][MWIDTH];
 
 typedef unsigned int	t_uint;
 typedef unsigned long	t_ulong;
@@ -61,8 +61,7 @@ typedef struct s_player
 	double				position[2];
 
 	double				heading; // in rads
-	double				heading_x;
-	double				heading_y;
+	
 	double				speed;
 	double				height;
 	double				vert_angle;

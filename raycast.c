@@ -24,6 +24,9 @@ typedef struct s_ray
 
 	double projection_plane_x;
 	double perp_wall_dist;
+	
+	double plane_x;
+	double plane_y;
 
 	int map_x;
 	int map_y;
@@ -31,145 +34,140 @@ typedef struct s_ray
 	int step_x;
 	int step_y;
 
+	double				heading_x;
+	double				heading_y;
+
 	bool hit;
 	bool side_x;
 
 	t_img *img;
-	char	*img_data;
+	unsigned int	*img_data;
 } t_ray;
 
-void draw_walls(t_params *params)
+
+void initialise_ray(t_ray *ray, t_player *player, int col)
 {
-	t_player *player = params->player;
-	t_ray ray;
+	ray->projection_plane_x = 2.0 * ((double) col) / (WIN_WIDTH - 1) - 1; // goes from -1 to 1.
 
+	ray->dir_x = ray->heading_x + ray->projection_plane_x * ray->plane_x;
+	ray->dir_y = ray->heading_y + ray->projection_plane_x * ray->plane_y;
 
-	player->heading_x = sin(player->heading);
-	player->heading_y = -cos(player->heading);
-	double half_projection_plane_width = tan(params->fov / 2.0);
-	// printf("ppw: %f\n", half_projection_plane_width);
+	ray->delta_dist_x = (ray->dir_x == 0) ? INFINITY : fabs(1 / ray->dir_x);
+	ray->delta_dist_y = (ray->dir_y == 0) ? INFINITY : fabs(1 / ray->dir_y);
 
-	double right_x = -player->heading_y * half_projection_plane_width;
-	double right_y = player->heading_x * half_projection_plane_width;
+	ray->map_x = (int) player->position[1];
+	ray->map_y = (int) player->position[0];
 
-    double pos_x = player->position[1];
-    double pos_y = player->position[0];
+	ray->hit = false;
+
+	ray->side_x = false;
+	ray->perp_wall_dist = 0.0;
 	
-	t_img *image;
-	for (int col = 0; col < WIN_WIDTH; col++)
+	/**
+	 * Set initial parameters based on heading
+	*/
+	ray->step_x = 0;
+	ray->step_y = 0;
+	ray->dist_x = 0.0;
+	ray->dist_y = 0.0;
+
+	if (ray->dir_x < 0) // looking "west"
 	{
-		ray.projection_plane_x = 2.0 * ((double) col) / (WIN_WIDTH - 1) - 1; // goes from -1 to 1.
+		ray->step_x = -1;
+		ray->dist_x = (player->position[1] - ray->map_x) * ray->delta_dist_x;
+	}
+	else
+	{
+		ray->step_x = 1;
+		ray->dist_x = (1.0 + ray->map_x - player->position[1]) * ray->delta_dist_x;
+	}
+	if (ray->dir_y < 0) // looking "north"
+	{
+		ray->step_y = -1;
+		ray->dist_y = (player->position[0] - ray->map_y) * ray->delta_dist_y;
+	}
+	else
+	{
+		ray->step_y = 1;
+		ray->dist_y = (1.0 + ray->map_y - player->position[0]) * ray->delta_dist_y;
+	}
+	ray->next = NULL;
+}
 
-		ray.dir_x = player->heading_x + ray.projection_plane_x * right_x;
-		ray.dir_y = player->heading_y + ray.projection_plane_x * right_y;
-
-		ray.delta_dist_x = (ray.dir_x == 0) ? INFINITY : fabs(1 / ray.dir_x);
-		ray.delta_dist_y = (ray.dir_y == 0) ? INFINITY : fabs(1 / ray.dir_y);
-
-        ray.map_x = (int) pos_x;
-        ray.map_y = (int) pos_y;
-
-        ray.hit = false;
-
-		ray.side_x = false;
-        ray.perp_wall_dist = 0.0;
-		
-        /**
-         * Set initial parameters based on heading
-        */
-        ray.step_x = 0;
-		ray.step_y = 0;
-		ray.dist_x = 0.0;
-		ray.dist_y = 0.0;
-
-		if (ray.dir_x < 0) // looking "west"
-		{
-			ray.step_x = -1;
-			ray.dist_x = (pos_x - ray.map_x) * ray.delta_dist_x;
-		}
-		else
-		{
-			ray.step_x = 1;
-			ray.dist_x = (1.0 + ray.map_x - pos_x) * ray.delta_dist_x;
-		}
-		if (ray.dir_y < 0) // looking "north"
-		{
-			ray.step_y = -1;
-			ray.dist_y = (pos_y - ray.map_y) * ray.delta_dist_y;
-		}
-		else
-		{
-			ray.step_y = 1;
-			ray.dist_y = (1.0 + ray.map_y - pos_y) * ray.delta_dist_y;
-		}
-
-
+void dda(t_params *params, t_ray *ray)
+{
         /**
          * This just checks if we are currently inside a box
          * and renders the walls from within.
          * not exactly neccessary, especially once wall collision is implemented
         */
-		if (map[ray.map_y][ray.map_x] != 0)
+		if (map[ray->map_y][ray->map_x] != '0')
 		{
-			if (ray.dist_x < ray.dist_y) // what if equal?
+			if (ray->dist_x < ray->dist_y) // what if equal?
 			{
-				ray.dist_x += ray.delta_dist_x;
-				ray.side_x = 1;
+				ray->dist_x += ray->delta_dist_x;
+				ray->side_x = 1;
 			}
 			else
 			{
-				ray.dist_y += ray.delta_dist_y;
-				ray.side_x = 0;
+				ray->dist_y += ray->delta_dist_y;
+				ray->side_x = 0;
 			}
-			ray.hit = true;
-			image = params->inner;
+			ray->hit = true;
+			ray->img = params->inner;
 		}
 
         /* -------------------------------------------------------------------------- */
         /*                        DIGITAL DIFFERENTIAL ANALYSIS                       */
         /* -------------------------------------------------------------------------- */
-		while(!ray.hit)
+		while(!ray->hit)
 		{
-			if (ray.dist_x < ray.dist_y) // what if equal?
+			if (ray->dist_x < ray->dist_y) // what if equal?
 			{
-				ray.dist_x += ray.delta_dist_x;
-				ray.map_x += ray.step_x;
-				ray.side_x = 1;
+				ray->dist_x += ray->delta_dist_x;
+				ray->map_x += ray->step_x;
+				ray->side_x = 1;
 			}
 			else
 			{
-				ray.dist_y += ray.delta_dist_y;
-				ray.map_y += ray.step_y;
-				ray.side_x = 0;
+				ray->dist_y += ray->delta_dist_y;
+				ray->map_y += ray->step_y;
+				ray->side_x = 0;
 			}
-			if (map[ray.map_y][ray.map_x] != 0)
+			if (map[ray->map_y][ray->map_x] != '0')
 			{
-				ray.hit = true;
-				if (ray.side_x)
+				ray->hit = true;
+				if (ray->side_x)
 				{
-					if (ray.dir_x > 0)
-						image = params->east;
+					if (ray->dir_x > 0)
+						ray->img = params->east;
 					else
-						image = params->west;
+						ray->img = params->west;
 				}
 				else
 				{
-					if (ray.dir_y > 0)
-						image = params->south;
+					if (ray->dir_y > 0)
+						ray->img = params->south;
 					else
-						image = params->north;
+						ray->img = params->north;
 				}
 			}
 		}
-		unsigned int *img_data = (unsigned int *)image->data;
 
-		if (ray.side_x)
-			ray.perp_wall_dist = ray.dist_x - ray.delta_dist_x;
+		if (ray->side_x)
+			ray->perp_wall_dist = ray->dist_x - ray->delta_dist_x;
 		else
-			ray.perp_wall_dist = ray.dist_y - ray.delta_dist_y;
+			ray->perp_wall_dist = ray->dist_y - ray->delta_dist_y;
+}
 
+
+void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
+{
+	 	double pos_x = player->position[1];
+    	double pos_y = player->position[0];
+		
 		double dist_to_projection_plane = (WIN_WIDTH / 2.0) / (tan(params->fov / 2.0));
-		double ratio = dist_to_projection_plane / ray.perp_wall_dist;
+		double ratio = dist_to_projection_plane / ray->perp_wall_dist;
 		double vert_shear = tan(player->vert_angle) * dist_to_projection_plane;
 
 		int actual_bottom = ratio * player->height + WIN_HEIGHT / 2 + vert_shear;
@@ -182,20 +180,20 @@ void draw_walls(t_params *params)
 		if (top_of_wall < 0)
 			top_of_wall = 0;
 
-		// printf("unit height is %i, ray.perp_wall_dist is %f\n", unit_height, ray.perp_wall_dist);
+		// printf("unit height is %i, ray->perp_wall_dist is %f\n", unit_height, ray->perp_wall_dist);
 		// printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottom_of_wall, top_of_wall);
 
 		double texture_slice;
-		if (ray.side_x)
+		if (ray->side_x)
 		{
-			texture_slice = pos_y + ray.dir_y * ray.perp_wall_dist - ray.map_y;
-			if (ray.dir_x < 0)
+			texture_slice = pos_y + ray->dir_y * ray->perp_wall_dist - ray->map_y;
+			if (ray->dir_x < 0)
 				texture_slice = 1.0 - texture_slice;
 		}
 		else
 		{
-			texture_slice = pos_x + ray.dir_x * ray.perp_wall_dist - ray.map_x;
-			if (ray.dir_y > 0)
+			texture_slice = pos_x + ray->dir_x * ray->perp_wall_dist - ray->map_x;
+			if (ray->dir_y > 0)
 				texture_slice = 1.0 - texture_slice;
 		}
 		
@@ -203,19 +201,20 @@ void draw_walls(t_params *params)
         /*                             PAINTING THE WALLS                             */
         /* -------------------------------------------------------------------------- */
 
-		// int color = map[ray.map_y][ray.map_x] == 1 ? 0x000088 : 0x880000;
+		// int color = map[ray->map_y][ray->map_x] == 1 ? 0x000088 : 0x880000;
 		
 
 		// if (col == WIN_WIDTH / 2)
 		// {
-		// 	printf("looking at wall %i %i, at slice %f\n", ray.map_x, ray.map_y, texture_slice);
+		// 	printf("looking at wall %i %i, at slice %f\n", ray->map_x, ray->map_y, texture_slice);
 		// 	printf("ray dir x: %f | ray diry: %f\n", ray_dir_x, ray_dir_y);
 		// 	printf("%d %x\n", ((unsigned int*)image->data)[0], ((unsigned int*)image->data)[0]);
 		// 	printf("image bpp: %i, image width: %i, image height: %i, image line_sz: %i\n", image->bpp, image->width, image->height, image->size_line);
 		// 	printf("tex col is %i\n", tex_col);
 		// }
+		ray->img_data = (unsigned int *)ray->img->data;
 
-		int tex_col = texture_slice * (double) image->width;
+		int tex_col = texture_slice * (double) ray->img->width;
 
 		double true_line_height = actual_bottom - actual_top;
 		for (int px = 0; px < WIN_HEIGHT; px++)
@@ -227,9 +226,34 @@ void draw_walls(t_params *params)
 			else
 			{
 				double row_slice = (double) (px - actual_top) / true_line_height;
-				int tex_row = row_slice * (double) image->height;
-				put_pixel(*params, px, col, (img_data[(tex_row * image->size_line)/(image->bpp /8) + tex_col]));
+				int tex_row = row_slice * (double) ray->img->height;
+				put_pixel(*params, px, col, (ray->img_data[(tex_row * ray->img->size_line)/(ray->img->bpp /8) + tex_col]));
 			}
 		}
+}
+
+void draw_walls(t_params *params)
+{
+	t_player *player = params->player;
+	t_ray ray;
+
+
+	ray.heading_x = sin(player->heading);
+	ray.heading_y = -cos(player->heading);
+	double half_projection_plane_width = tan(params->fov / 2.0);
+	// printf("ppw: %f\n", half_projection_plane_width);
+
+	ray.plane_x = -ray.heading_y * half_projection_plane_width;
+	ray.plane_y = ray.heading_x * half_projection_plane_width;
+
+   
+	
+	for (int col = 0; col < WIN_WIDTH; col++)
+	{
+		initialise_ray(&ray, player, col);
+
+		dda(params, &ray);
+
+		paint_walls(params, player, &ray, col);
 	}
 }

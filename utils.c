@@ -160,11 +160,69 @@ int key_release_hook(int keycode, t_params *params)
 	}
 	return (1);
 }
+
+void shoot(t_params *params)
+{
+	t_player *player = params->player;
+	t_ray ray;
+
+	// ft_bzero(&ray, sizeof(t_ray));
+
+	ray.heading_x = sin(player->heading);
+	ray.heading_y = -cos(player->heading);
+	double half_projection_plane_width = tan(params->fov / 2.0);
+	// printf("ppw: %f\n", half_projection_plane_width);
+
+	ray.plane_x = -ray.heading_y * half_projection_plane_width;
+	ray.plane_y = ray.heading_x * half_projection_plane_width;
+
+	initialise_ray(&ray, player, WIN_WIDTH / 2);
+
+
+	dda(params, &ray);
+
+	double dist_to_projection_plane = (WIN_WIDTH / 2.0) / (tan(params->fov / 2.0));
+	double ratio = dist_to_projection_plane / ray.perp_wall_dist;
+	double vert_shear = tan(player->vert_angle) * dist_to_projection_plane;
+	int actual_bottom = ratio * player->height + WIN_HEIGHT / 2 + vert_shear;
+	int actual_top = actual_bottom - ratio;
+
+	int bottom_of_wall = actual_bottom;
+	if (bottom_of_wall >= WIN_HEIGHT)
+		bottom_of_wall = WIN_HEIGHT - 1;
+	int top_of_wall = actual_top;
+	if (top_of_wall < 0)
+		top_of_wall = 0;
+
+	// double true_line_height = actual_bottom - actual_top;
+
+	printf("vert shear is %f\n", vert_shear);
+
+	double row_slice;
+	double pos_x = player->position[1];
+	double pos_y = player->position[0];
+	if (ray.side_x)
+	{
+		row_slice = pos_y + ray.dir_y * ray.perp_wall_dist - ray.map_y;
+		if (ray.dir_x < 0)
+			row_slice = 1.0 - row_slice;
+	}
+	else
+	{
+		row_slice = pos_x + ray.dir_x * ray.perp_wall_dist - ray.map_x;
+		if (ray.dir_y > 0)
+			row_slice = 1.0 - row_slice;
+	}
+	double col_slice = player->height + tan(params->player->vert_angle) * ray.perp_wall_dist;	
+	printf("player is looking at wall at %i %i at slice %f %f\n", ray.map_x, ray.map_y, row_slice, col_slice);
+}
 int mouse_click(int button, int x, int y, t_params *params)
 {
 	printf("button: %i | mouseX: %i | mouseY: %i\n", button, x, y);
 
-	if (button == 2)
+	if (button ==1)
+		shoot(params);
+	else if (button == 2)
 	{
 		params->clicked_px[0] = x;
 		params->clicked_px[1] = y;

@@ -192,11 +192,11 @@ void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
 		double pos_y = player->position[0];
 		
 		double dist_to_projection_plane = (WIN_WIDTH / 2.0) / (tan(params->fov / 2.0));
-		double ratio = dist_to_projection_plane / ray->perp_wall_dist;
+		double line_height = dist_to_projection_plane / ray->perp_wall_dist;
 		double vert_shear = tan(player->vert_angle) * dist_to_projection_plane;
 
-		int actual_bottom = ratio * player->height + WIN_HEIGHT / 2 + vert_shear;
-		int actual_top = actual_bottom - ratio;
+		int actual_bottom = line_height * player->height + WIN_HEIGHT / 2 + vert_shear;
+		int actual_top = actual_bottom - line_height;
 
 		int bottom_of_wall = actual_bottom;
 		if (bottom_of_wall >= WIN_HEIGHT)

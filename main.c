@@ -108,17 +108,18 @@ void draw_minimap(t_params p)
 	int pos_y = p.player->position[0];
 	int pos_x = p.player->position[1];
 
+	int off_y = sq_size / 2 + (p.player->position[0] - pos_y) * sq_size;
+	int off_x = sq_size / 2 + (p.player->position[1] - pos_x) * sq_size;
+	printf("off y: %i off_x : %i\n", off_y, off_x);
 	for (int px_col = 0; px_col < total_size; px_col++)
 	{
 		for (int px_row = 0; px_row < total_size; px_row++)
 		{
-			if (px_row % sq_size == 0 || px_col % sq_size == 0 || px_row == total_size - 1 || px_col == total_size - 1)
+			if ((px_row + off_y) % sq_size == 0|| (px_col + off_x ) % sq_size == 0)
 				put_pixel(p, px_row, px_col, 0xffffff);
 			
-			int col_check = pos_x - mm_size / 2 + px_col / sq_size;
-			int row_check = pos_y - mm_size / 2 + px_row / sq_size;
-			// printf("col %i row %i\n", mm_size / 2 - col / sq_size,  mm_size / 2 - row / sq_size);
-			// printf("%c\n", map[row_check][col_check]);
+			int col_check = pos_x - mm_size / 2 + (px_col + off_x) / sq_size - 1;
+			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size - 1;
 			if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
 				put_pixel(p, px_row, px_col, 0x11111);
 			if (map[row_check][col_check] == '1')

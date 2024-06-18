@@ -160,21 +160,16 @@ void dda(t_params *params, t_ray *ray)
 				if (ray->img == params->inner)
 				{
 					if (ray->side_x)
-					{
 						next->map_x += ray->step_x;
-						// next->dist_y += 1;
-					}
 					else
-					{
 						next->map_y += ray->step_y;
-						// next->dist_x += 1;
-
-					}
 				}
 				// if (ray->col == WIN_WIDTH / 2)
 				// 	printf("new ray starting from %i %i\n", next->map_x, next->map_y);
 				dda(params, next);
 			}
+			else if(ray->col == WIN_WIDTH / 2)
+				printf("\tplayer %f %f, ray %i %i\n", params->player->position[1],params->player->position[0], ray->map_x, ray->map_y);
 		}
 }
 
@@ -260,7 +255,7 @@ void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
 				else if (px > bottom_of_wall )
 					put_pixel(*params, px, col, 0x333333);
 			}
-			if (px > top_of_wall && px < bottom_of_wall)
+			if (px >= top_of_wall && px <= bottom_of_wall)
 			{
 				double row_slice = (double) (px - actual_top) / true_line_height;
 				int tex_row = row_slice * (double) ray->img->height;

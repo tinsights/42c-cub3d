@@ -22,6 +22,12 @@ void put_pixel(t_params p, t_uint row, t_uint col, int colour)
 int	close_window(t_params *params)
 {
 	mlx_destroy_image(params->mlx->ptr, params->mlx->img);
+	mlx_destroy_image(params->mlx->ptr, params->north);
+	mlx_destroy_image(params->mlx->ptr, params->east);
+	mlx_destroy_image(params->mlx->ptr, params->west);
+	mlx_destroy_image(params->mlx->ptr, params->south);
+	mlx_destroy_image(params->mlx->ptr, params->inner);
+
 	mlx_destroy_window(params->mlx->ptr, params->mlx->win);
 	mlx_destroy_display(params->mlx->ptr);
 	free(params->mlx->ptr);
@@ -73,6 +79,36 @@ void strafe_player(t_params *params, int direction)
 	player->position[1] += cos(player->heading) * step * direction;
 }
 
+void spraypaint(t_params *params)
+{
+	t_player *player = params->player;
+	t_ray ray;
+
+	// ft_bzero(&ray, sizeof(t_ray));
+
+	ray.heading_x = sin(player->heading);
+	ray.heading_y = -cos(player->heading);
+	double half_projection_plane_width = tan(params->fov / 2.0);
+	// printf("ppw: %f\n", half_projection_plane_width);
+
+	ray.plane_x = -ray.heading_y * half_projection_plane_width;
+	ray.plane_y = ray.heading_x * half_projection_plane_width;
+
+	initialise_ray(&ray, player, WIN_WIDTH / 2);
+
+
+	dda(params, &ray);
+	printf("player is looking at wall at %i %i\n", ray.map_x, ray.map_y);
+	int map_x = ray.map_x;
+	int map_y = ray.map_y;
+	if (map[map_y][map_x] == 't')
+		map[map_y][map_x] = '1';
+	else
+		map[map_y][map_x] = 't';
+
+	
+}
+
 int	key_hook(int keycode, t_params *params)
 {
 	t_player *player = params->player;
@@ -107,6 +143,8 @@ int	key_hook(int keycode, t_params *params)
 		player->height -= 0.25;
 	else if (keycode == XK_space)
 		player->height += 0.25;
+	else if (keycode == XK_t)
+		spraypaint(params);
 	else
 		ft_printf("KEY: %i\n", keycode);
 	render(params);

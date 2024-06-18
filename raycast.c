@@ -13,42 +13,6 @@
 #include "cub3d.h"
 
 
-typedef struct s_ray
-{
-	int id;
-	int col; //pixel col;
-	double dir_x;
-	double dir_y;
-	double dist_x;
-	double dist_y;
-	double delta_dist_x;
-	double delta_dist_y;
-
-	double projection_plane_x;
-	double perp_wall_dist;
-	
-	double plane_x;
-	double plane_y;
-
-	int map_x;
-	int map_y;
-
-	int step_x;
-	int step_y;
-
-	double				heading_x;
-	double				heading_y;
-
-	bool hit;
-	bool side_x;
-
-	int height;
-	t_img *img;
-	unsigned int	*img_data;
-	struct s_ray	*next;
-} t_ray;
-
-
 void initialise_ray(t_ray *ray, t_player *player, int col)
 {
 	ray->id = 1;
@@ -162,6 +126,9 @@ void dda(t_params *params, t_ray *ray)
 						ray->img = params->north;
 				}
 			}
+			if (map[ray->map_y][ray->map_x] == 't')
+				ray->img = params->spray;
+
 		}
 
 		if (ray->side_x)
@@ -204,8 +171,8 @@ void dda(t_params *params, t_ray *ray)
 
 					}
 				}
-				if (ray->col == WIN_WIDTH / 2)
-					printf("new ray starting from %i %i\n", next->map_x, next->map_y);
+				// if (ray->col == WIN_WIDTH / 2)
+				// 	printf("new ray starting from %i %i\n", next->map_x, next->map_y);
 				dda(params, next);
 			}
 		}
@@ -216,11 +183,11 @@ void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
 {
 		if (ray->next)
 		{
-			
 			paint_walls(params, player, ray->next, col);
+			free(ray->next);
 		}
-		if (ray->col == WIN_WIDTH / 2)
-			printf("painting ray %i\n", ray->id);
+		// if (ray->col == WIN_WIDTH / 2)
+		// 	printf("painting ray %i\n", ray->id);
 		double pos_x = player->position[1];
 		double pos_y = player->position[0];
 		
@@ -275,17 +242,22 @@ void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
 		int tex_col = texture_slice * (double) ray->img->width;
 
 		double true_line_height = actual_bottom - actual_top;
-		if (ray->col == WIN_WIDTH / 2)
-			printf("ray %i has tlh of %f\n", ray->id, true_line_height);
-		// if (!ray->next)
-		// {
+		// if (ray->col == WIN_WIDTH / 2)
+		// 	printf("ray %i has tlh of %f\n", ray->id, true_line_height);
+
+		// bool condition = ray->img == params->inner;
 		for (int px = 0; px < WIN_HEIGHT; px++)
 		{
+
+			// if (condition)
+			// {
+			// 	put_pixel(*params, px, col, 0xfffff);
+			// }
 			if (!(ray->next))
 			{
 				if (px < top_of_wall )
 					put_pixel(*params, px, col, 0x888888);
-				else if (px> bottom_of_wall )
+				else if (px > bottom_of_wall )
 					put_pixel(*params, px, col, 0x333333);
 			}
 			if (px > top_of_wall && px < bottom_of_wall)
@@ -293,7 +265,6 @@ void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
 				double row_slice = (double) (px - actual_top) / true_line_height;
 				int tex_row = row_slice * (double) ray->img->height;
 				put_pixel(*params, px, col, (ray->img_data[(tex_row * ray->img->size_line)/(ray->img->bpp /8) + tex_col]));
-				// put_pixel(*params, px, col, 0xfffff / ray->id);
 			}
 		}
 		// }
@@ -322,19 +293,19 @@ void draw_walls(t_params *params)
 
 		dda(params, &ray);
 
-		if (ray.next)
-		{
-			if (col == WIN_WIDTH / 2)
-			{	
-				t_ray *ptr = &ray;
+		// if (ray.next)
+		// {
+		// 	if (col == WIN_WIDTH / 2)
+		// 	{	
+		// 		t_ray *ptr = &ray;
 
-				while (ptr)
-				{
-					printf("ray %i hit %i %i with dist %f\n", ptr->id, ptr->map_x, ptr->map_y, ptr->perp_wall_dist);
-					ptr = ptr->next;
-				}
-			}
-		}
+		// 		while (ptr)
+		// 		{
+		// 			printf("ray %i hit %i %i with dist %f\n", ptr->id, ptr->map_x, ptr->map_y, ptr->perp_wall_dist);
+		// 			ptr = ptr->next;
+		// 		}
+		// 	}
+		// }
 
 		paint_walls(params, player, &ray, col);
 	}

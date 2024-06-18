@@ -79,8 +79,44 @@ typedef struct s_params
 	t_img				*south;
 	t_img				*east;
 	t_img				*west;
+	t_img				*spray;
 	double				fov;
 }						t_params;
+
+typedef struct s_ray
+{
+	int id;
+	int col; //pixel col;
+	double dir_x;
+	double dir_y;
+	double dist_x;
+	double dist_y;
+	double delta_dist_x;
+	double delta_dist_y;
+
+	double projection_plane_x;
+	double perp_wall_dist;
+	
+	double plane_x;
+	double plane_y;
+
+	int map_x;
+	int map_y;
+
+	int step_x;
+	int step_y;
+
+	double				heading_x;
+	double				heading_y;
+
+	bool hit;
+	bool side_x;
+
+	int height;
+	t_img *img;
+	unsigned int	*img_data;
+	struct s_ray	*next;
+} t_ray;
 
 int						key_hook(int keycode, t_params *params);
 int						close_window(t_params *params);
@@ -94,5 +130,9 @@ int						mouse_click(int button, int x, int y, t_params *params);
 int						key_release_hook(int keycode, t_params *params);
 void					draw_crosshair(t_params p);
 int						render(t_params *p);
+void dda(t_params *params, t_ray *ray);
+void initialise_ray(t_ray *ray, t_player *player, int col);
+
+
 
 #endif

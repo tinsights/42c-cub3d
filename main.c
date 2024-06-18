@@ -75,6 +75,7 @@ int main(void)
 	int width;
 	int height;
 	params.inner = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height);
+	params.spray = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height);
 	params.north = mlx_xpm_file_to_image(mlx.ptr, "cooi.xpm", &width, &height);
 	params.south = mlx_xpm_file_to_image(mlx.ptr, "jerlim.xpm", &width, &height);
 	params.east = mlx_xpm_file_to_image(mlx.ptr, "achak.xpm", &width, &height);

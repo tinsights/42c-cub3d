@@ -23,10 +23,22 @@ int map[MHEIGHT][MWIDTH] = {
 {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
 };
 
-int main(void)
+int main(int argc, char *argv[])
 {
+	t_input	*dat;
 
+	dat = (t_input *)malloc(sizeof(t_input));
+	if (dat == NULL)
+		return (0);
+	if (argc != 2)
+		return (0);
+	else
+		get_data(argv[1], dat);
 	t_params params;
+	
+	print_input(dat);
+	printf("end of validation\n");
+	return (0);
 	/* -------------------------------------------------------------------------- */
 	/*                                  MLX INIT                                  */
 	/* -------------------------------------------------------------------------- */

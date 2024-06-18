@@ -128,6 +128,11 @@ void draw_walls(t_params *params)
 		else
 			perp_wall_distance = dist_y - delta_dist_y;
 
+
+		if (col == WIN_WIDTH / 2)
+		{
+			//printf("looking at %f\n", )
+		}
 		double dist_to_projection_plane = (WIN_WIDTH / 2.0) / (tan(params->fov / 2.0));
 		double ratio = dist_to_projection_plane / perp_wall_distance;
 		double vert_shear = tan(player->vert_angle) * dist_to_projection_plane;

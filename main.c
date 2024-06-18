@@ -14,14 +14,14 @@
 
 
 char map[MHEIGHT][MWIDTH] = {
-"22222222222",
-"20000000002",
-"20000000002",
-"20000010002",
-"20000000002",
-"20000000002",
-"20000000002",
-"22222222222",
+"11111111111",
+"10000000001",
+"10000000001",
+"10000110001",
+"10000110001",
+"10000000001",
+"10000000001",
+"11111111111",
 };
 
 // int map[MHEIGHT][MWIDTH] = {
@@ -92,7 +92,7 @@ int main(void)
 	mlx_do_key_autorepeaton(mlx.ptr); // does this do anything?
 
 	render(&params);
-	mlx_loop_hook(mlx.ptr, render, &params);
+	// mlx_loop_hook(mlx.ptr, render, &params);
 	mlx_loop(mlx.ptr);
 }
 

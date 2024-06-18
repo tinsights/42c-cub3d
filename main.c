@@ -60,7 +60,7 @@ int main(void)
 	params.player = &player;
 	params.fov = FOV / 180.0 * M_PI;
 	
-	player.position[0] = 3.0;
+	player.position[0] = 3.5;
 	player.position[1] = 3.5;
 	player.heading = 0;
 	player.height = 0.5;
@@ -99,6 +99,40 @@ int main(void)
 
 void draw_walls(t_params *p);
 
+void draw_minimap(t_params p)
+{
+	int sq_size = 20;
+	int mm_size = 5;
+	int total_size = sq_size * mm_size;
+
+	int pos_y = p.player->position[0];
+	int pos_x = p.player->position[1];
+
+	for (int px_col = 0; px_col < total_size; px_col++)
+	{
+		for (int px_row = 0; px_row < total_size; px_row++)
+		{
+			if (px_row % sq_size == 0 || px_col % sq_size == 0 || px_row == total_size - 1 || px_col == total_size - 1)
+				put_pixel(p, px_row, px_col, 0xffffff);
+			
+			int col_check = pos_x - mm_size / 2 + px_col / sq_size;
+			int row_check = pos_y - mm_size / 2 + px_row / sq_size;
+			// printf("col %i row %i\n", mm_size / 2 - col / sq_size,  mm_size / 2 - row / sq_size);
+			// printf("%c\n", map[row_check][col_check]);
+			if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
+				put_pixel(p, px_row, px_col, 0x11111);
+			if (map[row_check][col_check] == '1')
+				put_pixel(p, px_row,px_col, 0xff0000);
+			if (px_col > total_size / 2 - 2 && px_col < total_size / 2 + 2
+				&& px_row > total_size / 2 - 2 && px_row < total_size / 2 + 2)
+				{
+					put_pixel(p, px_row, px_col, 0x00ffff);
+				}
+		}
+	}
+
+}
+
 int render(t_params *p)
 {
 	// draw_grid(*p);
@@ -106,7 +140,7 @@ int render(t_params *p)
 
 	draw_walls(p);
 	draw_crosshair(*p);
-
+	draw_minimap(*p);
 	mlx_put_image_to_window(p->mlx->ptr, p->mlx->win, p->mlx->img, 0, 0);
 	return (1);
 }

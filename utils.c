@@ -77,6 +77,7 @@ void strafe_player(t_params *params, int direction)
 
 	player->position[0] += sin(player->heading) * step * direction;
 	player->position[1] += cos(player->heading) * step * direction;
+	printf("player pos: %f %f\n", player->position[0], player->position[1]);
 }
 
 void spraypaint(t_params *params)

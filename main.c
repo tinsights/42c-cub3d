@@ -35,10 +35,22 @@ char map[MHEIGHT][MWIDTH] = {
 // {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
 // };
 
-int main(void)
+int main(int argc, char *argv[])
 {
+	t_input	*dat;
 
+	dat = (t_input *)malloc(sizeof(t_input));
+	if (dat == NULL)
+		return (0);
+	if (argc != 2)
+		return (0);
+	else
+		get_data(argv[1], dat);
 	t_params params;
+	
+	print_input(dat);
+	printf("end of validation\n");
+	return (0);
 	/* -------------------------------------------------------------------------- */
 	/*                                  MLX INIT                                  */
 	/* -------------------------------------------------------------------------- */
@@ -60,10 +72,10 @@ int main(void)
 	params.player = &player;
 	params.fov = FOV / 180.0 * M_PI;
 	
-	player.position[0] = 3.5;
-	player.position[1] = 3.5;
+	player.position[0] = 3.0; // 300
+	player.position[1] = 3.9; // 390
 	player.heading = 0;
-	player.height = 0.5;
+	player.height = 0.1; // 10
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
 

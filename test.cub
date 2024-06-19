@@ -1,0 +1,12 @@
+F 200,150,50
+
+NO ./incs/sample.xpm
+SO ./incs/sample.xpm
+
+EA ./incs/sample.xpm
+WE ./incs/sample.xpm
+C 255,100,5
+
+11   11    111 
+111111100001N1111
+11110        111

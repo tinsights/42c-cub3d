@@ -21,6 +21,7 @@
 # include <mlx_int.h>
 # include <stdbool.h>
 # include <stdio.h> // printf
+# include <fcntl.h>
 
 # define WIN_WIDTH 1280
 # define WIN_HEIGHT 800
@@ -38,11 +39,38 @@
  */
 # define MHEIGHT 8
 # define MWIDTH 11
+# define ONEORZERO 1 //1 or 0
 
 extern char				map[MHEIGHT][MWIDTH];
 
 typedef unsigned int	t_uint;
 typedef unsigned long	t_ulong;
+
+typedef struct s_mapinfo
+{
+	t_list	*lst;
+	int	rows; //row size
+	int	rwidth; //same as col size
+	int	nswe[4][3];
+	int	irow;
+	int	icol;
+} t_mapinfo;
+
+typedef struct s_input
+{
+	char	*nxpm;
+	char	*sxpm;
+	char	*expm;
+	char	*wxpm;
+	int	fcolor[3];
+	int	ccolor[3];
+	int	xdir;//xdir based on NSWE
+	int	ydir;//ydir based on NSWE
+	int	xpos;//xcoordinate of player
+	int	ypos;//ycoordinate of player
+	//int 	**map;
+	char	**map;
+} t_input;
 
 typedef struct s_mlx
 {
@@ -134,5 +162,42 @@ void dda(t_params *params, t_ray *ray);
 void initialise_ray(t_ray *ray, t_player *player, int col);
 
 
+
+//parse_input.c
+void 	get_data(char *mapfile, t_input	*dat);
+
+//scene_info.c
+int	validate_typeid(int fd, t_input *dat);
+int	read_line(int fd, char **line);
+
+//memory_cleanup.c
+void	free_intarr(int **arr, int size);
+void	free_str(char **str);
+void	free_strarr(char **ptr);
+int	free_maplst(t_list **lst);
+int	free_return1(t_list **lst, char **str);
+
+//parse_utils.c
+int	nondigits(char *str);
+int	validchar(char c, char *vchr);
+int	validstr(char *str, char *vchr);
+int	wcount(char **elem);
+
+//map.c
+int	parse_map(int fd, t_input *dat);
+
+//map_utils.c
+int	remove_nl(char **line);
+int	isemptyline(char *line);
+int	validate_nswe(const char *str, t_mapinfo *mi, t_input *dat);
+
+//mapborder.c
+int	isvalidborder(t_mapinfo *mi, t_input *dat);
+
+//print.c
+void	print_mi(t_mapinfo *mi);
+void	print_lst(t_list *lst);
+void	print_input(t_input *dat);
+void	print_dblarr(char **arr);
 
 #endif

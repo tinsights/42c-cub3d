@@ -74,12 +74,12 @@ int main(void)
 
 	int width;
 	int height;
-	params.inner = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height);
+	params.inner = mlx_xpm_file_to_image(mlx.ptr, "hallway.xpm", &width, &height);
 	params.spray = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height);
-	params.north = mlx_xpm_file_to_image(mlx.ptr, "cooi.xpm", &width, &height);
-	params.south = mlx_xpm_file_to_image(mlx.ptr, "jerlim.xpm", &width, &height);
-	params.east = mlx_xpm_file_to_image(mlx.ptr, "achak.xpm", &width, &height);
-	params.west = mlx_xpm_file_to_image(mlx.ptr, "so-leary.xpm", &width, &height);
+	params.north = mlx_xpm_file_to_image(mlx.ptr, "tube.xpm", &width, &height);
+	params.south = mlx_xpm_file_to_image(mlx.ptr, "sakura.xpm", &width, &height);
+	params.east = mlx_xpm_file_to_image(mlx.ptr, "seeds.xpm", &width, &height);
+	params.west = mlx_xpm_file_to_image(mlx.ptr, "square.xpm", &width, &height);
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */
@@ -101,7 +101,7 @@ void draw_walls(t_params *p);
 
 void draw_minimap(t_params p)
 {
-	int sq_size = 10;
+	int sq_size = 15;
 	int mm_size = 10;
 	int total_size = sq_size * mm_size;
 
@@ -121,6 +121,10 @@ void draw_minimap(t_params p)
 	double heading_y = -cos(heading);
 	double plane_x = -heading_y * half_projection_plane_width;
 	double plane_y = heading_x * half_projection_plane_width;
+
+	for (int px_col = 0; px_col < total_size; px_col++)
+		for (int px_row = 0; px_row < total_size; px_row++)
+				put_pixel(p, px_row, px_col, 0xa9a9a9);
 
 	for (int ray = -WIN_WIDTH / 2; ray < WIN_WIDTH / 2; ray++)
 	{

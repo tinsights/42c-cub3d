@@ -40,6 +40,9 @@ void	init_input(t_input *dat)
 	dat->ccolor[0] = -1;
 	dat->ccolor[1] = -1;
 	dat->ccolor[2] = -1;
+	dat->fclr = 0;
+	dat->cclr = 0;
+	dat->fov = 0;
 	dat->xdir = 0;
 	dat->ydir = 0;
 	dat->xpos = 0;
@@ -56,8 +59,8 @@ void 	get_data(char *mapfile, t_input	*dat)
 	if (fd == -1)
 		error_exit(-1, "Open", 1);
 	if (validate_typeid(fd, dat) == -1)
-		error_exit(fd, "Invalid Typeid", 0);//close (fd) is done also
+		error_exit(fd, "Invalid Typeid", 0);//closed (fd)
 	if (parse_map(fd, dat) == -1)
-		error_exit(fd, "Invalid Map", 0);//close (fd) is done also
+		error_exit(fd, "Invalid Map", 0);//closed (fd)
 	close(fd);
 }

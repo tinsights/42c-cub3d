@@ -119,5 +119,9 @@ int	validate_typeid(int fd, t_input *dat)
 	free (line);
 	if (vcount < 6)
 		return (-1);
+	//update fclr and cclr; R,G,B
+	dat->fclr = (dat->fcolor[0] << 16) | dat->fcolor[1] << 8 | dat->fcolor[2];
+	dat->cclr = (dat->ccolor[0] << 16) | dat->ccolor[1] << 8 | dat->ccolor[2];
+	printf("fclr %x , cclr %x \n",dat->fclr, dat->cclr); getchar();
 	return(1);
 }

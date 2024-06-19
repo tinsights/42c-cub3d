@@ -1,10 +1,10 @@
 F 200,150,50
 
-NO ./incs/sample.xpm
-SO ./incs/sample.xpm
+NO ./incs/tube.xpm
+SO ./incs/sakura.xpm
 
-EA ./incs/sample.xpm
-WE ./incs/sample.xpm
+EA ./incs/seeds.xpm
+WE ./incs/square.xpm
 C 255,100,5
 
 11   11    111 

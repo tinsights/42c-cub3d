@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 	
 	print_input(dat);
 	printf("end of validation\n");
-	return (0);
+	//return (0);
 	/* -------------------------------------------------------------------------- */
 	/*                                  MLX INIT                                  */
 	/* -------------------------------------------------------------------------- */
@@ -71,9 +71,12 @@ int main(int argc, char *argv[])
 
 	params.player = &player;
 	params.fov = FOV / 180.0 * M_PI;
-	
+	//params.fov = FOV / dat->fov * M_PI;
+
 	player.position[0] = 3.0; // 300
 	player.position[1] = 3.9; // 390
+	//player.position[0] = 3.0; // 300 -->dat->ypos;
+	//player.position[1] = 3.9; // 390 -->dat->xpos;
 	player.heading = 0;
 	player.height = 0.1; // 10
 	player.vert_angle = 0.0;
@@ -86,12 +89,22 @@ int main(int argc, char *argv[])
 
 	int width;
 	int height;
-	params.inner = mlx_xpm_file_to_image(mlx.ptr, "hallway.xpm", &width, &height);
-	params.spray = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height);
+	params.inner = mlx_xpm_file_to_image(mlx.ptr, "hallway.xpm", &width, &height); // extra
+	params.spray = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height); // extra
 	params.north = mlx_xpm_file_to_image(mlx.ptr, "tube.xpm", &width, &height);
 	params.south = mlx_xpm_file_to_image(mlx.ptr, "sakura.xpm", &width, &height);
 	params.east = mlx_xpm_file_to_image(mlx.ptr, "seeds.xpm", &width, &height);
 	params.west = mlx_xpm_file_to_image(mlx.ptr, "square.xpm", &width, &height);
+	// params.north = mlx_xpm_file_to_image(mlx.ptr, dat->nxpm, &width, &height);
+	// params.south = mlx_xpm_file_to_image(mlx.ptr, dat->sxpm, &width, &height);
+	// params.east = mlx_xpm_file_to_image(mlx.ptr, dat->expm, &width, &height);
+	// params.west = mlx_xpm_file_to_image(mlx.ptr, dat->wxpm, &width, &height);
+
+	/**
+	 * TODO: set params for floor and ceiling colour*/
+	params.fclr = dat->fclr;
+	params.cclr = dat->cclr;
+
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */

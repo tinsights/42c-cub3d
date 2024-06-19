@@ -27,7 +27,7 @@ int	update_playerpos(t_mapinfo *mi, t_input *dat)
 		valid = validate_nswe((char *)lst->content, mi, dat);
 		if (valid == -1 || (valid == 1 && flag == 1))
 			return (-1);
-		if (valid == 1 && flag == 0)
+		if (valid == 1 && flag == 0)// else if
 			flag = 1;
 		lst = lst->next;
 	}
@@ -110,21 +110,26 @@ int	init_mapinfo(t_mapinfo *mi, int fd)
 {
 	mi->rows = 0;
 	mi->rwidth = 0;
-	mi->nswe[0][0] = 78;
+	mi->nswe[0][0] = 78;//n
 	mi->nswe[0][1] = 0;
 	mi->nswe[0][2] = -1;
+	mi->nswe[0][3] = 90;
 
-	mi->nswe[1][0] = 83;
+	mi->nswe[1][0] = 83;//s
 	mi->nswe[1][1] = 0;
 	mi->nswe[1][2] = 1;
+	mi->nswe[1][3] = 270;
 
-	mi->nswe[2][0] = 87;
+	mi->nswe[2][0] = 87;//w
 	mi->nswe[2][1] = -1;
 	mi->nswe[2][2] = 0;
+	mi->nswe[2][3] = 180;
 
-	mi->nswe[3][0] = 69;
+	mi->nswe[3][0] = 69;//e
 	mi->nswe[3][1] = 1;
 	mi->nswe[3][2] = 0;
+	mi->nswe[3][3] = 0;
+
 	if (maplist(fd, mi) == -1)
 		return (-1);
 	return (0);

@@ -27,7 +27,7 @@ void	print_mi(t_mapinfo *mi)
 {
 	printf("\nprint map info: \n");
 	printf("mi->rows %d\n",mi->rows);
-	printf("mi->cols %d\n",mi->cols);
+	// printf("mi->cols %d\n",mi->cols);
 	printf("mi->rwidth %d\n",mi->rwidth);
 	print_lst(mi->lst);
 }

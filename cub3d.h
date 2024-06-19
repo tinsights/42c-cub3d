@@ -51,7 +51,7 @@ typedef struct s_mapinfo
 	t_list	*lst;
 	int	rows; //row size
 	int	rwidth; //same as col size
-	int	nswe[4][3];
+	int	nswe[4][4];
 	int	irow;
 	int	icol;
 } t_mapinfo;
@@ -64,6 +64,9 @@ typedef struct s_input
 	char	*wxpm;
 	int	fcolor[3];
 	int	ccolor[3];
+	int	fclr;
+	int	cclr;
+	int fov; //E 0, N 90, W 180, S 270
 	int	xdir;//xdir based on NSWE
 	int	ydir;//ydir based on NSWE
 	int	xpos;//xcoordinate of player
@@ -108,6 +111,8 @@ typedef struct s_params
 	t_img				*east;
 	t_img				*west;
 	t_img				*spray;
+	int				fclr;
+	int				cclr;
 	double				fov;
 }						t_params;
 

@@ -116,6 +116,7 @@ int	validate_typeid(int fd, t_input *dat)
 		free (line);
 		line = get_next_line(fd);
 	}
+	free (line);
 	if (vcount < 6)
 		return (-1);
 	return(1);

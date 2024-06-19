@@ -48,14 +48,11 @@ typedef unsigned long	t_ulong;
 typedef struct s_mapinfo
 {
 	t_list	*lst;
-	int	rows; //count rows
-	int	cols; //count cols
-	int	rwidth; //current row width //replace it with cols
+	int	rows; //row size
+	int	rwidth; //same as col size
 	int	nswe[4][3];
 	int	irow;
 	int	icol;
-	//int	max; //maxwidth
-	//int	pflag;//to check duplicate player
 } t_mapinfo;
 
 typedef struct s_input

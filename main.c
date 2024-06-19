@@ -101,37 +101,69 @@ void draw_walls(t_params *p);
 
 void draw_minimap(t_params p)
 {
-	int sq_size = 20;
-	int mm_size = 5;
+	int sq_size = 10;
+	int mm_size = 10;
 	int total_size = sq_size * mm_size;
+
+
+	// start at center of minimap, draw straight line in direction of heading
+	double heading = p.player->heading;
 
 	int pos_y = p.player->position[0];
 	int pos_x = p.player->position[1];
 
-	int off_y = sq_size / 2 + (p.player->position[0] - pos_y) * sq_size;
-	int off_x = sq_size / 2 + (p.player->position[1] - pos_x) * sq_size;
-	printf("off y: %i off_x : %i\n", off_y, off_x);
+	int off_y =(p.player->position[0] - pos_y) * sq_size;
+	int off_x =(p.player->position[1] - pos_x) * sq_size;
+	// printf("off y: %i off_x : %i\n", off_y, off_x);
+	double half_projection_plane_width = tan(p.fov / 2.0);
+
+	double heading_x = sin(heading);
+	double heading_y = -cos(heading);
+	double plane_x = -heading_y * half_projection_plane_width;
+	double plane_y = heading_x * half_projection_plane_width;
+
+	for (int ray = -WIN_WIDTH / 2; ray < WIN_WIDTH / 2; ray++)
+	{
+
+		double projection_plane_x = 2.0 * (double) ray / (WIN_WIDTH - 1); // goes from -1 to 1.
+		double dir_x = heading_x + projection_plane_x * plane_x;
+		double dir_y = heading_y + projection_plane_x * plane_y;
+		double heading_px_row = total_size / 2;
+		double heading_px_col = total_size / 2;
+		while (heading_px_col < total_size && heading_px_col > 0
+		&& heading_px_row > 0 && heading_px_row < total_size)
+		{
+			int col_check = pos_x - mm_size / 2 + (heading_px_col + off_x) / sq_size;
+			int row_check = pos_y - mm_size / 2 + (heading_px_row + off_y) / sq_size;
+			if (map[row_check][col_check] == '1' && p.player->height <= 1.0 && p.player->height >= 0)
+				break ;
+			put_pixel(p, heading_px_row, heading_px_col, 0x550077);
+			heading_px_row += dir_y;
+			heading_px_col += dir_x;
+		}
+	}
+
 	for (int px_col = 0; px_col < total_size; px_col++)
 	{
 		for (int px_row = 0; px_row < total_size; px_row++)
 		{
-			if ((px_row + off_y) % sq_size == 0|| (px_col + off_x ) % sq_size == 0)
+			if (px_row == 0 || px_row == total_size -1 || px_col == 0 | px_col == total_size - 1)
+				put_pixel(p, px_row, px_col, 0x000000);
+			else if ((px_row + off_y) % sq_size == 0|| (px_col + off_x ) % sq_size == 0)
 				put_pixel(p, px_row, px_col, 0xffffff);
 			
-			int col_check = pos_x - mm_size / 2 + (px_col + off_x) / sq_size - 1;
-			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size - 1;
+			int col_check = pos_x - mm_size / 2 + (px_col + off_x) / sq_size;
+			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size;
 			if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
-				put_pixel(p, px_row, px_col, 0x11111);
-			if (map[row_check][col_check] == '1')
+				put_pixel(p, px_row, px_col, 0x111111);
+			else if (map[row_check][col_check] == '1')
 				put_pixel(p, px_row,px_col, 0xff0000);
+
 			if (px_col > total_size / 2 - 2 && px_col < total_size / 2 + 2
 				&& px_row > total_size / 2 - 2 && px_row < total_size / 2 + 2)
-				{
 					put_pixel(p, px_row, px_col, 0x00ffff);
-				}
 		}
 	}
-
 }
 
 int render(t_params *p)

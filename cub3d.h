@@ -80,6 +80,7 @@ typedef struct s_params
 	t_img				*east;
 	t_img				*west;
 	t_img				*spray;
+	t_img				*door;
 	double				fov;
 }						t_params;
 

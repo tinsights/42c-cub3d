@@ -16,8 +16,8 @@
 char map[MHEIGHT][MWIDTH] = {
 "11111111111",
 "10000000001",
-"10000000001",
 "10000110001",
+"10000D10001",
 "10000110001",
 "10000000001",
 "10000000001",
@@ -80,6 +80,7 @@ int main(void)
 	params.south = mlx_xpm_file_to_image(mlx.ptr, "sakura.xpm", &width, &height);
 	params.east = mlx_xpm_file_to_image(mlx.ptr, "seeds.xpm", &width, &height);
 	params.west = mlx_xpm_file_to_image(mlx.ptr, "square.xpm", &width, &height);
+	params.door = mlx_xpm_file_to_image(mlx.ptr, "tunnelv2.xpm", &width, &height);
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */
@@ -139,7 +140,7 @@ void draw_minimap(t_params p)
 		{
 			int col_check = pos_x - mm_size / 2 + (heading_px_col + off_x) / sq_size;
 			int row_check = pos_y - mm_size / 2 + (heading_px_row + off_y) / sq_size;
-			if (map[row_check][col_check] == '1' && p.player->height <= 1.0 && p.player->height >= 0)
+			if (map[row_check][col_check] != '0' && p.player->height <= 1.0 && p.player->height >= 0)
 				break ;
 			put_pixel(p, heading_px_row, heading_px_col, 0x550077);
 			heading_px_row += dir_y;
@@ -160,7 +161,7 @@ void draw_minimap(t_params p)
 			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size;
 			if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
 				put_pixel(p, px_row, px_col, 0x111111);
-			else if (map[row_check][col_check] == '1')
+			else if (map[row_check][col_check] != '0')
 				put_pixel(p, px_row,px_col, 0xff0000);
 
 			if (px_col > total_size / 2 - 2 && px_col < total_size / 2 + 2

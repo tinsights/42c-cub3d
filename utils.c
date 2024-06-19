@@ -101,12 +101,21 @@ void spraypaint(t_params *params)
 	printf("player is looking at wall at %i %i\n", ray.map_x, ray.map_y);
 	int map_x = ray.map_x;
 	int map_y = ray.map_y;
-	if (map[map_y][map_x] == 't')
-		map[map_y][map_x] = '1';
-	else
+	if (map[map_y][map_x] == '1')
 		map[map_y][map_x] = 't';
+	else if (map[map_y][map_x] == 't')
+		map[map_y][map_x] = '1';
+}
 
-	
+void door(t_params *params)
+{
+	t_player *player = params->player;
+	int map_x = player->position[1] + 1;
+	int map_y = player->position[0];
+	if (map[map_y][map_x] == 'D')
+		map[map_y][map_x] = 'd';
+	else if (map[map_y][map_x] == 'd')
+		map[map_y][map_x] = 'D';
 }
 
 int	key_hook(int keycode, t_params *params)
@@ -145,6 +154,8 @@ int	key_hook(int keycode, t_params *params)
 		player->height += 0.25;
 	else if (keycode == XK_t)
 		spraypaint(params);
+	else if (keycode == XK_e)
+		door(params);
 	else
 		ft_printf("KEY: %i\n", keycode);
 	render(params);

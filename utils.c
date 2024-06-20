@@ -102,10 +102,10 @@ void spraypaint(t_params *params)
 	printf("player is looking at wall at %i %i\n", ray.map_x, ray.map_y);
 	int map_x = ray.map_x;
 	int map_y = ray.map_y;
-	if (map[map_y][map_x] == 't')
-		map[map_y][map_x] = '1';
+	if (params->map[map_y][map_x] == 't')
+		params->map[map_y][map_x] = '1';
 	else
-		map[map_y][map_x] = 't';
+		params->map[map_y][map_x] = 't';
 
 	
 }

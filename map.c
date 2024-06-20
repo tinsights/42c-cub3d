@@ -27,7 +27,7 @@ int	update_playerpos(t_mapinfo *mi, t_input *dat)
 		valid = validate_nswe((char *)lst->content, mi, dat);
 		if (valid == -1 || (valid == 1 && flag == 1))
 			return (-1);
-		if (valid == 1 && flag == 0)// else if
+		else if (valid == 1 && flag == 0)
 			flag = 1;
 		lst = lst->next;
 	}
@@ -69,7 +69,6 @@ int	maplist(int fd, t_mapinfo *mi)
 			return(free_return1(&head, &line));
 		if (remove_nl(&line) == -1)
 			return(free_return1(&head, &line));
-		//node = ft_lstnew(ft_strdup(line));
 		node = ft_lstnew(line);
 		if (node == NULL)
 			return(free_return1(&head, &line));
@@ -79,6 +78,68 @@ int	maplist(int fd, t_mapinfo *mi)
 	}
 	mi->lst = head;
 	return (1);
+}
+
+/*
+char	**tmap_to_array(t_mapinfo *mi)//modified below
+{
+	char	**arr;
+	t_list	*lst;
+	int	i;
+	
+	arr = (char **)malloc(sizeof(char *) * (mi->rows + 1));
+	if (arr == NULL)
+		return (NULL);
+	lst = mi->lst;
+	//printf("rwidth is %d\n", mi->rwidth);
+	i = 0;
+	while (mi->lst != NULL)//malloc for each row
+	{
+		//arr[i] = (char *)malloc(sizeof(char) * (mi->rwidth + 1));
+		lst = (*mi->lst).next;
+		arr[i] = (char *)(*mi->lst).content;
+		//arr[i] = temp((*mi->lst).content, rwidth);
+		//free((*mi->lst).content);
+		free(mi->lst);
+		mi->lst = lst;
+		i++;
+	}
+	free(mi->lst);
+	mi->lst = NULL;
+	arr[i] = NULL;
+	return (arr);
+} */
+
+char	*getstr(char *str, int rwidth)
+{
+	int	len;
+	int	bal;
+	int	i;
+	char	*arr;
+	
+	len = ft_strlen(str);
+	bal = rwidth - len;
+	arr = (char *)malloc(sizeof(char) * rwidth + 1);
+	if (arr == NULL)
+		return (NULL);
+	i = 0;
+	while(i < len)
+	{
+		arr[i] = str[i];
+		if (str[i] == ' ')
+			arr[i] = ONEORZERO;
+		else if (str[i] != '0' && str[i] != '1')//NSWE
+			arr[i] = '0';
+		i++;
+		
+	}
+	while (i < rwidth)
+	{
+		arr[i] = 'a';
+		i++;
+	}
+	arr[i] = '\0';
+	return(arr);
 }
 
 char	**tmap_to_array(t_mapinfo *mi)
@@ -92,10 +153,13 @@ char	**tmap_to_array(t_mapinfo *mi)
 		return (NULL);
 	lst = mi->lst;
 	i = 0;
-	while (mi->lst != NULL)
+	while (mi->lst != NULL)//malloc for each row
 	{
 		lst = (*mi->lst).next;
-		arr[i] = (char *)(*mi->lst).content;
+		arr[i] = getstr((*mi->lst).content, mi->rwidth);
+		if (arr[i] == NULL)
+			free_strarr2(arr, i);
+		free((*mi->lst).content);
 		free(mi->lst);
 		mi->lst = lst;
 		i++;
@@ -147,7 +211,7 @@ int	parse_map(int fd, t_input *dat)
 		return (free_maplst(&mi.lst));
 	if (isvalidborder(&mi, dat) == -1)
 		return (free_maplst(&mi.lst));
-	dat->map = tmap_to_array(&mi);
+	dat->map = tmap_to_array(&mi);//tmap refers to lst
 	if (dat->map == NULL)
 		return (-1);
 	return (0);

@@ -29,17 +29,20 @@ int	update_xpmpath(char **xpm, char *elem)//valid xpm file path
 {
 	t_mlx	*mlx;
 	int	tmp;
+	void	*image;
 
 	if (*xpm != NULL)//*xpm != NULL means duplicate found
 		return (-1);
 	mlx = mlx_init();
 	if (!mlx)
 		return (-1);
-	if (mlx_xpm_file_to_image(mlx, elem, &tmp, &tmp) == NULL)
+	image = mlx_xpm_file_to_image(mlx, elem, &tmp, &tmp);
+	if (image == NULL)
 	{
 		free(mlx);
 		return (-1);
 	}
+	mlx_destroy_image(mlx, image);
 	free(mlx);
 	*xpm = ft_strdup(elem);
 	return (1);
@@ -122,6 +125,6 @@ int	validate_typeid(int fd, t_input *dat)
 	//update fclr and cclr; R,G,B
 	dat->fclr = (dat->fcolor[0] << 16) | dat->fcolor[1] << 8 | dat->fcolor[2];
 	dat->cclr = (dat->ccolor[0] << 16) | dat->ccolor[1] << 8 | dat->ccolor[2];
-	printf("fclr %x , cclr %x \n",dat->fclr, dat->cclr); getchar();
+	
 	return(1);
 }

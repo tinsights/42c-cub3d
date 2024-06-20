@@ -39,9 +39,10 @@
  */
 # define MHEIGHT 8
 # define MWIDTH 11
-# define ONEORZERO 1 //1 or 0
+# define ONEORZERO 48 //49 or 48
 
-extern char				map[MHEIGHT][MWIDTH];
+//extern char	map[MHEIGHT][MWIDTH];
+
 
 typedef unsigned int	t_uint;
 typedef unsigned long	t_ulong;
@@ -66,12 +67,13 @@ typedef struct s_input
 	int	ccolor[3];
 	int	fclr;
 	int	cclr;
-	int fov; //E 0, N 90, W 180, S 270
+	//int 	fov; //E 0, N 90, W 180, S 270
 	int	xdir;//xdir based on NSWE
 	int	ydir;//ydir based on NSWE
 	int	xpos;//xcoordinate of player
 	int	ypos;//ycoordinate of player
-	//int 	**map;
+	int	mwidth;
+	int	mheight;
 	char	**map;
 } t_input;
 
@@ -111,9 +113,10 @@ typedef struct s_params
 	t_img				*east;
 	t_img				*west;
 	t_img				*spray;
-	int				fclr;
-	int				cclr;
+	int					fclr;//floor
+	int					cclr;//ceiling
 	double				fov;
+	char				**map;
 }						t_params;
 
 typedef struct s_ray
@@ -179,6 +182,7 @@ int	read_line(int fd, char **line);
 void	free_intarr(int **arr, int size);
 void	free_str(char **str);
 void	free_strarr(char **ptr);
+char	*free_strarr2(char **ptr, int len);
 int	free_maplst(t_list **lst);
 int	free_return1(t_list **lst, char **str);
 

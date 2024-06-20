@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-
+/*
 char map[MHEIGHT][MWIDTH] = {
 "11111111111",
 "10000000001",
@@ -23,6 +23,7 @@ char map[MHEIGHT][MWIDTH] = {
 "10000000001",
 "11111111111",
 };
+*/
 
 // int map[MHEIGHT][MWIDTH] = {
 // {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
@@ -47,10 +48,8 @@ int main(int argc, char *argv[])
 	else
 		get_data(argv[1], dat);
 	t_params params;
-	
-	print_input(dat);
-	printf("end of validation\n");
-	//return (0);
+	params.map = dat->map;
+
 	/* -------------------------------------------------------------------------- */
 	/*                                  MLX INIT                                  */
 	/* -------------------------------------------------------------------------- */
@@ -71,17 +70,15 @@ int main(int argc, char *argv[])
 
 	params.player = &player;
 	params.fov = FOV / 180.0 * M_PI;
-	//params.fov = FOV / dat->fov * M_PI;
 
-	player.position[0] = 3.0; // 300
-	player.position[1] = 3.9; // 390
-	//player.position[0] = 3.0; // 300 -->dat->ypos;
-	//player.position[1] = 3.9; // 390 -->dat->xpos;
+	//player.position[0] = 3.0; // 300
+	//player.position[1] = 3.9; // 390
+	player.position[0] = dat->ypos + 0.5;
+	player.position[1] = dat->xpos + 0.5;
 	player.heading = 0;
-	player.height = 0.1; // 10
+	player.height = 0.5; // 10
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
-
 
 	/* -------------------------------------------------------------------------- */
 	/*                                TEXTURE INIT                                */
@@ -89,22 +86,23 @@ int main(int argc, char *argv[])
 
 	int width;
 	int height;
-	params.inner = mlx_xpm_file_to_image(mlx.ptr, "hallway.xpm", &width, &height); // extra
-	params.spray = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height); // extra
-	params.north = mlx_xpm_file_to_image(mlx.ptr, "tube.xpm", &width, &height);
-	params.south = mlx_xpm_file_to_image(mlx.ptr, "sakura.xpm", &width, &height);
-	params.east = mlx_xpm_file_to_image(mlx.ptr, "seeds.xpm", &width, &height);
-	params.west = mlx_xpm_file_to_image(mlx.ptr, "square.xpm", &width, &height);
-	// params.north = mlx_xpm_file_to_image(mlx.ptr, dat->nxpm, &width, &height);
-	// params.south = mlx_xpm_file_to_image(mlx.ptr, dat->sxpm, &width, &height);
-	// params.east = mlx_xpm_file_to_image(mlx.ptr, dat->expm, &width, &height);
-	// params.west = mlx_xpm_file_to_image(mlx.ptr, dat->wxpm, &width, &height);
+	params.inner = mlx_xpm_file_to_image(mlx.ptr, "./incs/hallway.xpm", &width, &height); // extra
+	params.spray = mlx_xpm_file_to_image(mlx.ptr, "./incs/mpivet-p.xpm", &width, &height); // extra
+	// params.north = mlx_xpm_file_to_image(mlx.ptr, "./incs/tube.xpm", &width, &height);
+	// params.south = mlx_xpm_file_to_image(mlx.ptr, "./incs/sakura.xpm", &width, &height);
+	// params.east = mlx_xpm_file_to_image(mlx.ptr, "./incs/seeds.xpm", &width, &height);
+	// params.west = mlx_xpm_file_to_image(mlx.ptr, "./incs/square.xpm", &width, &height);
+	params.north = mlx_xpm_file_to_image(mlx.ptr, dat->nxpm, &width, &height);
+	params.south = mlx_xpm_file_to_image(mlx.ptr, dat->sxpm, &width, &height);
+	params.east = mlx_xpm_file_to_image(mlx.ptr, dat->expm, &width, &height);
+	params.west = mlx_xpm_file_to_image(mlx.ptr, dat->wxpm, &width, &height);
 
 	/**
-	 * TODO: set params for floor and ceiling colour*/
+	 * TODO: set params for floor and ceiling colour
+	dat->fcolor[0];dat->fcolor[1]; dat->fcolor[2];//RGB
+	dat->ccolor[0];dat->ccolor[1]; dat->ccolor[2];//RGB*/
 	params.fclr = dat->fclr;
 	params.cclr = dat->cclr;
-
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */
@@ -164,7 +162,7 @@ void draw_minimap(t_params p)
 		{
 			int col_check = pos_x - mm_size / 2 + (heading_px_col + off_x) / sq_size;
 			int row_check = pos_y - mm_size / 2 + (heading_px_row + off_y) / sq_size;
-			if (map[row_check][col_check] == '1' && p.player->height <= 1.0 && p.player->height >= 0)
+			if (p.map[row_check][col_check] == '1' && p.player->height <= 1.0 && p.player->height >= 0)
 				break ;
 			put_pixel(p, heading_px_row, heading_px_col, 0x550077);
 			heading_px_row += dir_y;
@@ -185,7 +183,7 @@ void draw_minimap(t_params p)
 			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size;
 			if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
 				put_pixel(p, px_row, px_col, 0x111111);
-			else if (map[row_check][col_check] == '1')
+			else if (p.map[row_check][col_check] == '1')
 				put_pixel(p, px_row,px_col, 0xff0000);
 
 			if (px_col > total_size / 2 - 2 && px_col < total_size / 2 + 2
@@ -202,7 +200,7 @@ int render(t_params *p)
 
 	draw_walls(p);
 	draw_crosshair(*p);
-	draw_minimap(*p);
+	//draw_minimap(*p);
 	mlx_put_image_to_window(p->mlx->ptr, p->mlx->win, p->mlx->img, 0, 0);
 	return (1);
 }

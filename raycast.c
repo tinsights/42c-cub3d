@@ -75,7 +75,7 @@ void dda(t_params *params, t_ray *ray)
          * and renders the walls from within.
          * not exactly neccessary, especially once wall collision is implemented
         */
-		if (map[ray->map_y][ray->map_x] != '0')
+		if (params->map[ray->map_y][ray->map_x] != '0')
 		{
 			if (ray->dist_x < ray->dist_y) // what if equal?
 			{
@@ -108,7 +108,7 @@ void dda(t_params *params, t_ray *ray)
 				ray->map_y += ray->step_y;
 				ray->side_x = 0;
 			}
-			if (map[ray->map_y][ray->map_x] != '0')
+			if (params->map[ray->map_y][ray->map_x] != '0')
 			{
 				ray->hit = true;
 				if (ray->side_x)
@@ -126,7 +126,7 @@ void dda(t_params *params, t_ray *ray)
 						ray->img = params->north;
 				}
 			}
-			if (map[ray->map_y][ray->map_x] == 't')
+			if (params->map[ray->map_y][ray->map_x] == 't')
 				ray->img = params->spray;
 
 		}

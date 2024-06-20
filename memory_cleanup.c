@@ -55,6 +55,25 @@ int	free_return1(t_list **lst, char **str)
 	return (-1);
 }
 
+char	*free_strarr2(char **ptr, int len)
+{
+	int	i;
+
+	i = 0;
+	while (ptr && i < len)
+	{
+		//printf("printf free ptr %s\n",ptr[i]);
+		if (ptr[i])
+			free(ptr[i]);
+		ptr[i] = NULL;
+		i++;
+	}
+	if (ptr)
+		free(ptr);
+	ptr = NULL;
+	return (NULL);
+}
+
 void	free_strarr(char **ptr)
 {
 	int	i;

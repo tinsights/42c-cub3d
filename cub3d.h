@@ -70,6 +70,7 @@ typedef struct s_input
 	//int 	fov; //E 0, N 90, W 180, S 270
 	int	xdir;//xdir based on NSWE
 	int	ydir;//ydir based on NSWE
+	char	nswe;//set to N S W or E
 	int	xpos;//xcoordinate of player
 	int	ypos;//ycoordinate of player
 	int	mwidth;
@@ -116,6 +117,8 @@ typedef struct s_params
 	int					fclr;//floor
 	int					cclr;//ceiling
 	double				fov;
+	int				mwidth;
+	int				mheight;
 	char				**map;
 }						t_params;
 

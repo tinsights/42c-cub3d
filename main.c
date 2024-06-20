@@ -49,6 +49,8 @@ int main(int argc, char *argv[])
 		get_data(argv[1], dat);
 	t_params params;
 	params.map = dat->map;
+	params.mwidth = dat->mwidth;
+	params.mheight = dat->mheight;
 
 	/* -------------------------------------------------------------------------- */
 	/*                                  MLX INIT                                  */
@@ -75,7 +77,16 @@ int main(int argc, char *argv[])
 	//player.position[1] = 3.9; // 390
 	player.position[0] = dat->ypos + 0.5;
 	player.position[1] = dat->xpos + 0.5;
-	player.heading = 0;
+	if (dat->nswe == 'N')
+		player.heading = 0;
+	else if (dat->nswe == 'S')
+		player.heading = M_PI / 2;
+	else if (dat->nswe == 'E')
+		player.heading = M_PI / 4;
+	else
+		player.heading = 3 * M_PI / 4;
+	
+	//player.heading = 0;// M_PI macro goes here dat->
 	player.height = 0.5; // 10
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
@@ -181,7 +192,8 @@ void draw_minimap(t_params p)
 			
 			int col_check = pos_x - mm_size / 2 + (px_col + off_x) / sq_size;
 			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size;
-			if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
+			// if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
+			if (col_check < 0 || row_check < 0 || col_check >= p.mwidth || row_check >= p.mheight)
 				put_pixel(p, px_row, px_col, 0x111111);
 			else if (p.map[row_check][col_check] == '1')
 				put_pixel(p, px_row,px_col, 0xff0000);

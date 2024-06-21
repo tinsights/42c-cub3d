@@ -44,6 +44,25 @@ void	print_dblarr(char **arr)
 	}
 }
 
+void	print_intarr(int **arr, int rows, int cols)
+{
+	int 	i;
+	int	j;
+	
+	i = 0;
+	while(i < rows)
+	{
+		j = 0;
+		while (j < cols)
+		{
+			printf("%d",arr[i][j]);
+			j++;
+		}
+		printf("\n");
+		i++;
+	}
+}
+
 void	print_input(t_input *dat) // test function 
 {
 	printf("print input: \n");
@@ -57,8 +76,9 @@ void	print_input(t_input *dat) // test function
 	printf("ceiling color r: %d\n",dat->ccolor[0]);
 	printf("ceiling color g: %d\n",dat->ccolor[1]);
 	printf("ceiling color b: %d\n",dat->ccolor[2]);
-	printf("x dir: %d\n",dat->xdir);
-	printf("y dir: %d\n",dat->ydir);
+	printf("heading : %f\n",dat->heading);
+	//printf("x dir: %d\n",dat->xdir);
+	//printf("y dir: %d\n",dat->ydir);
 	printf("player pos x: %d\n",dat->xpos);
 	printf("player pos y: %d\n",dat->ypos);
 	printf("The map:\n");

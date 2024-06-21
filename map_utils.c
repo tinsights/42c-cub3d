@@ -44,9 +44,9 @@ void	update_orient_pos(t_mapinfo *mi, t_input *dat, int j)
 {
 	dat->xpos = mi->icol + 1;
 	dat->ypos = mi->irow;
-	dat->nswe = mi->nswe[j][0]; 
-	dat->xdir = mi->nswe[j][1]; //don't need
-	dat->ydir = mi->nswe[j][2]; //don't need
+	dat->heading = mi->nswe[j][0]; 
+	//dat->xdir = mi->nswe[j][1]; //don't need
+	//dat->ydir = mi->nswe[j][2]; //don't need
 }
 
 int	validate_nswe(const char *str, t_mapinfo *mi, t_input *dat)

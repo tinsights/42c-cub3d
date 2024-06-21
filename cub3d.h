@@ -67,9 +67,9 @@ typedef struct s_input
 	int	ccolor[3];
 	int	fclr;
 	int	cclr;
-	//int 	fov; //E 0, N 90, W 180, S 270
-	int	xdir;//xdir based on NSWE -->remove
-	int	ydir;//ydir based on NSWE -->remove
+	double	heading;
+	//int	xdir;//xdir based on NSWE -->remove
+	//int	ydir;//ydir based on NSWE -->remove
 	char	nswe;//set to N S W or E
 	int	xpos;//xcoordinate of player
 	int	ypos;//ycoordinate of player
@@ -213,5 +213,6 @@ void	print_mi(t_mapinfo *mi);
 void	print_lst(t_list *lst);
 void	print_input(t_input *dat);
 void	print_dblarr(char **arr);
+void	print_intarr(int **arr, int rows, int cols);
 
 #endif

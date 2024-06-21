@@ -51,7 +51,6 @@ int main(int argc, char *argv[])
 	params.map = dat->map;
 	params.mwidth = dat->mwidth; 
 	params.mheight = dat->mheight; 
-
 	/* -------------------------------------------------------------------------- */
 	/*                                  MLX INIT                                  */
 	/* -------------------------------------------------------------------------- */
@@ -73,20 +72,9 @@ int main(int argc, char *argv[])
 	params.player = &player;
 	params.fov = FOV / 180.0 * M_PI;
 
-	//player.position[0] = 3.0; // 300
-	//player.position[1] = 3.9; // 390
 	player.position[0] = dat->ypos + 0.5;
 	player.position[1] = dat->xpos + 0.5;
-	if (dat->nswe == 'N')
-		player.heading = 0;
-	else if (dat->nswe == 'S')
-		player.heading = M_PI / 2;
-	else if (dat->nswe == 'E')
-		player.heading = M_PI / 4;
-	else
-		player.heading = 3 * M_PI / 4;
-	
-	//player.heading = 0;// M_PI macro goes here dat->
+	player.heading = dat->heading;
 	player.height = 0.5; // 10
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
@@ -101,19 +89,12 @@ int main(int argc, char *argv[])
 	int height;
 	params.inner = mlx_xpm_file_to_image(mlx.ptr, "./incs/hallway.xpm", &width, &height); // extra
 	params.spray = mlx_xpm_file_to_image(mlx.ptr, "./incs/mpivet-p.xpm", &width, &height); // extra
-	// params.north = mlx_xpm_file_to_image(mlx.ptr, "./incs/tube.xpm", &width, &height);
-	// params.south = mlx_xpm_file_to_image(mlx.ptr, "./incs/sakura.xpm", &width, &height);
-	// params.east = mlx_xpm_file_to_image(mlx.ptr, "./incs/seeds.xpm", &width, &height);
-	// params.west = mlx_xpm_file_to_image(mlx.ptr, "./incs/square.xpm", &width, &height);
+	params.door = mlx_xpm_file_to_image(mlx.ptr, "./incs/tunnelv2.xpm", &width, &height);
 	params.north = mlx_xpm_file_to_image(mlx.ptr, dat->nxpm, &width, &height);
 	params.south = mlx_xpm_file_to_image(mlx.ptr, dat->sxpm, &width, &height);
 	params.east = mlx_xpm_file_to_image(mlx.ptr, dat->expm, &width, &height);
 	params.west = mlx_xpm_file_to_image(mlx.ptr, dat->wxpm, &width, &height);
 
-	/**
-	 * TODO: set params for floor and ceiling colour
-	dat->fcolor[0];dat->fcolor[1]; dat->fcolor[2];//RGB
-	dat->ccolor[0];dat->ccolor[1]; dat->ccolor[2];//RGB*/
 	params.fclr = dat->fclr;
 	params.cclr = dat->cclr;
 	/* -------------------------------------------------------------------------- */

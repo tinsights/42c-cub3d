@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-
+/*
 char map[MHEIGHT][MWIDTH] = {
 "11111111111",
 "10000000001",
@@ -23,6 +23,7 @@ char map[MHEIGHT][MWIDTH] = {
 "10000000001",
 "11111111111",
 };
+*/
 
 // int map[MHEIGHT][MWIDTH] = {
 // {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
@@ -35,10 +36,22 @@ char map[MHEIGHT][MWIDTH] = {
 // {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
 // };
 
-int main(void)
+int main(int argc, char *argv[])
 {
+	t_input	*dat;
 
+	dat = (t_input *)malloc(sizeof(t_input));
+	if (dat == NULL)
+		return (0);
+	if (argc != 2)
+		return (0);
+	else
+		get_data(argv[1], dat);
 	t_params params;
+	params.map = dat->map;
+	params.mwidth = dat->mwidth; 
+	params.mheight = dat->mheight; 
+
 	/* -------------------------------------------------------------------------- */
 	/*                                  MLX INIT                                  */
 	/* -------------------------------------------------------------------------- */
@@ -59,11 +72,22 @@ int main(void)
 
 	params.player = &player;
 	params.fov = FOV / 180.0 * M_PI;
+
+	//player.position[0] = 3.0; // 300
+	//player.position[1] = 3.9; // 390
+	player.position[0] = dat->ypos + 0.5;
+	player.position[1] = dat->xpos + 0.5;
+	if (dat->nswe == 'N')
+		player.heading = 0;
+	else if (dat->nswe == 'S')
+		player.heading = M_PI / 2;
+	else if (dat->nswe == 'E')
+		player.heading = M_PI / 4;
+	else
+		player.heading = 3 * M_PI / 4;
 	
-	player.position[0] = 3.5;
-	player.position[1] = 3.5;
-	player.heading = 0;
-	player.height = 0.5;
+	//player.heading = 0;// M_PI macro goes here dat->
+	player.height = 0.5; // 10
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
 	player.god = false;
@@ -75,13 +99,23 @@ int main(void)
 
 	int width;
 	int height;
-	params.inner = mlx_xpm_file_to_image(mlx.ptr, "hallway.xpm", &width, &height);
-	params.spray = mlx_xpm_file_to_image(mlx.ptr, "so-leary.xpm", &width, &height);
-	params.north = mlx_xpm_file_to_image(mlx.ptr, "tube.xpm", &width, &height);
-	params.south = mlx_xpm_file_to_image(mlx.ptr, "sakura.xpm", &width, &height);
-	params.east = mlx_xpm_file_to_image(mlx.ptr, "seeds.xpm", &width, &height);
-	params.west = mlx_xpm_file_to_image(mlx.ptr, "square.xpm", &width, &height);
-	params.door = mlx_xpm_file_to_image(mlx.ptr, "tunnelv2.xpm", &width, &height);
+	params.inner = mlx_xpm_file_to_image(mlx.ptr, "./incs/hallway.xpm", &width, &height); // extra
+	params.spray = mlx_xpm_file_to_image(mlx.ptr, "./incs/mpivet-p.xpm", &width, &height); // extra
+	// params.north = mlx_xpm_file_to_image(mlx.ptr, "./incs/tube.xpm", &width, &height);
+	// params.south = mlx_xpm_file_to_image(mlx.ptr, "./incs/sakura.xpm", &width, &height);
+	// params.east = mlx_xpm_file_to_image(mlx.ptr, "./incs/seeds.xpm", &width, &height);
+	// params.west = mlx_xpm_file_to_image(mlx.ptr, "./incs/square.xpm", &width, &height);
+	params.north = mlx_xpm_file_to_image(mlx.ptr, dat->nxpm, &width, &height);
+	params.south = mlx_xpm_file_to_image(mlx.ptr, dat->sxpm, &width, &height);
+	params.east = mlx_xpm_file_to_image(mlx.ptr, dat->expm, &width, &height);
+	params.west = mlx_xpm_file_to_image(mlx.ptr, dat->wxpm, &width, &height);
+
+	/**
+	 * TODO: set params for floor and ceiling colour
+	dat->fcolor[0];dat->fcolor[1]; dat->fcolor[2];//RGB
+	dat->ccolor[0];dat->ccolor[1]; dat->ccolor[2];//RGB*/
+	params.fclr = dat->fclr;
+	params.cclr = dat->cclr;
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */
@@ -104,12 +138,12 @@ void draw_walls(t_params *p);
 void draw_minimap(t_params p)
 {
 	int sq_size = 15;
-	int mm_size = 10;
+	int mm_size = 8;
 	int total_size = sq_size * mm_size;
 
 
 	// start at center of minimap, draw straight line in direction of heading
-	double heading = p.player->heading;
+	double heading = p.player->heading; 
 
 	int pos_y = p.player->position[0];
 	int pos_x = p.player->position[1];
@@ -162,11 +196,12 @@ void draw_minimap(t_params p)
 			int col_check = pos_x - mm_size / 2 + (px_col + off_x) / sq_size;
 			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size;
 			char block = map[row_check][col_check];
-			if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
+			// if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
+			if (col_check < 0 || row_check < 0 || col_check >= p.mwidth || row_check >= p.mheight)
 				put_pixel(p, px_row, px_col, 0x111111);
 			else if (block != '0' && block != 'd')
 				put_pixel(p, px_row,px_col, 0xff0000);
-
+			//printf("rowcheck: %i, colcheck: %i, mwidth: %i mheight: %i\n", row_check, col_check, p.mwidth, p.mheight);
 			if (px_col > total_size / 2 - 2 && px_col < total_size / 2 + 2
 				&& px_row > total_size / 2 - 2 && px_row < total_size / 2 + 2)
 					put_pixel(p, px_row, px_col, 0x00ffff);

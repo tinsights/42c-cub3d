@@ -80,7 +80,7 @@ void dda(t_params *params, t_ray *ray)
          * and renders the walls from within.
          * not exactly neccessary, especially once wall collision is implemented
         */
-		if (is_wall(map[ray->map_y][ray->map_x]))
+		if (is_wall(p->map[ray->map_y][ray->map_x]))
 		{
 			if (ray->dist_x < ray->dist_y) // what if equal?
 			{
@@ -113,7 +113,7 @@ void dda(t_params *params, t_ray *ray)
 				ray->map_y += ray->step_y;
 				ray->side_x = 0;
 			}
-			if (map[ray->map_y][ray->map_x] != '0')
+			if (params->map[ray->map_y][ray->map_x] != '0')
 			{
 				ray->hit = true;
 				if (ray->side_x)
@@ -131,11 +131,11 @@ void dda(t_params *params, t_ray *ray)
 						ray->img = params->north;
 				}
 			}
-			if (map[ray->map_y][ray->map_x] == 't' || map[ray->map_y][ray->map_x] == 'T')
+			if (params->map[ray->map_y][ray->map_x] == 't' || params->map[ray->map_y][ray->map_x] == 'T')
 				ray->img = params->spray;
-			else if (map[ray->map_y][ray->map_x] == 'D')
+			else if (params->map[ray->map_y][ray->map_x] == 'D')
 				ray->img = params->door;
-			if (map[ray->map_y][ray->map_x] == 'd')
+			if (params->map[ray->map_y][ray->map_x] == 'd')
 				ray->hit = false;
 
 		}
@@ -147,8 +147,10 @@ void dda(t_params *params, t_ray *ray)
 
 		if (params->player->height > 1.0 || params->player->height < 0)
 		{
-			if ((ray->map_x > 0 && ray->map_x < MWIDTH - 1)
-				&& (ray->map_y > 0 && ray->map_y < MHEIGHT - 1))
+			// if ((ray->map_x > 0 && ray->map_x < MWIDTH - 1)
+			// 	&& (ray->map_y > 0 && ray->map_y < MHEIGHT - 1))
+			if ((ray->map_x > 0 && ray->map_x < params->mwidth - 1)
+				&& (ray->map_y > 0 && ray->map_y < params->mheight - 1))
 			{
 				t_ray *next = ft_calloc(1, sizeof(t_ray));
 				ray->next = next;
@@ -259,10 +261,12 @@ void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
 			// }
 			if (!(ray->next))
 			{
-				if (px < top_of_wall )
-					put_pixel(*params, px, col, 0x888888);
-				else if (px > bottom_of_wall )
-					put_pixel(*params, px, col, 0x333333);
+				if (px < top_of_wall ) // ceiling
+					//put_pixel(*params, px, col, 0x888888);
+					put_pixel(*params, px, col, params->cclr);
+				else if (px > bottom_of_wall ) // floor
+					//put_pixel(*params, px, col, 0x333333);
+					put_pixel(*params, px, col, params->fclr);
 			}
 			if (px >= top_of_wall && px <= bottom_of_wall)
 			{

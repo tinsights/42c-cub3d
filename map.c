@@ -80,36 +80,6 @@ int	maplist(int fd, t_mapinfo *mi)
 	return (1);
 }
 
-/*
-char	**tmap_to_array(t_mapinfo *mi)//modified below
-{
-	char	**arr;
-	t_list	*lst;
-	int	i;
-	
-	arr = (char **)malloc(sizeof(char *) * (mi->rows + 1));
-	if (arr == NULL)
-		return (NULL);
-	lst = mi->lst;
-	//printf("rwidth is %d\n", mi->rwidth);
-	i = 0;
-	while (mi->lst != NULL)//malloc for each row
-	{
-		//arr[i] = (char *)malloc(sizeof(char) * (mi->rwidth + 1));
-		lst = (*mi->lst).next;
-		arr[i] = (char *)(*mi->lst).content;
-		//arr[i] = temp((*mi->lst).content, rwidth);
-		//free((*mi->lst).content);
-		free(mi->lst);
-		mi->lst = lst;
-		i++;
-	}
-	free(mi->lst);
-	mi->lst = NULL;
-	arr[i] = NULL;
-	return (arr);
-} */
-
 char	*getstr(char *str, int rwidth)
 {
 	int	len;
@@ -197,6 +167,7 @@ int	init_mapinfo(t_mapinfo *mi, int fd)
 	if (maplist(fd, mi) == -1)
 		return (-1);
 	return (0);
+	
 }
 
 int	parse_map(int fd, t_input *dat)
@@ -212,6 +183,8 @@ int	parse_map(int fd, t_input *dat)
 	if (isvalidborder(&mi, dat) == -1)
 		return (free_maplst(&mi.lst));
 	dat->map = tmap_to_array(&mi);//tmap refers to lst
+	dat->mwidth = mi.rwidth;
+	dat->mheight = mi.rows;
 	if (dat->map == NULL)
 		return (-1);
 	return (0);

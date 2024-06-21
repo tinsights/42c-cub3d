@@ -68,8 +68,8 @@ typedef struct s_input
 	int	fclr;
 	int	cclr;
 	//int 	fov; //E 0, N 90, W 180, S 270
-	int	xdir;//xdir based on NSWE
-	int	ydir;//ydir based on NSWE
+	int	xdir;//xdir based on NSWE -->remove
+	int	ydir;//ydir based on NSWE -->remove
 	char	nswe;//set to N S W or E
 	int	xpos;//xcoordinate of player
 	int	ypos;//ycoordinate of player
@@ -114,8 +114,8 @@ typedef struct s_params
 	t_img				*east;
 	t_img				*west;
 	t_img				*spray;
-	int					fclr;//floor
-	int					cclr;//ceiling
+	int				fclr;//floor
+	int				cclr;//ceiling
 	double				fov;
 	int				mwidth;
 	int				mheight;

@@ -49,8 +49,8 @@ int main(int argc, char *argv[])
 		get_data(argv[1], dat);
 	t_params params;
 	params.map = dat->map;
-	params.mwidth = dat->mwidth;
-	params.mheight = dat->mheight;
+	params.mwidth = dat->mwidth; 
+	params.mheight = dat->mheight; 
 
 	/* -------------------------------------------------------------------------- */
 	/*                                  MLX INIT                                  */
@@ -136,12 +136,12 @@ void draw_walls(t_params *p);
 void draw_minimap(t_params p)
 {
 	int sq_size = 15;
-	int mm_size = 10;
+	int mm_size = 8;
 	int total_size = sq_size * mm_size;
 
 
 	// start at center of minimap, draw straight line in direction of heading
-	double heading = p.player->heading;
+	double heading = p.player->heading; 
 
 	int pos_y = p.player->position[0];
 	int pos_x = p.player->position[1];
@@ -197,7 +197,7 @@ void draw_minimap(t_params p)
 				put_pixel(p, px_row, px_col, 0x111111);
 			else if (p.map[row_check][col_check] == '1')
 				put_pixel(p, px_row,px_col, 0xff0000);
-
+			//printf("rowcheck: %i, colcheck: %i, mwidth: %i mheight: %i\n", row_check, col_check, p.mwidth, p.mheight);
 			if (px_col > total_size / 2 - 2 && px_col < total_size / 2 + 2
 				&& px_row > total_size / 2 - 2 && px_row < total_size / 2 + 2)
 					put_pixel(p, px_row, px_col, 0x00ffff);
@@ -212,7 +212,7 @@ int render(t_params *p)
 
 	draw_walls(p);
 	draw_crosshair(*p);
-	//draw_minimap(*p);
+	draw_minimap(*p);
 	mlx_put_image_to_window(p->mlx->ptr, p->mlx->win, p->mlx->img, 0, 0);
 	return (1);
 }

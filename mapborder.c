@@ -20,14 +20,16 @@ void	fill_tmap(int row[], int col, char *str)
 	len = 0;
 	if (str)
 		len = ft_strlen(str);
-	row[0] = -1;
-	row[col - 1] = -1;
+	row[0] = -1;		//column 1 is -1
+	row[col - 1] = -1;	//last column is -1
 	i = 0;
 	while (i < len)
 	{
-		row[i + 1] = str[i] - 48;
-		if (str[i] == ' ')
+		row[i + 1] = str[i] - 48;	//0 or 1
+		if (str[i] == ' ')		//space
 			row[i + 1] = ONEORZERO;
+		else if (str[i] == 'D')
+			row[i + 1] = 2; //DOOR
 		else if (str[i] != '0' && str[i] != '1')//NSWE
 			row[i + 1] = 0;
 		i++;
@@ -46,7 +48,7 @@ int	isenclosedwall(int **tmap, t_mapinfo *mi, int row, int col)
 	if (tmap[row][col] == 1 || tmap[row][col] == 2)
 		return (0);
 	if (tmap[row][col] == 0)
-		tmap[row][col] = 2;
+		tmap[row][col] = 1;
 	if (isenclosedwall(tmap, mi, row - 1, col) == -1)
 		return (-1);
 	if (isenclosedwall(tmap, mi, row + 1, col) == -1)
@@ -94,9 +96,9 @@ int	isvalidborder(t_mapinfo *mi, t_input *dat)
 	i = 0;
 	while (i < mi->rows + 2)
 	{
-		if (i == 0 || i == mi->rows + 1)
+		if (i == 0 || i == mi->rows + 1) //1st and last row
 			fill_tmap(tmap[i], mi->rwidth + 2, NULL);
-		else
+		else//rows inbetween
 		{
 			fill_tmap(tmap[i], mi->rwidth + 2, (char *)lst->content);
 			lst = lst->next;

@@ -42,9 +42,9 @@ void	init_input(t_input *dat)
 	dat->ccolor[2] = -1;
 	dat->fclr = 0;
 	dat->cclr = 0;
-	//dat->fov = 0;
-	dat->xdir = 0;
-	dat->ydir = 0;
+	dat->heading = 0;
+	//dat->xdir = 0;//remove
+	//dat->ydir = 0;//remove
 	dat->xpos = 0;
 	dat->ypos = 0;
 	dat->map = NULL;

@@ -48,7 +48,7 @@ int	isvalidchars(t_mapinfo *mi)
 		max = ft_strlen((char *)lst->content);
 		if (max > mi->rwidth)
 			mi->rwidth = max;
-		if (!validstr((char *)lst->content, "\n 10NSWE"))
+		if (!validstr((char *)lst->content, "\n 10NSWED"))//D door
 			return (-1);
 		lst = lst->next;
 	}
@@ -98,7 +98,7 @@ char	*getstr(char *str, int rwidth)
 		arr[i] = str[i];
 		if (str[i] == ' ')
 			arr[i] = ONEORZERO;
-		else if (str[i] != '0' && str[i] != '1')//NSWE
+		else if (str[i] != '0' && str[i] != '1' && str[i] != 'D')//NSWE
 			arr[i] = '0';
 		i++;
 		
@@ -142,6 +142,7 @@ char	**tmap_to_array(t_mapinfo *mi)
 
 int	init_mapinfo(t_mapinfo *mi, int fd)
 {
+/*
 	mi->rows = 0;
 	mi->rwidth = 0;
 	mi->nswe[0][0] = 78;//n
@@ -167,7 +168,24 @@ int	init_mapinfo(t_mapinfo *mi, int fd)
 	if (maplist(fd, mi) == -1)
 		return (-1);
 	return (0);
-	
+*/
+	mi->rows = 0;
+	mi->rwidth = 0;
+	mi->nswe[0][0] = 78;//n
+	mi->nswe[0][1] = 0;
+
+	mi->nswe[1][0] = 83;//s
+	mi->nswe[1][1] = M_PI / 2;
+
+	mi->nswe[2][0] = 87;//w
+	mi->nswe[2][1] = 3 * M_PI / 4;
+
+	mi->nswe[3][0] = 69;//e
+	mi->nswe[3][1] = M_PI / 4;
+
+	if (maplist(fd, mi) == -1)
+		return (-1);
+	return (0);	
 }
 
 int	parse_map(int fd, t_input *dat)

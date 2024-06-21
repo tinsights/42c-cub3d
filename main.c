@@ -66,6 +66,7 @@ int main(void)
 	player.height = 0.5;
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
+	player.god = false;
 
 
 	/* -------------------------------------------------------------------------- */
@@ -75,7 +76,7 @@ int main(void)
 	int width;
 	int height;
 	params.inner = mlx_xpm_file_to_image(mlx.ptr, "hallway.xpm", &width, &height);
-	params.spray = mlx_xpm_file_to_image(mlx.ptr, "mpivet-p.xpm", &width, &height);
+	params.spray = mlx_xpm_file_to_image(mlx.ptr, "so-leary.xpm", &width, &height);
 	params.north = mlx_xpm_file_to_image(mlx.ptr, "tube.xpm", &width, &height);
 	params.south = mlx_xpm_file_to_image(mlx.ptr, "sakura.xpm", &width, &height);
 	params.east = mlx_xpm_file_to_image(mlx.ptr, "seeds.xpm", &width, &height);
@@ -94,7 +95,7 @@ int main(void)
 	mlx_do_key_autorepeaton(mlx.ptr); // does this do anything?
 
 	render(&params);
-	// mlx_loop_hook(mlx.ptr, render, &params);
+	mlx_loop_hook(mlx.ptr, render, &params);
 	mlx_loop(mlx.ptr);
 }
 
@@ -140,7 +141,8 @@ void draw_minimap(t_params p)
 		{
 			int col_check = pos_x - mm_size / 2 + (heading_px_col + off_x) / sq_size;
 			int row_check = pos_y - mm_size / 2 + (heading_px_row + off_y) / sq_size;
-			if (map[row_check][col_check] != '0' && p.player->height <= 1.0 && p.player->height >= 0)
+			char block = map[row_check][col_check];
+			if (block != '0' && block != 'd' && p.player->height <= 1.1 && p.player->height >= -0.1)
 				break ;
 			put_pixel(p, heading_px_row, heading_px_col, 0x550077);
 			heading_px_row += dir_y;
@@ -159,9 +161,10 @@ void draw_minimap(t_params p)
 			
 			int col_check = pos_x - mm_size / 2 + (px_col + off_x) / sq_size;
 			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size;
+			char block = map[row_check][col_check];
 			if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
 				put_pixel(p, px_row, px_col, 0x111111);
-			else if (map[row_check][col_check] != '0')
+			else if (block != '0' && block != 'd')
 				put_pixel(p, px_row,px_col, 0xff0000);
 
 			if (px_col > total_size / 2 - 2 && px_col < total_size / 2 + 2

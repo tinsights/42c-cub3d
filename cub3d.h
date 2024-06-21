@@ -65,6 +65,7 @@ typedef struct s_player
 	double				speed;
 	double				height;
 	double				vert_angle;
+	bool				god;
 }						t_player;
 
 typedef struct s_params
@@ -133,6 +134,8 @@ void					draw_crosshair(t_params p);
 int						render(t_params *p);
 void dda(t_params *params, t_ray *ray);
 void initialise_ray(t_ray *ray, t_player *player, int col);
+bool is_wall(char c);
+
 
 
 

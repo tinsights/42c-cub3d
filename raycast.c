@@ -65,6 +65,11 @@ void initialise_ray(t_ray *ray, t_player *player, int col)
 	ray->next = NULL;
 }
 
+bool is_wall(char c)
+{
+	return (c == '1' || c == '2' || c == 'D');
+}
+
 void dda(t_params *params, t_ray *ray)
 {
 
@@ -75,7 +80,7 @@ void dda(t_params *params, t_ray *ray)
          * and renders the walls from within.
          * not exactly neccessary, especially once wall collision is implemented
         */
-		if (map[ray->map_y][ray->map_x] == '1')
+		if (is_wall(map[ray->map_y][ray->map_x]))
 		{
 			if (ray->dist_x < ray->dist_y) // what if equal?
 			{
@@ -126,7 +131,7 @@ void dda(t_params *params, t_ray *ray)
 						ray->img = params->north;
 				}
 			}
-			if (map[ray->map_y][ray->map_x] == 't')
+			if (map[ray->map_y][ray->map_x] == 't' || map[ray->map_y][ray->map_x] == 'T')
 				ray->img = params->spray;
 			else if (map[ray->map_y][ray->map_x] == 'D')
 				ray->img = params->door;

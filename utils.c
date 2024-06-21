@@ -12,8 +12,6 @@
 
 #include "cub3d.h"
 
-#include <math.h>
-
 void put_pixel(t_params p, t_uint row, t_uint col, int colour)
 {
     char *px = p.mlx->img_addr + row * p.mlx->line_sz + col * (p.mlx->bpp / 8);
@@ -53,19 +51,27 @@ void rotate_player(t_params *params, int degrees)
 /** TODO:
  * 		- convert to singular rotation matrix
 */
+
+#define STEP 0.11
 void move_player(t_params *params, double direction)
 {
 	t_player *player = params->player;
 
-	double horizStep = 0.1 * cos(player->vert_angle);
-	double vertStep = 0.1 * -sin(player->vert_angle);
+	double horizStep = STEP * cos(player->vert_angle);
+	double vertStep = STEP * -sin(player->vert_angle);
 
-	printf("player vert angle: %f | vertStep: %f\n", player->vert_angle, vertStep);
-	player->height += vertStep * direction;
+	// printf("player vert angle: %f | vertStep: %f\n", player->vert_angle, vertStep);
+	double new_height = player->height + vertStep * direction;
+	if (!player->god && new_height > 0.0 && new_height < 1.0)
+		player->height = new_height;
 
-	player->position[0] += cos(player->heading) * horizStep * direction;
-	player->position[1] += -sin(player->heading) * horizStep * direction;
-	printf("player pos: %f %f\n", player->position[0], player->position[1]);
+	double new_y = player->position[0] + cos(player->heading) * horizStep * direction;
+	double new_x = player->position[1] + -sin(player->heading) * horizStep * direction;
+
+	if (!player->god && is_wall(map[(int)new_y][(int)new_x]))
+		return ;
+	player->position[0] = new_y;
+	player->position[1] = new_x;
 }
 
 
@@ -73,45 +79,46 @@ void strafe_player(t_params *params, int direction)
 {
 	t_player *player = params->player;
 
-	double step = 0.1;
+	double new_y = player->position[0] + sin(player->heading) * STEP * direction;
+	double new_x = player->position[1] + cos(player->heading) * STEP * direction;
 
-	player->position[0] += sin(player->heading) * step * direction;
-	player->position[1] += cos(player->heading) * step * direction;
+	printf("new x %f new y %f\n", new_x, new_y);
+
+	if (!player->god && is_wall(map[(int)new_y][(int)new_x]))
+		return ;
+	printf("new x %i new y %i\n", (int) new_x, (int) new_y);
+	player->position[0] = new_y;
+	player->position[1] = new_x;
 }
 
 void spraypaint(t_params *params)
 {
 	t_player *player = params->player;
-	t_ray ray;
 
-	// ft_bzero(&ray, sizeof(t_ray));
+	double heading = player->heading;
 
-	ray.heading_x = sin(player->heading);
-	ray.heading_y = -cos(player->heading);
-	double half_projection_plane_width = tan(params->fov / 2.0);
-	// printf("ppw: %f\n", half_projection_plane_width);
-
-	ray.plane_x = -ray.heading_y * half_projection_plane_width;
-	ray.plane_y = ray.heading_x * half_projection_plane_width;
-
-	initialise_ray(&ray, player, WIN_WIDTH / 2);
-
-
-	dda(params, &ray);
-	printf("player is looking at wall at %i %i\n", ray.map_x, ray.map_y);
-	int map_x = ray.map_x;
-	int map_y = ray.map_y;
+	int map_x = player->position[1] + sin(heading);
+	int map_y = player->position[0] - cos(heading);
+		
 	if (map[map_y][map_x] == '1')
 		map[map_y][map_x] = 't';
 	else if (map[map_y][map_x] == 't')
 		map[map_y][map_x] = '1';
+	else if (map[map_y][map_x] == '2')
+		map[map_y][map_x] = 'T';
+	else if (map[map_y][map_x] == 'T')
+		map[map_y][map_x] = '2';
 }
 
 void door(t_params *params)
 {
 	t_player *player = params->player;
-	int map_x = player->position[1] + 1;
-	int map_y = player->position[0];
+
+	double heading = player->heading;
+
+	int map_x = player->position[1] +  sin(heading);
+	int map_y = player->position[0] - cos(heading);
+		
 	if (map[map_y][map_x] == 'D')
 		map[map_y][map_x] = 'd';
 	else if (map[map_y][map_x] == 'd')
@@ -125,13 +132,13 @@ int	key_hook(int keycode, t_params *params)
 	if (keycode == XK_Escape)
 		return (close_window(params));
 	else if (keycode == XK_w)
-		move_player(params, -player->speed);
+		move_player(params, -1);
 	else if (keycode == XK_a)
-		strafe_player(params, -player->speed);
+		strafe_player(params, -1);
 	else if (keycode == XK_s)
-		move_player(params, player->speed);
+		move_player(params, 1);
 	else if (keycode == XK_d)
-		strafe_player(params, player->speed);
+		strafe_player(params, 1);
 	else if (keycode == XK_Left)
 		rotate_player(params, -6);
 	else if (keycode == XK_Right)
@@ -142,35 +149,58 @@ int	key_hook(int keycode, t_params *params)
 		params->fov -= M_PI / 30;
 	else if (keycode == XK_Up)
 	{
-		player->vert_angle += M_PI / 60; // 12 degs
+		if (player->vert_angle < M_PI / 5)
+			player->vert_angle += M_PI / 60; // 12 degs
 	}
 	else if (keycode == XK_Down)
 	{
-		player->vert_angle -= M_PI / 60; // 12degs
+		if (player->vert_angle > -M_PI / 5)
+			player->vert_angle -= M_PI / 60; // 12degs
 	}
 	else if (keycode == XK_Control_L)
-		player->height -= 0.25;
+	{
+		if (!player->god && player->height > 0.25)
+			player->height -= 0.25;
+	}
 	else if (keycode == XK_space)
-		player->height += 0.25;
+	{
+		if (!player->god && player->height < 0.75)
+			player->height += 0.25;
+	}
 	else if (keycode == XK_t)
 		spraypaint(params);
 	else if (keycode == XK_e)
 		door(params);
+	else if (keycode == XK_g)
+		player->god = !player->god;
 	else
 		ft_printf("KEY: %i\n", keycode);
-	render(params);
+	// render(params);
 	return (1);
 }
 
-int key_release_hook(int keycode, t_params *params)
+void build_wall(t_params *params)
 {
-	printf("keycode: %i\n", keycode);
-	if (keycode == XK_w && params)
+	t_player *player = params->player;
+
+	double heading = player->heading;
+
+	int map_x = player->position[1] +  sin(heading);
+	int map_y = player->position[0] - cos(heading);
+
+	char grid = map[map_y][map_x];
+	if (grid == '0')
 	{
-		// printf("hello\n");
+		map_x += sin(heading);
+		map_y -= cos(heading);
 	}
-	return (1);
+		
+	if (map[map_y][map_x] == '0')
+		map[map_y][map_x] = '2';
+	else if (map[map_y][map_x] == '2')
+		map[map_y][map_x] = '0';
 }
+
 int mouse_click(int button, int x, int y, t_params *params)
 {
 	printf("button: %i | mouseX: %i | mouseY: %i\n", button, x, y);
@@ -190,7 +220,11 @@ int mouse_click(int button, int x, int y, t_params *params)
 		params->fov += M_PI / 30;
 		printf("zooming out\n");
 	}
-	render(params);
+	else if (button == 3)
+	{
+		build_wall(params);
+	}
+	// render(params);
 	return (1);
 }
 
@@ -219,7 +253,7 @@ int mouse_move(int x, int y, t_params *params)
 	// printf(" mouseX: %i | mouseY: %i | xDelta: %i | ydelta: %i | heading_delta: %f vert_delta: %f\n",  x, y, xDelta, yDelta, heading_delta, vert_delta);
 	params->clicked_px[0] = x;
 	params->clicked_px[1] = y;
-	render(params);
+	// render(params);
 
 	return (1);
 }

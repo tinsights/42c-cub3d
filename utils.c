@@ -68,7 +68,7 @@ void move_player(t_params *params, double direction)
 	double new_y = player->position[0] + cos(player->heading) * horizStep * direction;
 	double new_x = player->position[1] + -sin(player->heading) * horizStep * direction;
 
-	if (!player->god && is_wall(map[(int)new_y][(int)new_x]))
+	if (!player->god && is_wall(params->map[(int)new_y][(int)new_x]))
 		return ;
 	player->position[0] = new_y;
 	player->position[1] = new_x;
@@ -84,7 +84,7 @@ void strafe_player(t_params *params, int direction)
 
 	printf("new x %f new y %f\n", new_x, new_y);
 
-	if (!player->god && is_wall(map[(int)new_y][(int)new_x]))
+	if (!player->god && is_wall(params->map[(int)new_y][(int)new_x]))
 		return ;
 	printf("new x %i new y %i\n", (int) new_x, (int) new_y);
 	player->position[0] = new_y;
@@ -100,14 +100,14 @@ void spraypaint(t_params *params)
 	int map_x = player->position[1] + sin(heading);
 	int map_y = player->position[0] - cos(heading);
 		
-	if (map[map_y][map_x] == '1')
-		map[map_y][map_x] = 't';
-	else if (map[map_y][map_x] == 't')
-		map[map_y][map_x] = '1';
-	else if (map[map_y][map_x] == '2')
-		map[map_y][map_x] = 'T';
-	else if (map[map_y][map_x] == 'T')
-		map[map_y][map_x] = '2';
+	if (params->map[map_y][map_x] == '1')
+		params->map[map_y][map_x] = 't';
+	else if (params->map[map_y][map_x] == 't')
+		params->map[map_y][map_x] = '1';
+	else if (params->map[map_y][map_x] == '2')
+		params->map[map_y][map_x] = 'T';
+	else if (params->map[map_y][map_x] == 'T')
+		params->map[map_y][map_x] = '2';
 }
 
 void door(t_params *params)
@@ -119,10 +119,10 @@ void door(t_params *params)
 	int map_x = player->position[1] +  sin(heading);
 	int map_y = player->position[0] - cos(heading);
 		
-	if (map[map_y][map_x] == 'D')
-		map[map_y][map_x] = 'd';
-	else if (map[map_y][map_x] == 'd')
-		map[map_y][map_x] = 'D';
+	if (params->map[map_y][map_x] == 'D')
+		params->map[map_y][map_x] = 'd';
+	else if (params->map[map_y][map_x] == 'd')
+		params->map[map_y][map_x] = 'D';
 }
 
 int	key_hook(int keycode, t_params *params)
@@ -188,17 +188,17 @@ void build_wall(t_params *params)
 	int map_x = player->position[1] +  sin(heading);
 	int map_y = player->position[0] - cos(heading);
 
-	char grid = map[map_y][map_x];
+	char grid = params->map[map_y][map_x];
 	if (grid == '0')
 	{
 		map_x += sin(heading);
 		map_y -= cos(heading);
 	}
 		
-	if (map[map_y][map_x] == '0')
-		map[map_y][map_x] = '2';
-	else if (map[map_y][map_x] == '2')
-		map[map_y][map_x] = '0';
+	if (params->map[map_y][map_x] == '0')
+		params->map[map_y][map_x] = '2';
+	else if (params->map[map_y][map_x] == '2')
+		params->map[map_y][map_x] = '0';
 }
 
 int mouse_click(int button, int x, int y, t_params *params)

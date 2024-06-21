@@ -80,7 +80,7 @@ void dda(t_params *params, t_ray *ray)
          * and renders the walls from within.
          * not exactly neccessary, especially once wall collision is implemented
         */
-		if (is_wall(p->map[ray->map_y][ray->map_x]))
+		if (is_wall(params->map[ray->map_y][ray->map_x]))
 		{
 			if (ray->dist_x < ray->dist_y) // what if equal?
 			{

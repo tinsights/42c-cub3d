@@ -175,7 +175,7 @@ void draw_minimap(t_params p)
 		{
 			int col_check = pos_x - mm_size / 2 + (heading_px_col + off_x) / sq_size;
 			int row_check = pos_y - mm_size / 2 + (heading_px_row + off_y) / sq_size;
-			char block = map[row_check][col_check];
+			char block = p.map[row_check][col_check];
 			if (block != '0' && block != 'd' && p.player->height <= 1.1 && p.player->height >= -0.1)
 				break ;
 			put_pixel(p, heading_px_row, heading_px_col, 0x550077);
@@ -195,7 +195,7 @@ void draw_minimap(t_params p)
 			
 			int col_check = pos_x - mm_size / 2 + (px_col + off_x) / sq_size;
 			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size;
-			char block = map[row_check][col_check];
+			char block = p.map[row_check][col_check];
 			// if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
 			if (col_check < 0 || row_check < 0 || col_check >= p.mwidth || row_check >= p.mheight)
 				put_pixel(p, px_row, px_col, 0x111111);

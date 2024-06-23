@@ -28,8 +28,8 @@ int	chktypeid(char *elem, char *target)// N or NO, S OR SO etc
 int	update_xpmpath(char **xpm, char *elem)//valid xpm file path
 {
 	t_mlx	*mlx;
-	int	tmp;
 	void	*image;
+	int	tmp;
 
 	if (*xpm != NULL)//*xpm != NULL means duplicate found
 		return (-1);
@@ -48,9 +48,10 @@ int	update_xpmpath(char **xpm, char *elem)//valid xpm file path
 	return (1);
 }
 
-int	update_color(int (*color)[3], char *elem) //pass only elem[1]?
+int	update_color(int *color, char *elem) //pass only elem[1]?
 {
 	char	**rgb;
+	int	irgb[3];
 	int	i;
 
 	if (nondigits(elem))
@@ -61,8 +62,8 @@ int	update_color(int (*color)[3], char *elem) //pass only elem[1]?
 	i = 0;
 	while (i < 3)
 	{
-		(*color)[i] = ft_atoi(rgb[i]);
-		if ((*color)[i] < 0 || (*color)[i] > 255)
+		irgb[i] = ft_atoi(rgb[i]);
+		if (irgb[i] < 0 || irgb[i] > 255)
 		{
 			free_strarr(rgb);
 			return (-1);
@@ -70,6 +71,7 @@ int	update_color(int (*color)[3], char *elem) //pass only elem[1]?
 		i++;
 	}
 	free_strarr(rgb);
+	*color = (irgb[0] << 16) | irgb[1] << 8 | irgb[2];
 	return (1);
 }
 
@@ -84,9 +86,9 @@ int	is_valid_typeid(char **elem, t_input *dat)
 	else if (chktypeid(elem[0], "EA"))
 		return (update_xpmpath(&dat->expm, elem[1]));
 	else if (chktypeid(elem[0], "F"))
-		return (update_color(&dat->fcolor, elem[1]));
+		return (update_color(&dat->fclr, elem[1]));
 	else if (chktypeid(elem[0], "C"))
-		return (update_color(&dat->ccolor, elem[1]));
+		return (update_color(&dat->cclr, elem[1]));
 	return (-1);
 }
 
@@ -122,9 +124,5 @@ int	validate_typeid(int fd, t_input *dat)
 	free (line);
 	if (vcount < 6)
 		return (-1);
-	//update fclr and cclr; R,G,B
-	dat->fclr = (dat->fcolor[0] << 16) | dat->fcolor[1] << 8 | dat->fcolor[2];
-	dat->cclr = (dat->ccolor[0] << 16) | dat->ccolor[1] << 8 | dat->ccolor[2];
-	
 	return(1);
 }

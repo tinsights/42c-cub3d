@@ -12,31 +12,32 @@
 
 #include "cub3d.h"
 
-int	update_playerpos(t_mapinfo *mi, t_input *dat)
+int	update_playerspawn(t_mapdata *mi, t_input *dat)
 {
 	t_list	*lst;
-	int	flag;
+	int	counter;
 	int	valid;
+	int	row;
 	
-	flag = 0;
-	mi->irow = 0;
+	counter = 0;
+	row = 0;
 	lst = mi->lst;
 	while (lst)
 	{
-		mi->irow++;
-		valid = validate_nswe((char *)lst->content, mi, dat);
-		if (valid == -1 || (valid == 1 && flag == 1))
+		row++;
+		valid = validate_spawn((char *)lst->content, row, dat);
+		if (valid == -1 || (valid == 1 && counter == 1))
 			return (-1);
-		else if (valid == 1 && flag == 0)
-			flag = 1;
+		else if (valid == 1 && counter == 0)
+			counter = 1;
 		lst = lst->next;
 	}
-	if (flag == 0)
+	if (counter == 0)
 		return (-1);
 	return (1);
 }
 
-int	isvalidchars(t_mapinfo *mi)
+int	isvalidchars(t_mapdata *mi)
 {
 	t_list	*lst;
 	int	max;
@@ -55,7 +56,7 @@ int	isvalidchars(t_mapinfo *mi)
 	return (0);
 }
 
-int	maplist(int fd, t_mapinfo *mi)
+int	maplist(int fd, t_mapdata *mi)
 {
 	char	*line;
 	t_list	*head;
@@ -112,7 +113,7 @@ char	*getstr(char *str, int rwidth)
 	return(arr);
 }
 
-char	**tmap_to_array(t_mapinfo *mi)
+char	**tmap_to_array(t_mapdata *mi)
 {
 	char	**arr;
 	t_list	*lst;
@@ -140,49 +141,10 @@ char	**tmap_to_array(t_mapinfo *mi)
 	return (arr);
 }
 
-int	init_mapinfo(t_mapinfo *mi, int fd)
+int	init_mapdata(t_mapdata *mi, int fd)
 {
-/*
 	mi->rows = 0;
 	mi->rwidth = 0;
-	mi->nswe[0][0] = 78;//n
-	mi->nswe[0][1] = 0;
-	mi->nswe[0][2] = -1;
-	mi->nswe[0][3] = 90;
-
-	mi->nswe[1][0] = 83;//s
-	mi->nswe[1][1] = 0;
-	mi->nswe[1][2] = 1;
-	mi->nswe[1][3] = 270;
-
-	mi->nswe[2][0] = 87;//w
-	mi->nswe[2][1] = -1;
-	mi->nswe[2][2] = 0;
-	mi->nswe[2][3] = 180;
-
-	mi->nswe[3][0] = 69;//e
-	mi->nswe[3][1] = 1;
-	mi->nswe[3][2] = 0;
-	mi->nswe[3][3] = 0;
-
-	if (maplist(fd, mi) == -1)
-		return (-1);
-	return (0);
-*/
-	mi->rows = 0;
-	mi->rwidth = 0;
-	mi->nswe[0][0] = 78;//n
-	mi->nswe[0][1] = 0;
-
-	mi->nswe[1][0] = 83;//s
-	mi->nswe[1][1] = M_PI;
-
-	mi->nswe[2][0] = 87;//w
-	mi->nswe[2][1] = 3 * M_PI / 2;
-
-	mi->nswe[3][0] = 69;//e
-	mi->nswe[3][1] = M_PI / 2;
-
 	if (maplist(fd, mi) == -1)
 		return (-1);
 	return (0);	
@@ -190,13 +152,13 @@ int	init_mapinfo(t_mapinfo *mi, int fd)
 
 int	parse_map(int fd, t_input *dat)
 {
-	t_mapinfo	mi;
+	t_mapdata	mi;
 	
-	if (init_mapinfo(&mi, fd) == -1)
+	if (init_mapdata(&mi, fd) == -1)
 		return (-1);
-	if (isvalidchars(&mi) == -1)
+	if (isvalidchars(&mi) == -1) //valid letters in map
 		return (free_maplst(&mi.lst));
-	if (update_playerpos(&mi, dat) == -1)
+	if (update_playerspawn(&mi, dat) == -1)//valid nswe
 		return (free_maplst(&mi.lst));
 	if (isvalidborder(&mi, dat) == -1)
 		return (free_maplst(&mi.lst));

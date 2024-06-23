@@ -43,19 +43,15 @@
 
 //extern char	map[MHEIGHT][MWIDTH];
 
-
 typedef unsigned int	t_uint;
 typedef unsigned long	t_ulong;
 
-typedef struct s_mapinfo
+typedef struct s_mapdata
 {
 	t_list	*lst;
 	int	rows; //row size
 	int	rwidth; //same as col size
-	double	nswe[4][4];
-	int	irow;
-	int	icol;
-} t_mapinfo;
+} t_mapdata;
 
 typedef struct s_input
 {
@@ -63,13 +59,9 @@ typedef struct s_input
 	char	*sxpm;
 	char	*expm;
 	char	*wxpm;
-	int	fcolor[3];
-	int	ccolor[3];
 	int	fclr;
 	int	cclr;
 	double	heading;
-	//int	xdir;//xdir based on NSWE -->remove
-	//int	ydir;//ydir based on NSWE -->remove
 	char	nswe;//set to N S W or E
 	int	xpos;//xcoordinate of player
 	int	ypos;//ycoordinate of player
@@ -83,7 +75,6 @@ typedef struct s_mlx
 	void				*ptr;
 	void				*win;
 	void				*img;
-
 	char				*img_addr;
 	int					bpp;
 	int					line_sz;
@@ -93,9 +84,7 @@ typedef struct s_mlx
 typedef struct s_player
 {
 	double				position[2];
-
 	double				heading; // in rads
-	
 	double				speed;
 	double				height;
 	double				vert_angle;
@@ -106,9 +95,7 @@ typedef struct s_params
 {
 	t_mlx				*mlx;
 	t_player			*player;
-
 	int					clicked_px[2];
-
 	t_img				*inner;
 	t_img				*north;
 	t_img				*south;
@@ -193,7 +180,7 @@ int	free_return1(t_list **lst, char **str);
 
 //parse_utils.c
 int	nondigits(char *str);
-int	validchar(char c, char *vchr);
+int	ischr_found(char c, char *vchr);
 int	validstr(char *str, char *vchr);
 int	wcount(char **elem);
 
@@ -203,13 +190,13 @@ int	parse_map(int fd, t_input *dat);
 //map_utils.c
 int	remove_nl(char **line);
 int	isemptyline(char *line);
-int	validate_nswe(const char *str, t_mapinfo *mi, t_input *dat);
+int	validate_spawn(const char *str, int row, t_input *dat);
 
 //mapborder.c
-int	isvalidborder(t_mapinfo *mi, t_input *dat);
+int	isvalidborder(t_mapdata *mi, t_input *dat);
 
 //print.c
-void	print_mi(t_mapinfo *mi);
+void	print_mi(t_mapdata *mi);
 void	print_lst(t_list *lst);
 void	print_input(t_input *dat);
 void	print_dblarr(char **arr);

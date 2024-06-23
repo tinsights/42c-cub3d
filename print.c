@@ -23,11 +23,10 @@ void	print_lst(t_list *lst)
 	printf("end of list\n");
 }
 
-void	print_mi(t_mapinfo *mi)
+void	print_mi(t_mapdata *mi)
 {
 	printf("\nprint map info: \n");
 	printf("mi->rows %d\n",mi->rows);
-	// printf("mi->cols %d\n",mi->cols);
 	printf("mi->rwidth %d\n",mi->rwidth);
 	print_lst(mi->lst);
 }
@@ -70,15 +69,9 @@ void	print_input(t_input *dat) // test function
 	printf("SO xpm: %s\n",dat->sxpm);
 	printf("EA xpm: %s\n",dat->expm);
 	printf("WE xpm: %s\n",dat->wxpm);
-	printf("floor color r: %d\n",dat->fcolor[0]);
-	printf("floor color g: %d\n",dat->fcolor[1]);
-	printf("floor color b: %d\n",dat->fcolor[2]);
-	printf("ceiling color r: %d\n",dat->ccolor[0]);
-	printf("ceiling color g: %d\n",dat->ccolor[1]);
-	printf("ceiling color b: %d\n",dat->ccolor[2]);
+	printf("floor color: %d\n",dat->fclr);
+	printf("ceiling color: %d\n",dat->cclr);
 	printf("heading : %f\n",dat->heading);
-	//printf("x dir: %d\n",dat->xdir);
-	//printf("y dir: %d\n",dat->ydir);
 	printf("player pos x: %d\n",dat->xpos);
 	printf("player pos y: %d\n",dat->ypos);
 	printf("The map:\n");

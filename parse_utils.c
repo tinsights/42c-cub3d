@@ -30,7 +30,7 @@ int	nondigits(char *str)
 	return (0);
 }
 
-int	validchar(char c, char *vchr)
+int	ischr_found(char c, char *vchr)
 {
 	while (*vchr)
 	{
@@ -40,13 +40,15 @@ int	validchar(char c, char *vchr)
 	return (0);
 }
 
+
+
 int	validstr(char *str, char *vchr)
 {
 	//if (!str)
 		//return (-1);//empty map line??
 	while (*str)
 	{
-		if (!validchar(*str++, vchr))
+		if (!ischr_found(*str++, vchr))
 			return (0);
 	}
 	return (1);//all valid chars

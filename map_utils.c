@@ -40,41 +40,53 @@ int	isemptyline(char *line)
 	return (0);		
 }
 
-void	update_orient_pos(t_mapinfo *mi, t_input *dat, int j)
+void	update_pos_heading(t_input *dat, int row, int col, char c)
 {
-	dat->xpos = mi->icol + 1;
-	dat->ypos = mi->irow;
-	dat->heading = mi->nswe[j][1];
+	// dat->xpos = mi->icol + 1;
+	// dat->ypos = mi->irow;
+	dat->xpos = col + 1;
+	dat->ypos = row;
+	if (c == 'N')
+		dat->heading = 0;
+	else if (c == 'S')
+		dat->heading = M_PI;
+	else if (c == 'W')
+		dat->heading = 3 * M_PI / 2;
+	else // E
+		dat->heading = M_PI / 2;
 }
 
-int	validate_nswe(const char *str, t_mapinfo *mi, t_input *dat)
+int	validate_spawn(const char *str, int row, t_input *dat)
 {
-	int	i;
 	int	len;
+	char c;
 	int	cflag;
+	int	col;
 
 	cflag = 0;
 	len = ft_strlen(str);
-	mi->icol = 0;
-	while (mi->icol < len)
+	//mi->icol = 0;
+	col = 0;
+	//while (mi->icol < len)
+	while (col < len)
 	{ 	
-		i = 0;
-		while (i < 4)//loop on nswe
+		//c = str[mi->icol];
+		c = str[col];
+		if (ischr_found(c, "NSWE") == 1)
 		{
-			if (str[mi->icol] == mi->nswe[i][0])
-			{
-				cflag++;
-				if (cflag > 1)// dup found
-					return (-1);
-				else
-					update_orient_pos(mi, dat, i);		
-			}
-			i++;	
+			cflag++;
+			if (cflag > 1)// dup found
+				return (-1);
+			else
+				//update_pos_heading(mi, dat, c);
+				update_pos_heading(dat, row, col, c);	
 		}
-		mi->icol++;
+		//mi->icol++;
+		col++;
 	}
 	return (cflag);//0 none, 1 found
 }
+
 
 int	lst_count(t_list *lst)
 {

@@ -41,7 +41,7 @@ void	fill_tmap(int row[], int col, char *str)
 	}
 }
 
-int	isenclosedwall(int **tmap, t_mapinfo *mi, int row, int col)
+int	isenclosedwall(int **tmap, t_mapdata *mi, int row, int col)
 {
 	if (tmap[row][col] == -1)
 		return (-1);
@@ -82,7 +82,7 @@ int	**alloc_tmap(int rows, int cols)
 	return (tmap);
 }
 
-int	isvalidborder(t_mapinfo *mi, t_input *dat)
+int	isvalidborder(t_mapdata *mi, t_input *dat)
 {
 	t_list	*lst;
 	int	**tmap;

@@ -30,11 +30,6 @@ void reset_ray(t_ray *ray, t_player* player)
 
 	ray->side_x = false;
 	ray->perp_wall_dist = 0.0;
-	
-	/**
-	 * Set initial parameters based on heading
-	 * can do bzero
-	*/
 	ray->step_x = 0;
 	ray->step_y = 0;
 	ray->dist_x = 0.0;
@@ -69,7 +64,7 @@ void direct_ray(t_ray *ray, t_player *player)
 
 bool is_wall(char c)
 {
-	return (c == '1' || c == '2' || c == 'D');
+	return (c == '1' || c == '2' || c == 'D' || c == 'a');
 }
 
 void dda(t_params *params, t_ray *ray)
@@ -269,10 +264,10 @@ void draw_walls(t_params *params)
 
 	ray.heading_x = sin(player->heading);
 	ray.heading_y = -cos(player->heading);
-	double half_projection_plane_width = tan(params->fov / 2.0); // todo: store in params, change during zoom
+	params->half_plane_width = tan(params->fov / 2.0); // todo: store in params, change during zoom
 
-	ray.plane_x = -ray.heading_y * half_projection_plane_width;
-	ray.plane_y = ray.heading_x * half_projection_plane_width;
+	ray.plane_x = -ray.heading_y * params->half_plane_width;
+	ray.plane_y = ray.heading_x * params->half_plane_width;
 
 	for (int col = 0; col < WIN_WIDTH; col++)
 	{

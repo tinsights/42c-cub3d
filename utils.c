@@ -52,43 +52,87 @@ void rotate_player(t_params *params, int degrees)
  * 		- convert to singular rotation matrix
 */
 
-#define STEP 0.11
+#define STEP 0.1
+
+// bool precision_wall_check(char** map, double x, double y)
+// {
+// 	int integer;
+// 	double xfract = modf(x, &integer);
+// 	double yfract = modf(y, &integer);
+// 	if (xfract > 0.9 || xfract < 0.1)
+// 		x = round(x);
+// 	if (yfract > 0.9 || yfract < 0.1)
+// 		y = round(y);
+
+// 	return (is_wall(map[(int) y][(int) x]));
+// }
+bool explorable(t_params *params, double y, double x)
+{
+	if (x < 0 || x > params->mwidth || y < 0 || y > params->mheight)
+		return false;
+	// if (params->map[(int) y][(int) x] == 'a')
+	// 	return false;
+	return (params->player->god || !is_wall(params->map[(int)y][(int)x]));
+		
+}
+
 void move_player(t_params *params, double direction)
 {
 	t_player *player = params->player;
 
-	double horizStep = STEP * cos(player->vert_angle);
-	double vertStep = STEP * -sin(player->vert_angle);
+	float  horizStep = STEP * cos(player->vert_angle);
+	float  vertStep = STEP * -sin(player->vert_angle);
 
 	// printf("player vert angle: %f | vertStep: %f\n", player->vert_angle, vertStep);
-	double new_height = player->height + vertStep * direction;
-	if (!player->god && new_height > 0.0 && new_height < 1.0)
+	float  new_height = player->height + vertStep * direction;
+	if (player->god && (new_height > 0.0 && new_height < 1.0))
 		player->height = new_height;
 
-	double new_y = player->position[0] + cos(player->heading) * horizStep * direction;
-	double new_x = player->position[1] + -sin(player->heading) * horizStep * direction;
+	float  curr_y = player->position[0];
+	float  curr_x = player->position[1];
+	float  heading = player->heading;
+	float  new_y = curr_y + cos(heading) * horizStep * direction;
+	float  new_x = curr_x + -sin(heading) * horizStep * direction;
 
-	if (!player->god && is_wall(params->map[(int)new_y][(int)new_x]))
-		return ;
-	player->position[0] = new_y;
-	player->position[1] = new_x;
+	printf("new x %f %i new y %f %i\n", new_x, (int) new_x, new_y, (int) new_y);
+
+	if (explorable(params, curr_y, new_x))
+	{
+			player->position[1] = new_x;
+			curr_x = new_x;
+	}
+	if (explorable(params, new_y, curr_x))
+	{
+		if (new_y > 0 && new_y < params->mheight)
+			player->position[0] = new_y;
+	}
+
 }
-
 
 void strafe_player(t_params *params, int direction)
 {
 	t_player *player = params->player;
 
-	double new_y = player->position[0] + sin(player->heading) * STEP * direction;
-	double new_x = player->position[1] + cos(player->heading) * STEP * direction;
+	float curr_y = player->position[0];
+	float curr_x = player->position[1];
+	float heading = player->heading;
 
-	printf("new x %f new y %f\n", new_x, new_y);
+	float new_y = curr_y + sin(heading) * STEP * direction;
+	float new_x = curr_x + cos(heading) * STEP * direction;
+	printf("new x %f %i new y %f %i\n", new_x, (int) new_x, new_y, (int) new_y);
 
-	if (!player->god && is_wall(params->map[(int)new_y][(int)new_x]))
-		return ;
-	printf("new x %i new y %i\n", (int) new_x, (int) new_y);
-	player->position[0] = new_y;
-	player->position[1] = new_x;
+
+
+	if (explorable(params, curr_y, new_x))
+	{
+			player->position[1] = new_x;
+			curr_x = new_x;
+	}
+	if (explorable(params, new_y, curr_x))
+	{
+		if (new_y > 0 && new_y < params->mheight)
+			player->position[0] = new_y;
+	}
 }
 
 void spraypaint(t_params *params)
@@ -159,12 +203,12 @@ int	key_hook(int keycode, t_params *params)
 	}
 	else if (keycode == XK_Control_L)
 	{
-		if (!player->god && player->height > 0.25)
+		if (player->god || player->height > 0.25)
 			player->height -= 0.25;
 	}
 	else if (keycode == XK_space)
 	{
-		if (!player->god && player->height < 0.75)
+		if (player->god || player->height < 0.75)
 			player->height += 0.25;
 	}
 	else if (keycode == XK_t)
@@ -185,9 +229,11 @@ void build_wall(t_params *params)
 
 	double heading = player->heading;
 
-	int map_x = player->position[1] +  sin(heading);
+
+	int map_x = player->position[1] + sin(heading);
 	int map_y = player->position[0] - cos(heading);
 
+	printf("%i %i %f %f\n", map_x, map_y, sin(heading), -cos(heading));
 	char grid = params->map[map_y][map_x];
 	if (grid == '0')
 	{

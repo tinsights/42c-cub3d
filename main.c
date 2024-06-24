@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 	player.position[0] = dat->ypos + 0.5;
 	player.position[1] = dat->xpos + 0.5;
 	player.heading = dat->heading;
+	printf("heading: %f\n", dat->heading);
 	player.height = 0.5; // 10
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
@@ -157,6 +158,8 @@ void draw_minimap(t_params p)
 			int col_check = pos_x - mm_size / 2 + (heading_px_col + off_x) / sq_size;
 			int row_check = pos_y - mm_size / 2 + (heading_px_row + off_y) / sq_size;
 			char block = p.map[row_check][col_check];
+			if (col_check < 0 || row_check < 0 || col_check >= p.mwidth || row_check >= p.mheight)
+				break ;
 			if (block != '0' && block != 'd' && p.player->height <= 1.1 && p.player->height >= -0.1)
 				break ;
 			put_pixel(p, heading_px_row, heading_px_col, 0x550077);
@@ -180,6 +183,8 @@ void draw_minimap(t_params p)
 			// if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
 			if (col_check < 0 || row_check < 0 || col_check >= p.mwidth || row_check >= p.mheight)
 				put_pixel(p, px_row, px_col, 0x111111);
+			else if (block == 'a')
+				put_pixel(p, px_row,px_col, 0x880000);
 			else if (block != '0' && block != 'd')
 				put_pixel(p, px_row,px_col, 0xff0000);
 			//printf("rowcheck: %i, colcheck: %i, mwidth: %i mheight: %i\n", row_check, col_check, p.mwidth, p.mheight);

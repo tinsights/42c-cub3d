@@ -52,7 +52,7 @@ typedef struct s_mapinfo
 	t_list	*lst;
 	int	rows; //row size
 	int	rwidth; //same as col size
-	int	nswe[4][4];
+	double	nswe[4][4];
 	int	irow;
 	int	icol;
 } t_mapinfo;

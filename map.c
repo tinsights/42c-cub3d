@@ -175,13 +175,13 @@ int	init_mapinfo(t_mapinfo *mi, int fd)
 	mi->nswe[0][1] = 0;
 
 	mi->nswe[1][0] = 83;//s
-	mi->nswe[1][1] = M_PI / 2;
+	mi->nswe[1][1] = M_PI;
 
 	mi->nswe[2][0] = 87;//w
-	mi->nswe[2][1] = 3 * M_PI / 4;
+	mi->nswe[2][1] = 3 * M_PI / 2;
 
 	mi->nswe[3][0] = 69;//e
-	mi->nswe[3][1] = M_PI / 4;
+	mi->nswe[3][1] = M_PI / 2;
 
 	if (maplist(fd, mi) == -1)
 		return (-1);

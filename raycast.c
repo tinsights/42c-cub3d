@@ -67,9 +67,9 @@ bool is_wall(char c)
 	return (c == '1' || c == '2' || c == 'D' || c == 'a');
 }
 
-void dda(t_params *params, t_ray *ray)
+void inner_wall(t_params *params, t_ray* ray)
 {
-	if (is_wall(params->map[ray->map_y][ray->map_x]))
+    if (is_wall(params->map[ray->map_y][ray->map_x]))
 	{
 		if (ray->dist_x < ray->dist_y) // what if equal?
 		{
@@ -84,10 +84,10 @@ void dda(t_params *params, t_ray *ray)
 		ray->hit = true;
 		ray->img = params->inner;
 	}
+}
 
-	/* -------------------------------------------------------------------------- */
-	/*                        DIGITAL DIFFERENTIAL ANALYSIS                       */
-	/* -------------------------------------------------------------------------- */
+void cast_to_wall(t_params *params, t_ray *ray)
+{
 	while(!ray->hit)
 	{
 		if (ray->dist_x < ray->dist_y) // what if equal?
@@ -127,43 +127,49 @@ void dda(t_params *params, t_ray *ray)
 		if (params->map[ray->map_y][ray->map_x] == 'd')
 			ray->hit = false;
 	}
-
-	if (ray->side_x)
+    if (ray->side_x)
 		ray->perp_wall_dist = ray->dist_x - ray->delta_dist_x;
 	else
 		ray->perp_wall_dist = ray->dist_y - ray->delta_dist_y;
+}
 
+void ray_pierce(t_params *params, t_ray *ray)
+{
+    if ((ray->map_x > 0 && ray->map_x < params->mwidth - 1)
+        && (ray->map_y > 0 && ray->map_y < params->mheight - 1))
+    {
+        t_ray *next = ft_calloc(1, sizeof(t_ray));
+        ray->next = next;
+        next->id = ray->id + 1;
+        next->col = ray->col;
+        next->dir_x = ray->dir_x;
+        next->dir_y = ray->dir_y;
+        next->step_x = ray->step_x;
+        next->step_y = ray->step_y;
+        next->map_x = ray->map_x;
+        next->map_y = ray->map_y;
+        next->dist_x = ray->dist_x;
+        next->dist_y = ray->dist_y;
+        next->delta_dist_x = ray->delta_dist_x;
+        next->delta_dist_y = ray->delta_dist_y;
+        next->hit = 0;
+        if (ray->img == params->inner)
+        {
+            if (ray->side_x)
+                next->map_x += ray->step_x;
+            else
+                next->map_y += ray->step_y;
+        }
+        dda(params, next);
+    }
+}
+
+void dda(t_params *params, t_ray *ray)
+{
+	inner_wall(params, ray);
+    cast_to_wall(params, ray);
 	if (params->player->height > 1.0 || params->player->height < 0)
-	{
-		if ((ray->map_x > 0 && ray->map_x < params->mwidth - 1)
-			&& (ray->map_y > 0 && ray->map_y < params->mheight - 1))
-		{
-			t_ray *next = ft_calloc(1, sizeof(t_ray));
-			ray->next = next;
-
-			next->id = ray->id + 1;
-			next->col = ray->col;
-			next->dir_x = ray->dir_x;
-			next->dir_y = ray->dir_y;
-			next->step_x = ray->step_x;
-			next->step_y = ray->step_y;
-			next->map_x = ray->map_x;
-			next->map_y = ray->map_y;
-			next->dist_x = ray->dist_x;
-			next->dist_y = ray->dist_y;
-			next->delta_dist_x = ray->delta_dist_x;
-			next->delta_dist_y = ray->delta_dist_y;
-			next->hit = 0;
-			if (ray->img == params->inner)
-			{
-				if (ray->side_x)
-					next->map_x += ray->step_x;
-				else
-					next->map_y += ray->step_y;
-			}
-			dda(params, next);
-		}
-	}
+	    ray_pierce(params, ray);
 }
 
 
@@ -191,9 +197,6 @@ void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
 	if (top_of_wall < 0)
 		top_of_wall = 0;
 
-	// printf("unit height is %i, ray->perp_wall_dist is %f\n", unit_height, ray->perp_wall_dist);
-	// printf("lineheight is %i, bottom of wall is %i, top of wall is %i\n", lineHeight, bottom_of_wall, top_of_wall);
-
 	double texture_slice;
 	if (ray->side_x)
 	{
@@ -208,51 +211,44 @@ void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
 			texture_slice = 1.0 - texture_slice;
 	}
 	
-	/* -------------------------------------------------------------------------- */
-	/*                             PAINTING THE WALLS                             */
-	/* -------------------------------------------------------------------------- */
-
-	// int color = map[ray->map_y][ray->map_x] == 1 ? 0x000088 : 0x880000;
-	
-
-	// if (col == WIN_WIDTH / 2)
-	// {
-	// 	printf("looking at wall %i %i, at slice %f\n", ray->map_x, ray->map_y, texture_slice);
-	// 	printf("ray dir x: %f | ray diry: %f\n", ray_dir_x, ray_dir_y);
-	// 	printf("%d %x\n", ((unsigned int*)image->data)[0], ((unsigned int*)image->data)[0]);
-	// 	printf("image bpp: %i, image width: %i, image height: %i, image line_sz: %i\n", image->bpp, image->width, image->height, image->size_line);
-	// 	printf("tex col is %i\n", tex_col);
-	// }
 	ray->img_data = (unsigned int *)ray->img->data;
 
 	int tex_col = texture_slice * (double) ray->img->width;
 
 	double true_line_height = actual_bottom - actual_top;
-	// if (ray->col == WIN_WIDTH / 2)
-	// 	printf("ray %i has tlh of %f\n", ray->id, true_line_height);
 
-	// bool condition = ray->img == params->inner;
+    double dist = ray->perp_wall_dist;
+	if (dist < 1.0)
+		dist = 1.0;
+    double brightness = 1 / dist;
 	for (int px = 0; px < WIN_HEIGHT; px++)
 	{
-
-		// if (condition)
-		// {
-		// 	put_pixel(*params, px, col, 0xfffff);
-		// }
 		if (!(ray->next))
 		{
-			if (px < top_of_wall ) // ceiling
-				//put_pixel(*params, px, col, 0x888888);
+			if (px < top_of_wall )
 				put_pixel(*params, px, col, params->cclr);
 			else if (px > bottom_of_wall ) // floor
-				//put_pixel(*params, px, col, 0x333333);
 				put_pixel(*params, px, col, params->fclr);
 		}
 		if (px >= top_of_wall && px <= bottom_of_wall)
 		{
 			double row_slice = (double) (px - actual_top) / true_line_height;
 			int tex_row = row_slice * (double) ray->img->height;
-			put_pixel(*params, px, col, (ray->img_data[(tex_row * ray->img->size_line)/(ray->img->bpp /8) + tex_col]));
+			int color = ray->img_data[(tex_row * ray->img->size_line)/(ray->img->bpp /8) + tex_col];
+			int r = (color >> 16) & 0xFF;
+			int g = (color >> 8) & 0xFF;
+			int b = color & 0xFF;
+			r *= brightness;
+			g *= brightness;
+			b *= brightness;
+			color = ((r << 16) | (g << 8) | b);
+			if (ray->col == WIN_WIDTH / 2)
+			{
+			    printf("brightness: %f\n", brightness);
+				printf("%x %i || %x %x %x \n", color, color, r, g, b);
+				printf("%x %i || %x %x %x \n", color, color, (int) (r * brightness), (int) (g * brightness), (int)(b * brightness));
+			}
+			put_pixel(*params, px, col, color);
 		}
 	}
 }

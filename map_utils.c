@@ -42,9 +42,10 @@ int	isemptyline(char *line)
 
 void	update_orient_pos(t_mapinfo *mi, t_input *dat, int j)
 {
-	dat->xpos = mi->icol + 1;
-	dat->ypos = mi->irow;
+	dat->xpos = mi->icol;
+	dat->ypos = mi->irow - 1;
 	dat->heading = mi->nswe[j][1];
+	printf("x: %i y: %i\n", dat->xpos, dat->ypos);
 }
 
 int	validate_nswe(const char *str, t_mapinfo *mi, t_input *dat)

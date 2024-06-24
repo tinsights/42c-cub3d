@@ -19,6 +19,8 @@ void put_pixel(t_params p, t_uint row, t_uint col, int colour)
 }
 int	close_window(t_params *params)
 {
+	mlx_do_key_autorepeaton(params->mlx->ptr); // does this do anything?
+
 	mlx_destroy_image(params->mlx->ptr, params->mlx->img);
 	mlx_destroy_image(params->mlx->ptr, params->north);
 	mlx_destroy_image(params->mlx->ptr, params->east);
@@ -83,7 +85,6 @@ void move_player(t_params *params, float direction)
 	float  horizStep = STEP * cos(player->vert_angle);
 	float  vertStep = STEP * -sin(player->vert_angle);
 
-	// printf("player vert angle: %f | vertStep: %f\n", player->vert_angle, vertStep);
 	float  new_height = player->height + vertStep * direction;
 	if (player->god)
 		player->height = new_height;
@@ -93,9 +94,6 @@ void move_player(t_params *params, float direction)
 	float  heading = player->heading;
 	float  new_y = curr_y + cos(heading) * horizStep * direction;
 	float  new_x = curr_x + -sin(heading) * horizStep * direction;
-
-	// printf("new x %f %i new y %f %i\n", new_x, (int) new_x, new_y, (int) new_y);
-	printf("speed: %f\n", direction);
 
 	if (explorable(params, curr_y, new_x))
 	{
@@ -198,12 +196,12 @@ int	key_hook(int keycode, t_params *params)
 		params->player->move_tilt = -1;
 	else if (keycode == XK_Control_L)
 	{
-		if (player->god || player->height > 0.25)
+		if (player->god || player->height > 0.2)
 			player->height -= 0.25;
 	}
 	else if (keycode == XK_space)
 	{
-		if (player->god || player->height < 0.75)
+		if (player->god || player->height < 0.8)
 			player->height += 0.25;
 	}
 	else if (keycode == XK_t)

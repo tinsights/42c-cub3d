@@ -12,30 +12,6 @@
 
 #include "cub3d.h"
 
-/*
-char map[MHEIGHT][MWIDTH] = {
-"11111111111",
-"10000000001",
-"10000110001",
-"10000D10001",
-"10000110001",
-"10000000001",
-"10000000001",
-"11111111111",
-};
-*/
-
-// int map[MHEIGHT][MWIDTH] = {
-// {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-// {2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
-// {2,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
-// {2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,2},
-// {2,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2},
-// {2,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,2},
-// {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
-// {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-// };
-
 int main(int argc, char *argv[])
 {
 	t_input	*dat;
@@ -93,7 +69,7 @@ int main(int argc, char *argv[])
 	int width;
 	int height;
 	params.inner = mlx_xpm_file_to_image(mlx.ptr, "./incs/hallway.xpm", &width, &height); // extra
-	params.spray = mlx_xpm_file_to_image(mlx.ptr, "./incs/mpivet-p.xpm", &width, &height); // extra
+	params.spray = mlx_xpm_file_to_image(mlx.ptr, "./incs/42sg.xpm", &width, &height); // extra
 	params.door = mlx_xpm_file_to_image(mlx.ptr, "./incs/tunnelv2.xpm", &width, &height);
 	params.north = mlx_xpm_file_to_image(mlx.ptr, dat->nxpm, &width, &height);
 	params.south = mlx_xpm_file_to_image(mlx.ptr, dat->sxpm, &width, &height);
@@ -204,28 +180,14 @@ void draw_minimap(t_params p)
 void look_up_down(t_params *params, int direction)
 {
 	if (direction > 0 && params->player->vert_angle < M_PI / 6)
-		params->player->vert_angle += M_PI / 120;
+		params->player->vert_angle += M_PI / 180;
 	else if (direction < 0 && params->player->vert_angle > -M_PI / 6)
-		params->player->vert_angle -= M_PI / 120;
+		params->player->vert_angle -= M_PI / 180;
 
 }
 
-void acc_player(t_params *params)
-{
-	if (params->player->move_ws < 2 && params->player->move_ws > -2)
-		params->player->move_ws *= 1.01;
-	if (params->player->move_ad < 2 && params->player->move_ad > -2)
-		params->player->move_ad *= 1.01;
-	if (params->player->move_tilt < 2 && params->player->move_tilt > -2)
-		params->player->move_tilt *= 1.01;
-	if (params->player->move_turn < 2 && params->player->move_turn > -2)
-		params->player->move_turn *= 1.01;
-
-	
-}
 void move(t_params *params)
 {
-	acc_player(params);
 	move_player(params, params->player->move_ws);
 	strafe_player(params, params->player->move_ad);
 	rotate_player(params, params->player->move_turn);

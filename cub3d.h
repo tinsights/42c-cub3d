@@ -100,6 +100,11 @@ typedef struct s_player
 	double				height;
 	double				vert_angle;
 	bool				god;
+
+	float					move_ws;
+	float					move_ad;
+	float					move_turn;
+	float					move_tilt;
 }						t_player;
 
 typedef struct s_params
@@ -173,6 +178,10 @@ int						key_release_hook(int keycode, t_params *params);
 void					draw_crosshair(t_params p);
 int						render(t_params *p);
 void 					dda(t_params *params, t_ray *ray);
+void move_player(t_params *params, float direction);
+void strafe_player(t_params *params, float direction);
+void rotate_player(t_params *params, float degrees);
+
 bool is_wall(char c);
 
 

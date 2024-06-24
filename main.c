@@ -80,6 +80,10 @@ int main(int argc, char *argv[])
 	player.vert_angle = 0.0;
 	player.speed = 1.0;
 	player.god = false;
+	player.move_ad = 0;
+	player.move_ws = 0;
+	player.move_tilt = 0;
+	player.move_turn = 0;
 
 
 	/* -------------------------------------------------------------------------- */
@@ -101,14 +105,16 @@ int main(int argc, char *argv[])
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */
-	
+
+
+	mlx_do_key_autorepeatoff(mlx.ptr); // does this do anything?
+
 	mlx_hook(mlx.win, ButtonPress, ButtonPressMask, &mouse_click, &params);
-	// mlx_hook(mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook, &params);
+	mlx_hook(mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook, &params);
 
 	mlx_hook(mlx.win, MotionNotify, Button2MotionMask, &mouse_move, &params);
 	mlx_hook(mlx.win, KeyPress, KeyPressMask, &key_hook, (void *) &params);
 	mlx_hook(mlx.win, DestroyNotify, 0L, &close_window, (void *) &params);
-	mlx_do_key_autorepeaton(mlx.ptr); // does this do anything?
 
 	render(&params);
 	mlx_loop_hook(mlx.ptr, render, &params);
@@ -195,11 +201,43 @@ void draw_minimap(t_params p)
 	}
 }
 
+void look_up_down(t_params *params, int direction)
+{
+	if (direction > 0 && params->player->vert_angle < M_PI / 6)
+		params->player->vert_angle += M_PI / 120;
+	else if (direction < 0 && params->player->vert_angle > -M_PI / 6)
+		params->player->vert_angle -= M_PI / 120;
+
+}
+
+void acc_player(t_params *params)
+{
+	if (params->player->move_ws < 2 && params->player->move_ws > -2)
+		params->player->move_ws *= 1.01;
+	if (params->player->move_ad < 2 && params->player->move_ad > -2)
+		params->player->move_ad *= 1.01;
+	if (params->player->move_tilt < 2 && params->player->move_tilt > -2)
+		params->player->move_tilt *= 1.01;
+	if (params->player->move_turn < 2 && params->player->move_turn > -2)
+		params->player->move_turn *= 1.01;
+
+	
+}
+void move(t_params *params)
+{
+	acc_player(params);
+	move_player(params, params->player->move_ws);
+	strafe_player(params, params->player->move_ad);
+	rotate_player(params, params->player->move_turn);
+	look_up_down(params, params->player->move_tilt);
+
+}
+
 int render(t_params *p)
 {
 	// draw_grid(*p);
 	// draw_player(*p);
-
+	move(p);
 	draw_walls(p);
 	draw_crosshair(*p);
 	draw_minimap(*p);

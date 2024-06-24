@@ -33,26 +33,26 @@ int	close_window(t_params *params)
 	return (1);
 }
 
-void rotate_player(t_params *params, int degrees)
+void rotate_player(t_params *params, float degrees)
 {
     t_player *player = params->player;
     player->heading += M_PI / 180 * degrees;
-    if (degrees > 0)
-        printf("turning right, ");
-    else
-        printf("turning left, ");
+    // if (degrees > 0)
+    //     printf("turning right, ");
+    // else
+    //     printf("turning left, ");
 
-    printf("%f %f\n", player->heading, player->heading / M_PI * 360);
-    printf("sine of heading: %f\n", sin(player->heading));
-    printf("cosine of heading: %f\n", cos(player->heading));
-    printf("==============\n");
+    // printf("%f %f\n", player->heading, player->heading / M_PI * 360);
+    // printf("sine of heading: %f\n", sin(player->heading));
+    // printf("cosine of heading: %f\n", cos(player->heading));
+    // printf("==============\n");
 }
 
 /** TODO:
  * 		- convert to singular rotation matrix
 */
 
-#define STEP 0.1
+#define STEP 0.02
 
 // bool precision_wall_check(char** map, double x, double y)
 // {
@@ -76,7 +76,7 @@ bool explorable(t_params *params, double y, double x)
 		
 }
 
-void move_player(t_params *params, double direction)
+void move_player(t_params *params, float direction)
 {
 	t_player *player = params->player;
 
@@ -85,7 +85,7 @@ void move_player(t_params *params, double direction)
 
 	// printf("player vert angle: %f | vertStep: %f\n", player->vert_angle, vertStep);
 	float  new_height = player->height + vertStep * direction;
-	if (player->god && (new_height > 0.0 && new_height < 1.0))
+	if (player->god)
 		player->height = new_height;
 
 	float  curr_y = player->position[0];
@@ -94,7 +94,8 @@ void move_player(t_params *params, double direction)
 	float  new_y = curr_y + cos(heading) * horizStep * direction;
 	float  new_x = curr_x + -sin(heading) * horizStep * direction;
 
-	printf("new x %f %i new y %f %i\n", new_x, (int) new_x, new_y, (int) new_y);
+	// printf("new x %f %i new y %f %i\n", new_x, (int) new_x, new_y, (int) new_y);
+	printf("speed: %f\n", direction);
 
 	if (explorable(params, curr_y, new_x))
 	{
@@ -109,7 +110,7 @@ void move_player(t_params *params, double direction)
 
 }
 
-void strafe_player(t_params *params, int direction)
+void strafe_player(t_params *params, float direction)
 {
 	t_player *player = params->player;
 
@@ -119,7 +120,7 @@ void strafe_player(t_params *params, int direction)
 
 	float new_y = curr_y + sin(heading) * STEP * direction;
 	float new_x = curr_x + cos(heading) * STEP * direction;
-	printf("new x %f %i new y %f %i\n", new_x, (int) new_x, new_y, (int) new_y);
+	// printf("new x %f %i new y %f %i\n", new_x, (int) new_x, new_y, (int) new_y);
 
 
 
@@ -176,31 +177,25 @@ int	key_hook(int keycode, t_params *params)
 	if (keycode == XK_Escape)
 		return (close_window(params));
 	else if (keycode == XK_w)
-		move_player(params, -1);
+		params->player->move_ws = -1;
 	else if (keycode == XK_a)
-		strafe_player(params, -1);
+		params->player->move_ad = -1;
 	else if (keycode == XK_s)
-		move_player(params, 1);
+		params->player->move_ws = 1;
 	else if (keycode == XK_d)
-		strafe_player(params, 1);
+		params->player->move_ad = 1;
 	else if (keycode == XK_Left)
-		rotate_player(params, -6);
+		params->player->move_turn = -1;
 	else if (keycode == XK_Right)
-		rotate_player(params, 6);
+		params->player->move_turn = 1;
 	else if (keycode == XK_KP_Add)
 		params->fov += M_PI / 30;
 	else if (keycode == XK_KP_Subtract)
 		params->fov -= M_PI / 30;
 	else if (keycode == XK_Up)
-	{
-		if (player->vert_angle < M_PI / 5)
-			player->vert_angle += M_PI / 60; // 12 degs
-	}
+		params->player->move_tilt = 1;
 	else if (keycode == XK_Down)
-	{
-		if (player->vert_angle > -M_PI / 5)
-			player->vert_angle -= M_PI / 60; // 12degs
-	}
+		params->player->move_tilt = -1;
 	else if (keycode == XK_Control_L)
 	{
 		if (player->god || player->height > 0.25)
@@ -222,6 +217,27 @@ int	key_hook(int keycode, t_params *params)
 	// render(params);
 	return (1);
 }
+int	key_release_hook(int keycode, t_params *params)
+{
+	if (keycode == XK_w)
+		params->player->move_ws = 0;
+	else if (keycode == XK_a)
+		params->player->move_ad = 0;
+	else if (keycode == XK_s)
+		params->player->move_ws = 0;
+	else if (keycode == XK_d)
+		params->player->move_ad = 0;
+	else if (keycode == XK_Left)
+		params->player->move_turn = 0;
+	else if (keycode == XK_Right)
+		params->player->move_turn = 0;
+	else if (keycode == XK_Up)
+		params->player->move_tilt = 0;
+	else if (keycode == XK_Down)
+		params->player->move_tilt = 0;
+	return (1);
+}
+
 
 void build_wall(t_params *params)
 {

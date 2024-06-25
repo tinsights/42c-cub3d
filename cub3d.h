@@ -196,6 +196,11 @@ int	validate_spawn(const char *str, int row, t_input *dat);
 //mapborder.c
 int	isvalidborder(t_mapdata *mi, t_input *dat);
 
+//map_list.c
+int	get_tmaplist(int fd, t_mapdata *mi);
+char	**tmap_to_array(t_mapdata *mi);
+
+
 //print.c
 void	print_mi(t_mapdata *mi);
 void	print_lst(t_list *lst);

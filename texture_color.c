@@ -72,6 +72,7 @@ int	update_filepath(char **filepath, char *pathstr)//N S W E specific filepath
 	image = mlx_xpm_file_to_image(mlx, pathstr, &tmp, &tmp);
 	if (image == NULL)
 	{
+		mlx_destroy_display(mlx);
 		free(mlx);
 		return (-1);
 	}

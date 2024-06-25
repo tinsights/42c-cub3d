@@ -39,7 +39,6 @@
  */
 # define MHEIGHT 8
 # define MWIDTH 11
-# define ONEORZERO 48 //49 or 48
 
 //extern char	map[MHEIGHT][MWIDTH];
 
@@ -53,6 +52,7 @@ typedef struct s_mapdata
 	int	rwidth; //same as col size
 } t_mapdata;
 
+
 typedef struct s_input
 {
 	char	*nxpm;
@@ -65,6 +65,7 @@ typedef struct s_input
 	char	nswe;//set to N S W or E
 	int	xpos;//xcoordinate of player
 	int	ypos;//ycoordinate of player
+	double	position[2];//replace xpos, ypos
 	int	mwidth;
 	int	mheight;
 	char	**map;
@@ -96,7 +97,7 @@ typedef struct s_params
 	t_mlx				*mlx;
 	t_player			*player;
 	int					clicked_px[2];
-	t_img				*inner;
+	t_img				*inner;				
 	t_img				*north;
 	t_img				*south;
 	t_img				*east;
@@ -106,11 +107,38 @@ typedef struct s_params
 	int				fclr;//floor
 	int				cclr;//ceiling
 	double				fov;
-	int				mwidth;
-	int				mheight;
-	char				**map;
+	int				mwidth;			//r
+	int				mheight;		//r
+	char				**map;		//
 }						t_params;
-
+/* temp
+typedef struct s_input
+{
+	t_mlx				*mlx;
+	t_player			*player; //heading, position
+	int					clicked_px[2];
+	char	*nxpm;	//
+	char	*sxpm;	//
+	char	*expm;	//
+	char	*wxpm;	//
+	t_img				*inner;				
+	t_img				*north;
+	t_img				*south;
+	t_img				*east;
+	t_img				*west;
+	t_img				*spray;
+	t_img				*door;
+	int				fclr;//floor
+	int				cclr;//ceiling
+	double				fov;
+	int				mwidth;			//r
+	int				mheight;		//r
+	char				**map;		//
+	char	nswe;//set to N S W or E	//
+	int	xpos;//xcoordinate of player
+	int	ypos;//ycoordinate of player
+} t_input;
+*/
 typedef struct s_ray
 {
 	int id;
@@ -166,21 +194,21 @@ bool is_wall(char c);
 //parse_input.c
 void 	get_data(char *mapfile, t_input	*dat);
 
-//scene_info.c
-int	validate_typeid(int fd, t_input *dat);
+//texture_color.c
+int	parse_path_color(int fd, t_input *dat);
 int	read_line(int fd, char **line);
 
 //memory_cleanup.c
 void	free_intarr(int **arr, int size);
 void	free_str(char **str);
 void	free_strarr(char **ptr);
-char	*free_strarr2(char **ptr, int len);
-int	free_maplst(t_list **lst);
-int	free_return1(t_list **lst, char **str);
+void	free_strarr2(char **ptr, int len);
+void	free_maplst(t_list **lst);
+void	free_xpmpath(t_input *dat);
 
 //parse_utils.c
 int	nondigits(char *str);
-int	ischr_found(char c, char *vchr);
+int	validchr(char c, char *vchr);
 int	validstr(char *str, char *vchr);
 int	wcount(char **elem);
 

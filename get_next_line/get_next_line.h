@@ -41,7 +41,7 @@ typedef struct s_buffer_lst
 #  define BUFFER_SIZE 5
 # endif
 
-char	*get_next_line(int fd);
+char	*get_next_line(int fd, int lastcall);
 void	*ft_calloc(size_t nmemb, size_t size);
 int		store_buffer(t_buffer_lst *lst, t_buffer_str *buf);
 char	*free_lst(t_buffer_lst *lst, int fd, int status);

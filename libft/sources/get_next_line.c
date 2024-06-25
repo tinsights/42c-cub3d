@@ -12,6 +12,7 @@
 
 #include "get_next_line.h"
 #include "libft.h"
+#include <stdio.h>
 
 int	init(char **store, char **buff, char **result)
 {
@@ -89,13 +90,14 @@ int	meat_and_potatoes(char **buff, char **store, char **result)
 	return (0);
 }
 
-char	*get_next_line(int fd)
+//char	*get_next_line(int fd)
+char	*get_next_line(int fd, int lastcall)
 {
 	char		*buff;
 	char		*result;
 	static char	*store;
-
-	if (fd < 0 || !init(&store, &buff, &result))
+printf("TEST TINESH gnl [%d]>>>>>>>>>>>\n",lastcall);
+	if (fd < 0 || !init(&store, &buff, &result) || lastcall)//to clear store when cub3d invalid
 	{
 		ft_free((void **) &store);
 		return (NULL);

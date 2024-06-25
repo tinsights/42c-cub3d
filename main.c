@@ -47,6 +47,13 @@ int main(int argc, char *argv[])
 		return (0);
 	else
 		get_data(argv[1], dat);
+	
+	/*To test valgrind t_input *dat is freed correctly*/
+	//free_strarr(dat->map);
+	//free_xpmpath(dat); //frees dat also
+	//return(0);
+	/*---------------------------------------------------*/
+
 	t_params params;
 	params.map = dat->map;
 	params.mwidth = dat->mwidth; 

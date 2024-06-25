@@ -39,6 +39,8 @@ void	init_input(t_input *dat)
 	dat->heading = 0;
 	dat->xpos = 0;
 	dat->ypos = 0;
+	dat->mwidth = 0;
+	dat->mheight = 0;
 	dat->map = NULL;
 }
 
@@ -50,9 +52,17 @@ void 	get_data(char *mapfile, t_input	*dat)
 	fd = open(mapfile, O_RDONLY);
 	if (fd == -1)
 		error_exit(-1, "Open", 1);
-	if (validate_typeid(fd, dat) == -1)
-		error_exit(fd, "Invalid Typeid", 0);//closed (fd)
-	if (parse_map(fd, dat) == -1)
-		error_exit(fd, "Invalid Map", 0);//closed (fd)
+	if (parse_path_color(fd, dat) == -1)
+	{
+		//dat->map is NOT created, no free(dat->map) required
+		free_xpmpath(dat);
+		error_exit(fd, "Invalid Typeid", 0);
+	}
+	if (parse_map(fd, dat) == -1) 
+	{
+		//dat->map is NOT created, no free(dat->map) required
+		free_xpmpath(dat);
+		error_exit(fd, "Invalid Map", 0);
+	}
 	close(fd);
 }

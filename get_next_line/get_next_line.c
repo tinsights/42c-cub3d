@@ -110,7 +110,7 @@ static int	read_buffer(t_buffer_lst *lst, int fd, t_buffer_str *buf)
 	return (store_buffer(lst, buf));
 }
 
-char	*get_next_line(int fd)
+char	*get_next_line(int fd, int lastcall)
 {
 	static t_buffer_lst	lst = {0, NULL};
 	t_buffer_str		buf;
@@ -120,8 +120,11 @@ char	*get_next_line(int fd)
 	output = NULL;
 	buf.len = 0;
 	buf.pos = 0;
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || lastcall == 1)
+	{
+		printf("Received call to free static\n");
 		return (free_lst(&lst, fd, 0));
+	}
 	if (lst.node != NULL)
 	{
 		output = get_frm_lst_only(&lst, &buf);

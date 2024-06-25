@@ -24,20 +24,20 @@ int	update_playerspawn(t_mapdata *mi, t_input *dat)
 	lst = mi->lst;
 	while (lst)
 	{
-		row++;
 		valid = validate_spawn((char *)lst->content, row, dat);
 		if (valid == -1 || (valid == 1 && counter == 1))
 			return (-1);
 		else if (valid == 1 && counter == 0)
 			counter = 1;
 		lst = lst->next;
+		row++;
 	}
 	if (counter == 0)
 		return (-1);
 	return (1);
 }
 
-int	isvalidchars(t_mapdata *mi)
+int	allvalidchars(t_mapdata *mi)
 {
 	t_list	*lst;
 	int	max;
@@ -63,24 +63,35 @@ int	maplist(int fd, t_mapdata *mi)
 	t_list	*node;
 	
 	head = NULL;
-	line = get_next_line(fd);
+	line = get_next_line(fd, 0);
 	while(line)
 	{
+
 		if (isemptyline(line))
-			return(free_return1(&head, &line));
+			break;
 		if (remove_nl(&line) == -1)
-			return(free_return1(&head, &line));
+			break;
 		node = ft_lstnew(line);
 		if (node == NULL)
-			return(free_return1(&head, &line));
+			break;
 		ft_lstadd_back(&head, node);
 		mi->rows++;
-		line = get_next_line(fd);
+		line = get_next_line(fd, 0);
+	}
+	if (line != NULL) //meaning eof not reached, some error encountered in between
+	{
+		free_maplst(&head);
+		free_str(&line);
+		return (-1);
 	}
 	mi->lst = head;
 	return (1);
 }
 
+//returns a new str of rwidth len.
+//fills each index with str value, except if there is space
+//space is filled with 1 or 0 (CONSTANT)
+//if str len < rwidth, the balance indexes are filled with 'a'
 char	*getstr(char *str, int rwidth)
 {
 	int	len;
@@ -98,7 +109,7 @@ char	*getstr(char *str, int rwidth)
 	{
 		arr[i] = str[i];
 		if (str[i] == ' ')
-			arr[i] = ONEORZERO;
+			arr[i] = '1';
 		else if (str[i] != '0' && str[i] != '1' && str[i] != 'D')//NSWE
 			arr[i] = '0';
 		i++;
@@ -116,28 +127,32 @@ char	*getstr(char *str, int rwidth)
 char	**tmap_to_array(t_mapdata *mi)
 {
 	char	**arr;
-	t_list	*lst;
+	t_list	*head;
+	t_list	*next;
 	int	i;
 	
 	arr = (char **)malloc(sizeof(char *) * (mi->rows + 1));
 	if (arr == NULL)
-		return (NULL);
-	lst = mi->lst;
-	i = 0;
-	while (mi->lst != NULL)//malloc for each row
 	{
-		lst = (*mi->lst).next;
-		arr[i] = getstr((*mi->lst).content, mi->rwidth);
-		if (arr[i] == NULL)
-			free_strarr2(arr, i);
-		free((*mi->lst).content);
-		free(mi->lst);
-		mi->lst = lst;
-		i++;
+		free_maplst(&mi->lst);
+		return (NULL);
 	}
-	free(mi->lst);
-	mi->lst = NULL;
-	arr[i] = NULL;
+	head = mi->lst;
+	i = 0;
+	while (head != NULL)//malloc for each row
+	{
+		next = (*head).next;
+		arr[i] = getstr((*head).content, mi->rwidth);
+		if (arr[i] == NULL)
+		{
+			free_strarr2(arr, i);
+			break;
+		}
+		head = next;
+		i++;
+		arr[i] = NULL;//this is i+1 index of previous
+	}
+	free_maplst(&mi->lst);
 	return (arr);
 }
 
@@ -156,15 +171,24 @@ int	parse_map(int fd, t_input *dat)
 	
 	if (init_mapdata(&mi, fd) == -1)
 		return (-1);
-	if (isvalidchars(&mi) == -1) //valid letters in map
-		return (free_maplst(&mi.lst));
+	if (allvalidchars(&mi) == -1) //valid letters in map
+	{
+		free_maplst(&mi.lst);
+		return (-1);
+	}
 	if (update_playerspawn(&mi, dat) == -1)//valid nswe
-		return (free_maplst(&mi.lst));
+	{
+		free_maplst(&mi.lst);
+		return (-1);
+	}
 	if (isvalidborder(&mi, dat) == -1)
-		return (free_maplst(&mi.lst));
-	dat->map = tmap_to_array(&mi);//tmap refers to lst
+	{
+		free_maplst(&mi.lst);
+		return (-1);
+	}
 	dat->mwidth = mi.rwidth;
 	dat->mheight = mi.rows;
+	dat->map = tmap_to_array(&mi);//tmap refers to lst
 	if (dat->map == NULL)
 		return (-1);
 	return (0);

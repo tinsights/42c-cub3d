@@ -12,39 +12,48 @@
 
 #include "cub3d.h"
 
-int	remove_nl(char **line)
+//separate newline from str using ft_split
+//return the first part of the split, which has no \n
+int	remove_nl(char **str)
 {
 	char	**elem;
 	
-	elem = ft_split2(*line, "\n");//delimiter \n
+	elem = ft_split(*str, '\n');//delimiter \n
 	if (elem == NULL)
 		return (-1);
-	free (*line);
-	*line = ft_strdup(elem[0]);
+	free (*str);
+	*str = ft_strdup(elem[0]); //you want to free char **elem
 	free_strarr(elem);
 	return (0);
 }
 
-int	isemptyline(char *line)
+//a)line has no space, but only newline.
+//b)line has space, followed by newline.
+//a) and b) is valid between texture
+//a) is invalid if between map str
+//b) is valid (filled with 0 or 1) between map str
+
+//if str contains spaces and /n or /n only it is empty line
+int	isemptyline(char *str)
 {
 	char	**elem;
 	int	count;
 	
-	elem = ft_split2(line, " \n");//delimiter space, \n
+	elem = ft_split2(str, " \n");//delimiter space, \n
 	if (elem == NULL)
-		return (1);
+		return (1); //wrong!! it should return -1
 	count = wcount(elem);
 	free_strarr(elem);
-	if (count == 0)
+	if (count == 0)				//if word count = 0 means empty line
 		return (1);
 	return (0);		
 }
 
+//row and col where N S W or E was found
+//update rad depending on N S W or E
 void	update_pos_heading(t_input *dat, int row, int col, char c)
 {
-	// dat->xpos = mi->icol + 1;
-	// dat->ypos = mi->irow;
-	dat->xpos = col + 1;
+	dat->xpos = col + 1; //col;
 	dat->ypos = row;
 	if (c == 'N')
 		dat->heading = 0;
@@ -56,6 +65,11 @@ void	update_pos_heading(t_input *dat, int row, int col, char c)
 		dat->heading = M_PI / 2;
 }
 
+//row is the current row number of this uninspected str
+//inspects str in current row for presence of N S W E
+//invalid if there is more than one N S W or E
+//if there is only one N S W or E, update the position of row and col
+// col is the matched char index in the str
 int	validate_spawn(const char *str, int row, t_input *dat)
 {
 	int	len;
@@ -65,29 +79,25 @@ int	validate_spawn(const char *str, int row, t_input *dat)
 
 	cflag = 0;
 	len = ft_strlen(str);
-	//mi->icol = 0;
 	col = 0;
-	//while (mi->icol < len)
-	while (col < len)
+	while (col < len) 						//for each char in str
 	{ 	
-		//c = str[mi->icol];
 		c = str[col];
-		if (ischr_found(c, "NSWE") == 1)
+		if (validchr(c, "NSWE") == 1)		//current char is N S W or E
 		{
-			cflag++;
-			if (cflag > 1)// dup found
+			cflag++;						//invalid if cflag > 1
+			if (cflag > 1)					// dup found in the same line
 				return (-1);
 			else
-				//update_pos_heading(mi, dat, c);
 				update_pos_heading(dat, row, col, c);	
 		}
-		//mi->icol++;
 		col++;
 	}
 	return (cflag);//0 none, 1 found
 }
 
-
+//number of element is the list
+//lst is the temporary map list
 int	lst_count(t_list *lst)
 {
 	int	i;

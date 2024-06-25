@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-int	nondigits(char *str)
+int	nondigits(char *str) //parse_utils + texture_color
 {
 	int 	comma;
 
@@ -30,7 +30,7 @@ int	nondigits(char *str)
 	return (0);
 }
 
-int	ischr_found(char c, char *vchr)
+int	validchr(char c, char *vchr) //maps + parse_utils
 {
 	while (*vchr)
 	{
@@ -40,21 +40,19 @@ int	ischr_found(char c, char *vchr)
 	return (0);
 }
 
-
-
-int	validstr(char *str, char *vchr)
+int	validstr(char *str, char *vchr) //maps + parse_utils
 {
 	//if (!str)
 		//return (-1);//empty map line??
 	while (*str)
 	{
-		if (!ischr_found(*str++, vchr))
+		if (!validchr(*str++, vchr))
 			return (0);
 	}
 	return (1);//all valid chars
 }
 
-int	wcount(char **elem)
+int	wcount(char **elem) //maps + parse_utils + texture_color
 {
 	int	i;
 

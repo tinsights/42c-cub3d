@@ -12,9 +12,14 @@
 
 #include "cub3d.h"
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
-	t_input	*dat;
+	t_input		*dat;
+	t_params	params;
+	t_mlx		mlx;
+	t_player	player;
+	int			width;
+	int			height;
 
 	dat = (t_input *)malloc(sizeof(t_input));
 	if (dat == NULL)
@@ -23,39 +28,31 @@ int main(int argc, char *argv[])
 		return (0);
 	else
 		get_data(argv[1], dat);
-	
 	/*To test valgrind t_input *dat is freed correctly*/
-	//free_strarr(dat->map);
-	//free_xpmpath(dat); //frees dat also
-	//return(0);
+	// free_strarr(dat->map);
+	// free_xpmpath(dat); //frees dat also
+	// return(0);
 	/*---------------------------------------------------*/
-
-	t_params params;
 	params.map = dat->map;
-	params.mwidth = dat->mwidth; 
-	params.mheight = dat->mheight; 
+	params.mwidth = dat->mwidth;
+	params.mheight = dat->mheight;
 	/* -------------------------------------------------------------------------- */
 	/*                                  MLX INIT                                  */
 	/* -------------------------------------------------------------------------- */
-	t_mlx mlx;
 	params.mlx = &mlx;
 	mlx.ptr = mlx_init();
-	mlx.win= mlx_new_window(mlx.ptr, WIN_WIDTH, WIN_HEIGHT, "cub3d");
+	mlx.win = mlx_new_window(mlx.ptr, WIN_WIDTH, WIN_HEIGHT, "cub3d");
 	mlx.img = mlx_new_image(mlx.ptr, WIN_WIDTH, WIN_HEIGHT);
 	if (!mlx.ptr || !mlx.win || !mlx.img)
 		ft_putstr_fd("Error initialising mlx\n", 2);
-
-	mlx.img_addr = mlx_get_data_addr(mlx.img, &mlx.bpp, &mlx.line_sz, &mlx.endian);
-
+	mlx.img_addr = mlx_get_data_addr(mlx.img, &mlx.bpp, &mlx.line_sz,
+			&mlx.endian);
 	/* -------------------------------------------------------------------------- */
 	/*                           PLAYER AND PARAMS INIT                           */
 	/* -------------------------------------------------------------------------- */
-	t_player player;
-
 	params.player = &player;
 	params.fov = FOV / 180.0 * M_PI;
 	params.lights = false;
-
 	player.position[0] = dat->ypos + 0.5;
 	player.position[1] = dat->xpos + 0.5;
 	player.heading = dat->heading;
@@ -67,149 +64,172 @@ int main(int argc, char *argv[])
 	player.move_ws = 0;
 	player.move_tilt = 0;
 	player.move_turn = 0;
-
-
 	/* -------------------------------------------------------------------------- */
 	/*                                TEXTURE INIT                                */
 	/* -------------------------------------------------------------------------- */
-
-	int width;
-	int height;
-	params.inner = mlx_xpm_file_to_image(mlx.ptr, "./incs/hallway.xpm", &width, &height); // extra
-	params.spray = mlx_xpm_file_to_image(mlx.ptr, "./incs/42sg.xpm", &width, &height); // extra
-	params.door = mlx_xpm_file_to_image(mlx.ptr, "./incs/tunnelv2.xpm", &width, &height);
+	params.inner = mlx_xpm_file_to_image(mlx.ptr, "./incs/hallway.xpm", &width,
+			&height); // extra
+	params.spray = mlx_xpm_file_to_image(mlx.ptr, "./incs/42sg.xpm", &width,
+			&height);    // extra
+	params.door = mlx_xpm_file_to_image(mlx.ptr, "./incs/tunnelv2.xpm", &width,
+			&height);
 	params.north = mlx_xpm_file_to_image(mlx.ptr, dat->nxpm, &width, &height);
 	params.south = mlx_xpm_file_to_image(mlx.ptr, dat->sxpm, &width, &height);
 	params.east = mlx_xpm_file_to_image(mlx.ptr, dat->expm, &width, &height);
 	params.west = mlx_xpm_file_to_image(mlx.ptr, dat->wxpm, &width, &height);
-
 	params.fclr = dat->fclr;
 	params.cclr = dat->cclr;
 	/* -------------------------------------------------------------------------- */
 	/*                              MLX HOOK AND LOOP                             */
 	/* -------------------------------------------------------------------------- */
-
-
 	mlx_do_key_autorepeatoff(mlx.ptr); // does this do anything?
-
 	mlx_hook(mlx.win, ButtonPress, ButtonPressMask, &mouse_click, &params);
 	mlx_hook(mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook, &params);
-
 	mlx_hook(mlx.win, MotionNotify, Button2MotionMask, &mouse_move, &params);
-	mlx_hook(mlx.win, KeyPress, KeyPressMask, &key_hook, (void *) &params);
-	mlx_hook(mlx.win, DestroyNotify, 0L, &close_window, (void *) &params);
-
+	mlx_hook(mlx.win, KeyPress, KeyPressMask, &key_hook, (void *)&params);
+	mlx_hook(mlx.win, DestroyNotify, 0L, &close_window, (void *)&params);
 	render(&params);
 	mlx_loop_hook(mlx.ptr, render, &params);
 	mlx_loop(mlx.ptr);
 }
 
-void draw_walls(t_params *p);
+void	draw_walls(t_params *p);
 
-void draw_minimap(t_params p)
+
+typedef struct s_minimap {
+	int		sq_size;
+	int		mm_size;
+	int		total_size;
+	double	heading;
+	int		pos_y;
+	int		pos_x;
+	int		off_y;
+	int		off_x;
+	double	half_projection_plane_width;
+	double	heading_x;
+	double	heading_y;
+	double	plane_x;
+	double	plane_y;
+	double	dir_x;
+	double	dir_y;
+	double	heading_px_row;
+	double	heading_px_col;
+	int		col_check;
+	int		row_check;
+	char	block;
+} t_minimap;
+
+void draw_rays(t_params *p, t_minimap mm)
 {
-	int sq_size = 15;
-	int mm_size = 8;
-	int total_size = sq_size * mm_size;
-
-
-	// start at center of minimap, draw straight line in direction of heading
-	double heading = p.player->heading; 
-
-	int pos_y = p.player->position[0];
-	int pos_x = p.player->position[1];
-
-	int off_y =(p.player->position[0] - pos_y) * sq_size;
-	int off_x =(p.player->position[1] - pos_x) * sq_size;
-	// printf("off y: %i off_x : %i\n", off_y, off_x);
-	double half_projection_plane_width = tan(p.fov / 2.0);
-
-	double heading_x = sin(heading);
-	double heading_y = -cos(heading);
-	double plane_x = -heading_y * half_projection_plane_width;
-	double plane_y = heading_x * half_projection_plane_width;
-
-	for (int px_col = 0; px_col < total_size; px_col++)
-		for (int px_row = 0; px_row < total_size; px_row++)
-				put_pixel(p, px_row, px_col, 0xa9a9a9);
-
 	for (int ray = -WIN_WIDTH / 2; ray < WIN_WIDTH / 2; ray++)
 	{
-
-		double projection_plane_x = 2.0 * (double) ray / (WIN_WIDTH - 1); // goes from -1 to 1.
-		double dir_x = heading_x + projection_plane_x * plane_x;
-		double dir_y = heading_y + projection_plane_x * plane_y;
-		double heading_px_row = total_size / 2;
-		double heading_px_col = total_size / 2;
-		while (heading_px_col < total_size && heading_px_col > 0
-		&& heading_px_row > 0 && heading_px_row < total_size)
+		double projection_plane_x = 2.0 * (double)ray / (WIN_WIDTH - 1);
+		mm.dir_x = mm.heading_x + projection_plane_x * mm.plane_x;
+		mm.dir_y = mm.heading_y + projection_plane_x * mm.plane_y;
+		mm.heading_px_row = mm.total_size / 2;
+		mm.heading_px_col = mm.total_size / 2;
+		while (mm.heading_px_col < mm.total_size && mm.heading_px_col > 0
+			&& mm.heading_px_row > 0 && mm.heading_px_row < mm.total_size)
 		{
-			int col_check = pos_x - mm_size / 2 + (heading_px_col + off_x) / sq_size;
-			int row_check = pos_y - mm_size / 2 + (heading_px_row + off_y) / sq_size;
-			char block = p.map[row_check][col_check];
-			if (col_check < 0 || row_check < 0 || col_check >= p.mwidth || row_check >= p.mheight)
+			mm.col_check = mm.pos_x - mm.mm_size / 2 + (mm.heading_px_col + mm.off_x)
+				/ mm.sq_size;
+			mm.row_check = mm.pos_y - mm.mm_size / 2 + (mm.heading_px_row + mm.off_y)
+				/ mm.sq_size;
+			mm.block = p->map[mm.row_check][mm.col_check];
+			if (mm.col_check < 0 || mm.row_check < 0 || mm.col_check >= p->mwidth
+				|| mm.row_check >= p->mheight)
 				break ;
-			if (block != '0' && block != 'd' && (p.lights || (p.player->height <= 1.1 && p.player->height >= -0.1)))
+			if (mm.block != '0' && mm.block != 'd' && (p->lights
+					|| (p->player->height <= 1.1 && p->player->height >= -0.1)))
 				break ;
-			put_pixel(p, heading_px_row, heading_px_col, 0x550077);
-			heading_px_row += dir_y;
-			heading_px_col += dir_x;
+			put_pixel(*p, mm.heading_px_row, mm.heading_px_col, 0x550077);
+			mm.heading_px_row += mm.dir_y;
+			mm.heading_px_col += mm.dir_x;
 		}
 	}
-
-	for (int px_col = 0; px_col < total_size; px_col++)
+}
+void fill_grid(t_params *p, t_minimap mm)
+{
+	for (int px_col = 0; px_col < mm.total_size; px_col++)
 	{
-		for (int px_row = 0; px_row < total_size; px_row++)
+		for (int px_row = 0; px_row < mm.total_size; px_row++)
 		{
-			if (px_row == 0 || px_row == total_size -1 || px_col == 0 | px_col == total_size - 1)
-				put_pixel(p, px_row, px_col, 0x000000);
-			else if ((px_row + off_y) % sq_size == 0|| (px_col + off_x ) % sq_size == 0)
-				put_pixel(p, px_row, px_col, 0xffffff);
-			
-			int col_check = pos_x - mm_size / 2 + (px_col + off_x) / sq_size;
-			int row_check = pos_y - mm_size / 2 + (px_row + off_y) / sq_size;
-			char block = p.map[row_check][col_check];
-			// if (col_check < 0 || row_check < 0 || col_check >= MWIDTH || row_check >= MHEIGHT)
-			if (col_check < 0 || row_check < 0 || col_check >= p.mwidth || row_check >= p.mheight)
-				put_pixel(p, px_row, px_col, 0x111111);
-			else if (block == 'a')
-				put_pixel(p, px_row,px_col, 0x880000);
-			else if (block != '0' && block != 'd')
-				put_pixel(p, px_row,px_col, 0xff0000);
-			//printf("rowcheck: %i, colcheck: %i, mwidth: %i mheight: %i\n", row_check, col_check, p.mwidth, p.mheight);
-			if (px_col > total_size / 2 - 2 && px_col < total_size / 2 + 2
-				&& px_row > total_size / 2 - 2 && px_row < total_size / 2 + 2)
-					put_pixel(p, px_row, px_col, 0x00ffff);
+			if (px_row == 0 || px_row == mm.total_size - 1
+				|| px_col == 0 | px_col == mm.total_size - 1)
+				put_pixel(*p, px_row, px_col, 0x000000);
+			else if ((px_row + mm.off_y) % mm.sq_size == 0 || (px_col + mm.off_x)
+				% mm.sq_size == 0)
+				put_pixel(*p, px_row, px_col, 0xffffff);
+			mm.col_check = mm.pos_x - mm.mm_size / 2 + (px_col + mm.off_x) / mm.sq_size;
+			mm.row_check = mm.pos_y - mm.mm_size / 2 + (px_row + mm.off_y) / mm.sq_size;
+			if (mm.col_check < 0 || mm.row_check < 0 || mm.col_check >= p->mwidth
+				|| mm.row_check >= p->mheight)
+			{
+				put_pixel(*p, px_row, px_col, 0x111111);
+				continue ;
+			}
+			mm.block = p->map[mm.row_check][mm.col_check];
+			if (mm.block == 'a')
+				put_pixel(*p, px_row, px_col, 0x880000);
+			if (mm.block != '0' && mm.block != 'd')
+				put_pixel(*p, px_row, px_col, 0xff0000);
+			if (px_col > mm.total_size / 2 - 2 && px_col < mm.total_size / 2 + 2
+				&& px_row > mm.total_size / 2 - 2 && px_row < mm.total_size / 2 + 2)
+				put_pixel(*p, px_row, px_col, 0x00ffff);
 		}
 	}
 }
 
-void look_up_down(t_params *params, int direction)
+void	draw_minimap(t_params *p)
+{
+	t_minimap mm;
+	mm.sq_size = 15;
+	mm.mm_size = 8;
+	mm.total_size = mm.sq_size * mm.mm_size;
+	
+	mm.heading = p->player->heading;
+	mm.pos_y = p->player->position[0];
+	mm.pos_x = p->player->position[1];
+	mm.off_y = (p->player->position[0] - mm.pos_y) * mm.sq_size;
+	mm.off_x = (p->player->position[1] - mm.pos_x) * mm.sq_size;
+	// printf("off y: %i off_x : %i\n", off_y, off_x);
+	mm.half_projection_plane_width = tan(p->fov / 2.0);
+	mm.heading_x = sin(mm.heading);
+	mm.heading_y = -cos(mm.heading);
+	mm.plane_x = -mm.heading_y * mm.half_projection_plane_width;
+	mm.plane_y = mm.heading_x * mm.half_projection_plane_width;
+	for (int px_col = 0; px_col < mm.total_size; px_col++)
+		for (int px_row = 0; px_row < mm.total_size; px_row++)
+			put_pixel(*p, px_row, px_col, 0xa9a9a9);
+	draw_rays(p, mm);
+	fill_grid(p, mm);
+	
+}
+
+void	look_up_down(t_params *params, int direction)
 {
 	if (direction > 0 && params->player->vert_angle < M_PI / 6)
 		params->player->vert_angle += M_PI / 180;
 	else if (direction < 0 && params->player->vert_angle > -M_PI / 6)
 		params->player->vert_angle -= M_PI / 180;
-
 }
 
-void move(t_params *params)
+void	move(t_params *params)
 {
 	move_player(params, params->player->move_ws);
 	strafe_player(params, params->player->move_ad);
 	rotate_player(params, params->player->move_turn);
 	look_up_down(params, params->player->move_tilt);
-
 }
 
-int render(t_params *p)
+int	render(t_params *p)
 {
 	// draw_grid(*p);
 	// draw_player(*p);
 	move(p);
 	draw_walls(p);
 	draw_crosshair(*p);
-	draw_minimap(*p);
+	draw_minimap(p);
 	mlx_put_image_to_window(p->mlx->ptr, p->mlx->win, p->mlx->img, 0, 0);
 	return (1);
 }

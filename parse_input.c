@@ -44,6 +44,9 @@ void	init_input(t_input *dat)
 	dat->map = NULL;
 }
 
+//start of parsing text file contents
+//a) texture and color segment is validated and data struct updated
+//b) map portion is validated and data struct updated
 void 	get_data(char *mapfile, t_input	*dat)
 {
 	int	fd;

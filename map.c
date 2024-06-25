@@ -12,6 +12,8 @@
 
 #include "cub3d.h"
 
+//a) number of rows is counted here
+//b) validate there is only one (N S W E) in any one row
 int	update_playerspawn(t_mapdata *mi, t_input *dat)
 {
 	t_list	*lst;
@@ -24,19 +26,22 @@ int	update_playerspawn(t_mapdata *mi, t_input *dat)
 	lst = mi->lst;
 	while (lst)
 	{
-		valid = validate_spawn((char *)lst->content, row, dat);
+		valid = validate_spawn((char *)lst->content, row, dat); //b)
 		if (valid == -1 || (valid == 1 && counter == 1))
 			return (-1);
 		else if (valid == 1 && counter == 0)
 			counter = 1;
 		lst = lst->next;
-		row++;
+		row++; //a)
 	}
 	if (counter == 0)
 		return (-1);
 	return (1);
 }
 
+//a) each map line str can be 1 0 (N S W E) or D 
+// each string can have varying length
+// b) maximum row width is updated here.
 int	allvalidchars(t_mapdata *mi)
 {
 	t_list	*lst;
@@ -47,14 +52,18 @@ int	allvalidchars(t_mapdata *mi)
 	while (lst)
 	{
 		max = ft_strlen((char *)lst->content);
-		if (max > mi->rwidth)
+		if (max > mi->rwidth) //b)
 			mi->rwidth = max;
-		if (!validstr((char *)lst->content, "\n 10NSWED"))//D door
+		if (!validstr((char *)lst->content, "\n 10NSWED"))//a)
 			return (-1);
 		lst = lst->next;
 	}
 	return (0);
 }
+//build a temporary list of map strings
+//performs only 1 validation. (other validations require full scope of map)
+//a) map string can't be an just spaces
+//b) terminating \n in str not required. remove it.
 
 int	maplist(int fd, t_mapdata *mi)
 {
@@ -67,9 +76,9 @@ int	maplist(int fd, t_mapdata *mi)
 	while(line)
 	{
 
-		if (isemptyline(line))
+		if (isemptyline(line)) //a
 			break;
-		if (remove_nl(&line) == -1)
+		if (remove_nl(&line) == -1) //b
 			break;
 		node = ft_lstnew(line);
 		if (node == NULL)
@@ -88,7 +97,8 @@ int	maplist(int fd, t_mapdata *mi)
 	return (1);
 }
 
-//returns a new str of rwidth len.
+//map of regular shape needs each row in uniform width
+//returns a new str of rwidth len
 //fills each index with str value, except if there is space
 //space is filled with 1 or 0 (CONSTANT)
 //if str len < rwidth, the balance indexes are filled with 'a'
@@ -124,6 +134,7 @@ char	*getstr(char *str, int rwidth)
 	return(arr);
 }
 
+//convert the temporary map list after validation to char **map
 char	**tmap_to_array(t_mapdata *mi)
 {
 	char	**arr;
@@ -165,23 +176,26 @@ int	init_mapdata(t_mapdata *mi, int fd)
 	return (0);	
 }
 
+//a) valid letter in each line of map strings
+//b) there can only be 1 N S W E in the map
+//c) border enclosed with 1, Player within border
 int	parse_map(int fd, t_input *dat)
 {
 	t_mapdata	mi;
 	
 	if (init_mapdata(&mi, fd) == -1)
 		return (-1);
-	if (allvalidchars(&mi) == -1) //valid letters in map
+	if (allvalidchars(&mi) == -1) //a)
 	{
 		free_maplst(&mi.lst);
 		return (-1);
 	}
-	if (update_playerspawn(&mi, dat) == -1)//valid nswe
+	if (update_playerspawn(&mi, dat) == -1)//b) valid nswe
 	{
 		free_maplst(&mi.lst);
 		return (-1);
 	}
-	if (isvalidborder(&mi, dat) == -1)
+	if (isvalidborder(&mi, dat) == -1)//c) 
 	{
 		free_maplst(&mi.lst);
 		return (-1);

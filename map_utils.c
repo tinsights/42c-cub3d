@@ -53,7 +53,7 @@ int	isemptyline(char *str)
 //update rad depending on N S W or E
 void	update_pos_heading(t_input *dat, int row, int col, char c)
 {
-	dat->xpos = col + 1; //col;
+	dat->xpos = col;
 	dat->ypos = row;
 	if (c == 'N')
 		dat->heading = 0;
@@ -110,5 +110,3 @@ int	lst_count(t_list *lst)
 	}
 	return (i);
 }
-
-

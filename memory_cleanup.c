@@ -68,6 +68,9 @@ void	free_str(char **str)
 	*str = NULL;
 }
 
+//used when individual str is malloced
+//if 1 malloc fails, then free all previous mallocs
+//len is count of succesful malloc, to be freed
 void	free_strarr2(char **ptr, int len)
 {
 	int	i;

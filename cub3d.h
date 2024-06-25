@@ -107,38 +107,11 @@ typedef struct s_params
 	int				fclr;//floor
 	int				cclr;//ceiling
 	double				fov;
-	int				mwidth;			//r
-	int				mheight;		//r
-	char				**map;		//
+	int				mwidth;
+	int				mheight;
+	char				**map;
 }						t_params;
-/* temp
-typedef struct s_input
-{
-	t_mlx				*mlx;
-	t_player			*player; //heading, position
-	int					clicked_px[2];
-	char	*nxpm;	//
-	char	*sxpm;	//
-	char	*expm;	//
-	char	*wxpm;	//
-	t_img				*inner;				
-	t_img				*north;
-	t_img				*south;
-	t_img				*east;
-	t_img				*west;
-	t_img				*spray;
-	t_img				*door;
-	int				fclr;//floor
-	int				cclr;//ceiling
-	double				fov;
-	int				mwidth;			//r
-	int				mheight;		//r
-	char				**map;		//
-	char	nswe;//set to N S W or E	//
-	int	xpos;//xcoordinate of player
-	int	ypos;//ycoordinate of player
-} t_input;
-*/
+
 typedef struct s_ray
 {
 	int id;

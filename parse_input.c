@@ -34,22 +34,19 @@ void	init_input(t_input *dat)
 	dat->sxpm = NULL;
 	dat->expm = NULL;
 	dat->wxpm = NULL;
-	dat->fcolor[0] = -1;
-	dat->fcolor[1] = -1;
-	dat->fcolor[2] = -1;
-	dat->ccolor[0] = -1;
-	dat->ccolor[1] = -1;
-	dat->ccolor[2] = -1;
 	dat->fclr = 0;
 	dat->cclr = 0;
 	dat->heading = 0;
-	//dat->xdir = 0;//remove
-	//dat->ydir = 0;//remove
 	dat->xpos = 0;
 	dat->ypos = 0;
+	dat->mwidth = 0;
+	dat->mheight = 0;
 	dat->map = NULL;
 }
 
+//start of parsing text file contents
+//a) texture and color segment is validated and data struct updated
+//b) map portion is validated and data struct updated
 void 	get_data(char *mapfile, t_input	*dat)
 {
 	int	fd;
@@ -58,9 +55,17 @@ void 	get_data(char *mapfile, t_input	*dat)
 	fd = open(mapfile, O_RDONLY);
 	if (fd == -1)
 		error_exit(-1, "Open", 1);
-	if (validate_typeid(fd, dat) == -1)
-		error_exit(fd, "Invalid Typeid", 0);//closed (fd)
-	if (parse_map(fd, dat) == -1)
-		error_exit(fd, "Invalid Map", 0);//closed (fd)
+	if (parse_path_color(fd, dat) == -1)
+	{
+		//dat->map is NOT created, no free(dat->map) required
+		free_xpmpath(dat);
+		error_exit(fd, "Invalid Typeid", 0);
+	}
+	if (parse_map(fd, dat) == -1) 
+	{
+		//dat->map is NOT created, no free(dat->map) required
+		free_xpmpath(dat);
+		error_exit(fd, "Invalid Map", 0);
+	}
 	close(fd);
 }

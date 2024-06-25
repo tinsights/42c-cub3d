@@ -12,31 +12,37 @@
 
 #include "cub3d.h"
 
-int	update_playerpos(t_mapinfo *mi, t_input *dat)
+//a) number of rows is counted here
+//b) validate there is only one (N S W E) in any one row
+int	update_playerspawn(t_mapdata *mi, t_input *dat)
 {
 	t_list	*lst;
-	int	flag;
+	int	counter;
 	int	valid;
+	int	row;
 	
-	flag = 0;
-	mi->irow = 0;
+	counter = 0;
+	row = 0;
 	lst = mi->lst;
 	while (lst)
 	{
-		mi->irow++;
-		valid = validate_nswe((char *)lst->content, mi, dat);
-		if (valid == -1 || (valid == 1 && flag == 1))
+		valid = validate_spawn((char *)lst->content, row, dat); //b)
+		if (valid == -1 || (valid == 1 && counter == 1))
 			return (-1);
-		else if (valid == 1 && flag == 0)
-			flag = 1;
+		else if (valid == 1 && counter == 0)
+			counter = 1;
 		lst = lst->next;
+		row++; //a)
 	}
-	if (flag == 0)
+	if (counter == 0)
 		return (-1);
 	return (1);
 }
 
-int	isvalidchars(t_mapinfo *mi)
+//a) each map line str can be 1 0 (N S W E) or D 
+// each string can have varying length
+// b) maximum row width is updated here.
+int	allvalidchars(t_mapdata *mi)
 {
 	t_list	*lst;
 	int	max;
@@ -46,40 +52,56 @@ int	isvalidchars(t_mapinfo *mi)
 	while (lst)
 	{
 		max = ft_strlen((char *)lst->content);
-		if (max > mi->rwidth)
+		if (max > mi->rwidth) //b)
 			mi->rwidth = max;
-		if (!validstr((char *)lst->content, "\n 10NSWED"))//D door
+		if (!validstr((char *)lst->content, "\n 10NSWED"))//a)
 			return (-1);
 		lst = lst->next;
 	}
 	return (0);
 }
+//build a temporary list of map strings
+//performs only 1 validation. (other validations require full scope of map)
+//a) map string can't be an just spaces
+//b) terminating \n in str not required. remove it.
 
-int	maplist(int fd, t_mapinfo *mi)
+int	maplist(int fd, t_mapdata *mi)
 {
 	char	*line;
 	t_list	*head;
 	t_list	*node;
 	
 	head = NULL;
-	line = get_next_line(fd);
+	line = get_next_line(fd, 0);
 	while(line)
 	{
-		if (isemptyline(line))
-			return(free_return1(&head, &line));
-		if (remove_nl(&line) == -1)
-			return(free_return1(&head, &line));
+
+		if (isemptyline(line)) //a
+			break;
+		if (remove_nl(&line) == -1) //b
+			break;
 		node = ft_lstnew(line);
 		if (node == NULL)
-			return(free_return1(&head, &line));
+			break;
 		ft_lstadd_back(&head, node);
 		mi->rows++;
-		line = get_next_line(fd);
+		line = get_next_line(fd, 0);
+	}
+	if (line != NULL) //meaning eof not reached, some error encountered in between
+	{
+		free_maplst(&head);
+		free_str(&line);
+		return (-1);
 	}
 	mi->lst = head;
 	return (1);
 }
 
+//map of regular shape needs each row in uniform width
+//returns a new str of rwidth len
+//fills each index with str value, except if there is space
+//space is filled with 1 or 0 (CONSTANT)
+//if str len < rwidth, the balance indexes are filled with 'a'
 char	*getstr(char *str, int rwidth)
 {
 	int	len;
@@ -97,7 +119,7 @@ char	*getstr(char *str, int rwidth)
 	{
 		arr[i] = str[i];
 		if (str[i] == ' ')
-			arr[i] = ONEORZERO;
+			arr[i] = '1';
 		else if (str[i] != '0' && str[i] != '1' && str[i] != 'D')//NSWE
 			arr[i] = '0';
 		i++;
@@ -112,97 +134,75 @@ char	*getstr(char *str, int rwidth)
 	return(arr);
 }
 
-char	**tmap_to_array(t_mapinfo *mi)
+//convert the temporary map list after validation to char **map
+char	**tmap_to_array(t_mapdata *mi)
 {
 	char	**arr;
-	t_list	*lst;
+	t_list	*head;
+	t_list	*next;
 	int	i;
 	
 	arr = (char **)malloc(sizeof(char *) * (mi->rows + 1));
 	if (arr == NULL)
-		return (NULL);
-	lst = mi->lst;
-	i = 0;
-	while (mi->lst != NULL)//malloc for each row
 	{
-		lst = (*mi->lst).next;
-		arr[i] = getstr((*mi->lst).content, mi->rwidth);
-		if (arr[i] == NULL)
-			free_strarr2(arr, i);
-		free((*mi->lst).content);
-		free(mi->lst);
-		mi->lst = lst;
-		i++;
+		free_maplst(&mi->lst);
+		return (NULL);
 	}
-	free(mi->lst);
-	mi->lst = NULL;
-	arr[i] = NULL;
+	head = mi->lst;
+	i = 0;
+	while (head != NULL)//malloc for each row
+	{
+		next = (*head).next;
+		arr[i] = getstr((*head).content, mi->rwidth);
+		if (arr[i] == NULL)
+		{
+			free_strarr2(arr, i);
+			break;
+		}
+		head = next;
+		i++;
+		arr[i] = NULL;//this is i+1 index of previous
+	}
+	free_maplst(&mi->lst);
 	return (arr);
 }
 
-int	init_mapinfo(t_mapinfo *mi, int fd)
+int	init_mapdata(t_mapdata *mi, int fd)
 {
-/*
 	mi->rows = 0;
 	mi->rwidth = 0;
-	mi->nswe[0][0] = 78;//n
-	mi->nswe[0][1] = 0;
-	mi->nswe[0][2] = -1;
-	mi->nswe[0][3] = 90;
-
-	mi->nswe[1][0] = 83;//s
-	mi->nswe[1][1] = 0;
-	mi->nswe[1][2] = 1;
-	mi->nswe[1][3] = 270;
-
-	mi->nswe[2][0] = 87;//w
-	mi->nswe[2][1] = -1;
-	mi->nswe[2][2] = 0;
-	mi->nswe[2][3] = 180;
-
-	mi->nswe[3][0] = 69;//e
-	mi->nswe[3][1] = 1;
-	mi->nswe[3][2] = 0;
-	mi->nswe[3][3] = 0;
-
-	if (maplist(fd, mi) == -1)
-		return (-1);
-	return (0);
-*/
-	mi->rows = 0;
-	mi->rwidth = 0;
-	mi->nswe[0][0] = 78;//n
-	mi->nswe[0][1] = 0;
-
-	mi->nswe[1][0] = 83;//s
-	mi->nswe[1][1] = M_PI;
-
-	mi->nswe[2][0] = 87;//w
-	mi->nswe[2][1] = 3 * M_PI / 2;
-
-	mi->nswe[3][0] = 69;//e
-	mi->nswe[3][1] = M_PI / 2;
-
 	if (maplist(fd, mi) == -1)
 		return (-1);
 	return (0);	
 }
 
+//a) valid letter in each line of map strings
+//b) there can only be 1 N S W E in the map
+//c) border enclosed with 1, Player within border
 int	parse_map(int fd, t_input *dat)
 {
-	t_mapinfo	mi;
+	t_mapdata	mi;
 	
-	if (init_mapinfo(&mi, fd) == -1)
+	if (init_mapdata(&mi, fd) == -1)
 		return (-1);
-	if (isvalidchars(&mi) == -1)
-		return (free_maplst(&mi.lst));
-	if (update_playerpos(&mi, dat) == -1)
-		return (free_maplst(&mi.lst));
-	if (isvalidborder(&mi, dat) == -1)
-		return (free_maplst(&mi.lst));
-	dat->map = tmap_to_array(&mi);//tmap refers to lst
+	if (allvalidchars(&mi) == -1) //a)
+	{
+		free_maplst(&mi.lst);
+		return (-1);
+	}
+	if (update_playerspawn(&mi, dat) == -1)//b) valid nswe
+	{
+		free_maplst(&mi.lst);
+		return (-1);
+	}
+	if (isvalidborder(&mi, dat) == -1)//c) 
+	{
+		free_maplst(&mi.lst);
+		return (-1);
+	}
 	dat->mwidth = mi.rwidth;
 	dat->mheight = mi.rows;
+	dat->map = tmap_to_array(&mi);//tmap refers to lst
 	if (dat->map == NULL)
 		return (-1);
 	return (0);

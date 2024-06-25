@@ -21,6 +21,7 @@ void	put_pixel(t_params p, t_uint row, t_uint col, int colour)
 	px = p.mlx->img_addr + row * p.mlx->line_sz + col * (p.mlx->bpp / 8);
 	*(t_uint *)px = mlx_get_color_value(p.mlx->ptr, colour);
 }
+
 int	close_window(t_params *params)
 {
 	mlx_do_key_autorepeaton(params->mlx->ptr);
@@ -52,65 +53,66 @@ bool	explorable(t_params *params, double y, double x)
 	return (params->player->god || !is_wall(params->map[(int)y][(int)x]));
 }
 
+typedef struct s_move
+{
+	float	horiz_step;
+	float	vert_step;
+	float	new_height;
+	float	curr_y;
+	float	curr_x;
+	float	heading;
+	float	new_y;
+	float	new_x;
+}			t_move;
+
 void	move_player(t_params *params, float direction)
 {
 	t_player	*player;
-	float		horiz_step;
-	float		vert_step;
-	float		new_height;
-	float		curr_y;
-	float		curr_x;
-	float		heading;
-	float		new_y;
-	float		new_x;
+	t_move		move;
 
 	player = params->player;
-	horiz_step = STEP * cos(player->vert_angle);
-	vert_step = STEP * -sin(player->vert_angle);
-	new_height = player->height + vert_step * direction;
+	move.horiz_step = STEP * cos(player->vert_angle);
+	move.vert_step = STEP * -sin(player->vert_angle);
+	move.new_height = player->height + move.vert_step * direction;
 	if (player->god)
-		player->height = new_height;
-	curr_y = player->position[0];
-	curr_x = player->position[1];
-	heading = player->heading;
-	new_y = curr_y + cos(heading) * horiz_step * direction;
-	new_x = curr_x + -sin(heading) * horiz_step * direction;
-	if (explorable(params, curr_y, new_x))
+		player->height = move.new_height;
+	move.curr_y = player->position[0];
+	move.curr_x = player->position[1];
+	move.heading = player->heading;
+	move.new_y = move.curr_y + cos(move.heading) * move.horiz_step * direction;
+	move.new_x = move.curr_x + -sin(move.heading) * move.horiz_step * direction;
+	if (explorable(params, move.curr_y, move.new_x))
 	{
-		player->position[1] = new_x;
-		curr_x = new_x;
+		player->position[1] = move.new_x;
+		move.curr_x = move.new_x;
 	}
-	if (explorable(params, new_y, curr_x))
+	if (explorable(params, move.new_y, move.curr_x))
 	{
-		if (new_y > 0 && new_y < params->mheight)
-			player->position[0] = new_y;
+		if (move.new_y > 0 && move.new_y < params->mheight)
+			player->position[0] = move.new_y;
 	}
 }
 
 void	strafe_player(t_params *params, float direction)
 {
 	t_player	*player;
-	float		curr_y;
-	float		curr_x;
-	float		heading;
-	float		new_y;
-	float		new_x;
+	t_move		move;
 
 	player = params->player;
-	curr_y = player->position[0];
-	curr_x = player->position[1];
-	heading = player->heading;
-	new_y = curr_y + sin(heading) * STEP * direction;
-	new_x = curr_x + cos(heading) * STEP * direction;
-	if (explorable(params, curr_y, new_x))
+	move.curr_y = player->position[0];
+	move.curr_x = player->position[1];
+	move.heading = player->heading;
+	move.new_y = move.curr_y + sin(move.heading) * STEP * direction;
+	move.new_x = move.curr_x + cos(move.heading) * STEP * direction;
+	if (explorable(params, move.curr_y, move.new_x))
 	{
-		player->position[1] = new_x;
-		curr_x = new_x;
+		player->position[1] = move.new_x;
+		move.curr_x = move.new_x;
 	}
-	if (explorable(params, new_y, curr_x))
+	if (explorable(params, move.new_y, move.curr_x))
 	{
-		if (new_y > 0 && new_y < params->mheight)
-			player->position[0] = new_y;
+		if (move.new_y > 0 && move.new_y < params->mheight)
+			player->position[0] = move.new_y;
 	}
 }
 
@@ -152,14 +154,17 @@ void	door(t_params *params)
 		params->map[map_y][map_x] = 'D';
 }
 
-int	key_hook(int keycode, t_params *params)
+void	translate_player(t_player *player, float delta)
 {
-	t_player	*player;
+	if (delta > 0 && (player->god || player->height < 0.8))
+		player->height += delta;
+	else if (delta < 0 && (player->god || player->height > 0.2))
+		player->height += delta;
+}
 
-	player = params->player;
-	if (keycode == XK_Escape)
-		return (close_window(params));
-	else if (keycode == XK_w)
+void	move_keys(int keycode, t_params *params)
+{
+	if (keycode == XK_w)
 		params->player->move_ws = -1;
 	else if (keycode == XK_a)
 		params->player->move_ad = -1;
@@ -180,15 +185,24 @@ int	key_hook(int keycode, t_params *params)
 	else if (keycode == XK_Down)
 		params->player->move_tilt = -1;
 	else if (keycode == XK_Control_L)
-	{
-		if (player->god || player->height > 0.2)
-			player->height -= 0.25;
-	}
+		translate_player(params->player, -0.25);
 	else if (keycode == XK_space)
-	{
-		if (player->god || player->height < 0.8)
-			player->height += 0.25;
-	}
+		translate_player(params->player, 0.25);
+}
+
+int	key_hook(int keycode, t_params *params)
+{
+	t_player	*player;
+
+	player = params->player;
+	if (keycode == XK_Escape)
+		return (close_window(params));
+	else if (keycode == XK_w || keycode == XK_W || keycode == XK_a
+		|| keycode == XK_A || keycode == XK_s || keycode == XK_S
+		|| keycode == XK_D || keycode == XK_d || keycode == XK_Left
+		|| keycode == XK_Right || keycode == XK_Up || keycode == XK_Down
+		|| keycode == XK_Control_L || keycode == XK_space)
+		move_keys(keycode, params);
 	else if (keycode == XK_t)
 		spraypaint(params);
 	else if (keycode == XK_e)
@@ -196,11 +210,10 @@ int	key_hook(int keycode, t_params *params)
 	else if (keycode == XK_g)
 		player->god = !player->god;
 	else if (keycode == XK_f)
-	{
 		params->lights = !params->lights;
-	}
 	return (1);
 }
+
 int	key_release_hook(int keycode, t_params *params)
 {
 	if (keycode == XK_w)

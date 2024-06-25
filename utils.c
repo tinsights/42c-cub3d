@@ -14,23 +14,22 @@
 
 #define STEP 0.02
 
-
-void put_pixel(t_params p, t_uint row, t_uint col, int colour)
+void	put_pixel(t_params p, t_uint row, t_uint col, int colour)
 {
-    char *px = p.mlx->img_addr + row * p.mlx->line_sz + col * (p.mlx->bpp / 8);
-    *(t_uint *) px = mlx_get_color_value(p.mlx->ptr, colour);
+	char	*px;
+
+	px = p.mlx->img_addr + row * p.mlx->line_sz + col * (p.mlx->bpp / 8);
+	*(t_uint *)px = mlx_get_color_value(p.mlx->ptr, colour);
 }
 int	close_window(t_params *params)
 {
-	mlx_do_key_autorepeaton(params->mlx->ptr); // does this do anything?
-
+	mlx_do_key_autorepeaton(params->mlx->ptr);
 	mlx_destroy_image(params->mlx->ptr, params->mlx->img);
 	mlx_destroy_image(params->mlx->ptr, params->north);
 	mlx_destroy_image(params->mlx->ptr, params->east);
 	mlx_destroy_image(params->mlx->ptr, params->west);
 	mlx_destroy_image(params->mlx->ptr, params->south);
 	mlx_destroy_image(params->mlx->ptr, params->inner);
-
 	mlx_destroy_window(params->mlx->ptr, params->mlx->win);
 	mlx_destroy_display(params->mlx->ptr);
 	free(params->mlx->ptr);
@@ -38,72 +37,44 @@ int	close_window(t_params *params)
 	return (1);
 }
 
-void rotate_player(t_params *params, float degrees)
+void	rotate_player(t_params *params, float degrees)
 {
-    t_player *player = params->player;
-    player->heading += M_PI / 180 * degrees;
-    // if (degrees > 0)
-    //     printf("turning right, ");
-    // else
-    //     printf("turning left, ");
+	t_player	*player;
 
-    // printf("%f %f\n", player->heading, player->heading / M_PI * 360);
-    // printf("sine of heading: %f\n", sin(player->heading));
-    // printf("cosine of heading: %f\n", cos(player->heading));
-    // printf("==============\n");
+	player = params->player;
+	player->heading += M_PI / 180 * degrees;
 }
 
-bool explorable(t_params *params, double y, double x)
+bool	explorable(t_params *params, double y, double x)
 {
 	if (x < 0 || x > params->mwidth || y < 0 || y > params->mheight)
-		return false;
-
+		return (false);
 	return (params->player->god || !is_wall(params->map[(int)y][(int)x]));
-		
 }
 
-void move_player(t_params *params, float direction)
+void	move_player(t_params *params, float direction)
 {
-	t_player *player = params->player;
+	t_player	*player;
+	float		horiz_step;
+	float		vert_step;
+	float		new_height;
+	float		curr_y;
+	float		curr_x;
+	float		heading;
+	float		new_y;
+	float		new_x;
 
-	float  horizStep = STEP * cos(player->vert_angle);
-	float  vertStep = STEP * -sin(player->vert_angle);
-
-	float  new_height = player->height + vertStep * direction;
+	player = params->player;
+	horiz_step = STEP * cos(player->vert_angle);
+	vert_step = STEP * -sin(player->vert_angle);
+	new_height = player->height + vert_step * direction;
 	if (player->god)
 		player->height = new_height;
-
-	float  curr_y = player->position[0];
-	float  curr_x = player->position[1];
-	float  heading = player->heading;
-	float  new_y = curr_y + cos(heading) * horizStep * direction;
-	float  new_x = curr_x + -sin(heading) * horizStep * direction;
-
-	if (explorable(params, curr_y, new_x))
-	{
-			player->position[1] = new_x;
-			curr_x = new_x;
-	}
-	if (explorable(params, new_y, curr_x))
-	{
-		if (new_y > 0 && new_y < params->mheight)
-			player->position[0] = new_y;
-	}
-
-}
-
-void strafe_player(t_params *params, float direction)
-{
-	t_player *player = params->player;
-
-	float curr_y = player->position[0];
-	float curr_x = player->position[1];
-	float heading = player->heading;
-
-	float new_y = curr_y + sin(heading) * STEP * direction;
-	float new_x = curr_x + cos(heading) * STEP * direction;
-	// printf("new x %f %i new y %f %i\n", new_x, (int) new_x, new_y, (int) new_y);
-
+	curr_y = player->position[0];
+	curr_x = player->position[1];
+	heading = player->heading;
+	new_y = curr_y + cos(heading) * horiz_step * direction;
+	new_x = curr_x + -sin(heading) * horiz_step * direction;
 	if (explorable(params, curr_y, new_x))
 	{
 		player->position[1] = new_x;
@@ -116,15 +87,44 @@ void strafe_player(t_params *params, float direction)
 	}
 }
 
-void spraypaint(t_params *params)
+void	strafe_player(t_params *params, float direction)
 {
-	t_player *player = params->player;
+	t_player	*player;
+	float		curr_y;
+	float		curr_x;
+	float		heading;
+	float		new_y;
+	float		new_x;
 
-	double heading = player->heading;
+	player = params->player;
+	curr_y = player->position[0];
+	curr_x = player->position[1];
+	heading = player->heading;
+	new_y = curr_y + sin(heading) * STEP * direction;
+	new_x = curr_x + cos(heading) * STEP * direction;
+	if (explorable(params, curr_y, new_x))
+	{
+		player->position[1] = new_x;
+		curr_x = new_x;
+	}
+	if (explorable(params, new_y, curr_x))
+	{
+		if (new_y > 0 && new_y < params->mheight)
+			player->position[0] = new_y;
+	}
+}
 
-	int map_x = player->position[1] + sin(heading);
-	int map_y = player->position[0] - cos(heading);
-		
+void	spraypaint(t_params *params)
+{
+	t_player	*player;
+	double		heading;
+	int			map_x;
+	int			map_y;
+
+	player = params->player;
+	heading = player->heading;
+	map_x = player->position[1] + sin(heading);
+	map_y = player->position[0] - cos(heading);
 	if (params->map[map_y][map_x] == '1')
 		params->map[map_y][map_x] = 't';
 	else if (params->map[map_y][map_x] == 't')
@@ -135,15 +135,17 @@ void spraypaint(t_params *params)
 		params->map[map_y][map_x] = '2';
 }
 
-void door(t_params *params)
+void	door(t_params *params)
 {
-	t_player *player = params->player;
+	t_player	*player;
+	double		heading;
+	int			map_x;
+	int			map_y;
 
-	double heading = player->heading;
-
-	int map_x = player->position[1] +  sin(heading);
-	int map_y = player->position[0] - cos(heading);
-		
+	player = params->player;
+	heading = player->heading;
+	map_x = player->position[1] + sin(heading);
+	map_y = player->position[0] - cos(heading);
 	if (params->map[map_y][map_x] == 'D')
 		params->map[map_y][map_x] = 'd';
 	else if (params->map[map_y][map_x] == 'd')
@@ -152,8 +154,9 @@ void door(t_params *params)
 
 int	key_hook(int keycode, t_params *params)
 {
-	t_player *player = params->player;
+	t_player	*player;
 
+	player = params->player;
 	if (keycode == XK_Escape)
 		return (close_window(params));
 	else if (keycode == XK_w)
@@ -219,35 +222,34 @@ int	key_release_hook(int keycode, t_params *params)
 	return (1);
 }
 
-
-void build_wall(t_params *params)
+void	build_wall(t_params *params)
 {
-	t_player *player = params->player;
+	t_player	*player;
+	double		heading;
+	int			map_x;
+	int			map_y;
+	char		grid;
 
-	double heading = player->heading;
-
-
-	int map_x = player->position[1] + sin(heading);
-	int map_y = player->position[0] - cos(heading);
-
+	player = params->player;
+	heading = player->heading;
+	map_x = player->position[1] + sin(heading);
+	map_y = player->position[0] - cos(heading);
 	printf("%i %i %f %f\n", map_x, map_y, sin(heading), -cos(heading));
-	char grid = params->map[map_y][map_x];
+	grid = params->map[map_y][map_x];
 	if (grid == '0')
 	{
 		map_x += sin(heading);
 		map_y -= cos(heading);
 	}
-		
 	if (params->map[map_y][map_x] == '0')
 		params->map[map_y][map_x] = '2';
 	else if (params->map[map_y][map_x] == '2')
 		params->map[map_y][map_x] = '0';
 }
 
-int mouse_click(int button, int x, int y, t_params *params)
+int	mouse_click(int button, int x, int y, t_params *params)
 {
 	printf("button: %i | mouseX: %i | mouseY: %i\n", button, x, y);
-
 	if (button == 2)
 	{
 		params->clicked_px[0] = x;
@@ -267,40 +269,43 @@ int mouse_click(int button, int x, int y, t_params *params)
 	{
 		build_wall(params);
 	}
-	// render(params);
 	return (1);
 }
 
-int mouse_move(int x, int y, t_params *params)
+int	mouse_move(int x, int y, t_params *params)
 {
-	t_player *player = params->player;
+	t_player	*player;
+	int			x_delta;
+	int			y_delta;
+	double		heading_delta;
+	double		vert_delta;
 
-	int xDelta = x - params->clicked_px[0];
-	int yDelta = y - params->clicked_px[1];
-
-	double heading_delta = (double) xDelta / WIN_WIDTH * tan(params->fov / 2.0);
-	double vert_delta = (double) yDelta / WIN_WIDTH * tan(params->fov / 2.0);
+	player = params->player;
+	x_delta = x - params->clicked_px[0];
+	y_delta = y - params->clicked_px[1];
+	heading_delta = (double)x_delta / WIN_WIDTH * tan(params->fov / 2.0);
+	vert_delta = (double)y_delta / WIN_WIDTH * tan(params->fov / 2.0);
 	params->player->heading += 4.0 * heading_delta;
-
 	player->vert_angle -= 4.0 * vert_delta;
-	// printf(" mouseX: %i | mouseY: %i | xDelta: %i | ydelta: %i | heading_delta: %f vert_delta: %f\n",  x, y, xDelta, yDelta, heading_delta, vert_delta);
 	params->clicked_px[0] = x;
 	params->clicked_px[1] = y;
-	// render(params);
-
 	return (1);
 }
 
-
-void draw_crosshair(t_params p)
+void	draw_crosshair(t_params p)
 {
-	int vert_center = WIN_HEIGHT / 2;
-	int horiz_center = WIN_WIDTH / 2;
+	int	vert_center;
+	int	horiz_center;
+	int	half_crosshair_length;
+	int	i;
 
-	int half_crosshair_length = 8;
-
-	for (int i = vert_center - half_crosshair_length; i < vert_center + half_crosshair_length; i++)
-		put_pixel(p, i, horiz_center, 0x888800);
-	for (int i = horiz_center - half_crosshair_length; i < horiz_center + half_crosshair_length; i++)
-		put_pixel(p, vert_center, i, 0x888800);
+	vert_center = WIN_HEIGHT / 2;
+	horiz_center = WIN_WIDTH / 2;
+	half_crosshair_length = 8;
+	i = vert_center - half_crosshair_length;
+	while (i < vert_center + half_crosshair_length)
+		put_pixel(p, i++, horiz_center, 0x888800);
+	i = horiz_center - half_crosshair_length;
+	while (i < horiz_center + half_crosshair_length)
+		put_pixel(p, vert_center, i++, 0x888800);
 }

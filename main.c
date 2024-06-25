@@ -142,7 +142,7 @@ void draw_minimap(t_params p)
 			char block = p.map[row_check][col_check];
 			if (col_check < 0 || row_check < 0 || col_check >= p.mwidth || row_check >= p.mheight)
 				break ;
-			if (block != '0' && block != 'd' && p.player->height <= 1.1 && p.player->height >= -0.1)
+			if (block != '0' && block != 'd' && (p.lights || (p.player->height <= 1.1 && p.player->height >= -0.1)))
 				break ;
 			put_pixel(p, heading_px_row, heading_px_col, 0x550077);
 			heading_px_row += dir_y;

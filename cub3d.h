@@ -128,6 +128,7 @@ typedef struct s_params
 	int				mwidth;
 	int				mheight;
 	char				**map;
+	bool				lights;
 }						t_params;
 
 typedef struct s_ray
@@ -165,6 +166,28 @@ typedef struct s_ray
 	struct s_ray	*next;
 } t_ray;
 
+
+typedef struct s_wall {
+	double pos_x;
+	double pos_y;
+	double dist_to_pp;
+	double ratio; // no need ?
+	double vert_shear; // no need?
+	int actual_bottom;
+	int actual_top;
+	int bottom_of_wall;
+	int top_of_wall;
+
+	double texture_slice;
+	double row_slice;
+	int tex_col;
+	int tex_row;
+	int true_line_height;
+	float dist;
+	int color;
+	double brightness;
+} t_wall;
+
 int						key_hook(int keycode, t_params *params);
 int						close_window(t_params *params);
 
@@ -183,6 +206,8 @@ void strafe_player(t_params *params, float direction);
 void rotate_player(t_params *params, float degrees);
 
 bool is_wall(char c);
+int brightness_adj(int col, float brightness);
+
 
 
 //parse_input.c

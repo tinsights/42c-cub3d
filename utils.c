@@ -12,6 +12,9 @@
 
 #include "cub3d.h"
 
+#define STEP 0.02
+
+
 void put_pixel(t_params p, t_uint row, t_uint col, int colour)
 {
     char *px = p.mlx->img_addr + row * p.mlx->line_sz + col * (p.mlx->bpp / 8);
@@ -50,30 +53,11 @@ void rotate_player(t_params *params, float degrees)
     // printf("==============\n");
 }
 
-/** TODO:
- * 		- convert to singular rotation matrix
-*/
-
-#define STEP 0.02
-
-// bool precision_wall_check(char** map, double x, double y)
-// {
-// 	int integer;
-// 	double xfract = modf(x, &integer);
-// 	double yfract = modf(y, &integer);
-// 	if (xfract > 0.9 || xfract < 0.1)
-// 		x = round(x);
-// 	if (yfract > 0.9 || yfract < 0.1)
-// 		y = round(y);
-
-// 	return (is_wall(map[(int) y][(int) x]));
-// }
 bool explorable(t_params *params, double y, double x)
 {
 	if (x < 0 || x > params->mwidth || y < 0 || y > params->mheight)
 		return false;
-	// if (params->map[(int) y][(int) x] == 'a')
-	// 	return false;
+
 	return (params->player->god || !is_wall(params->map[(int)y][(int)x]));
 		
 }
@@ -120,12 +104,10 @@ void strafe_player(t_params *params, float direction)
 	float new_x = curr_x + cos(heading) * STEP * direction;
 	// printf("new x %f %i new y %f %i\n", new_x, (int) new_x, new_y, (int) new_y);
 
-
-
 	if (explorable(params, curr_y, new_x))
 	{
-			player->position[1] = new_x;
-			curr_x = new_x;
+		player->position[1] = new_x;
+		curr_x = new_x;
 	}
 	if (explorable(params, new_y, curr_x))
 	{
@@ -210,9 +192,10 @@ int	key_hook(int keycode, t_params *params)
 		door(params);
 	else if (keycode == XK_g)
 		player->god = !player->god;
-	else
-		ft_printf("KEY: %i\n", keycode);
-	// render(params);
+	else if (keycode == XK_f)
+	{
+		params->lights = !params->lights;
+	}
 	return (1);
 }
 int	key_release_hook(int keycode, t_params *params)
@@ -294,16 +277,6 @@ int mouse_move(int x, int y, t_params *params)
 
 	int xDelta = x - params->clicked_px[0];
 	int yDelta = y - params->clicked_px[1];
-
-	// double projection_plane_width = 2.0 * tan(params->fov / 2.0);
-
-	//2∗atan(tan(h/2)∗AR)
-	// printf("FOV: %f\n", params->fov);
-
-	// double ratio = tan(params->fov / 2) * 1.6;
-	// printf("ratio: %f\n", ratio);
-	// double vertFov = 2.0 * atan(ratio);
-	// printf("vertFov: %f\n", vertFov);
 
 	double heading_delta = (double) xDelta / WIN_WIDTH * tan(params->fov / 2.0);
 	double vert_delta = (double) yDelta / WIN_WIDTH * tan(params->fov / 2.0);

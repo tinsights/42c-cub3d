@@ -47,11 +47,11 @@ int main(int argc, char *argv[])
 
 	params.player = &player;
 	params.fov = FOV / 180.0 * M_PI;
+	params.lights = false;
 
 	player.position[0] = dat->ypos + 0.5;
 	player.position[1] = dat->xpos + 0.5;
 	player.heading = dat->heading;
-	printf("heading: %f\n", dat->heading);
 	player.height = 0.5; // 10
 	player.vert_angle = 0.0;
 	player.speed = 1.0;

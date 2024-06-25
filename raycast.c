@@ -168,90 +168,116 @@ void dda(t_params *params, t_ray *ray)
 {
 	inner_wall(params, ray);
     cast_to_wall(params, ray);
-	if (params->player->height > 1.0 || params->player->height < 0)
+	if (!params->lights && (params->player->height > 1.0 || params->player->height < 0))
 	    ray_pierce(params, ray);
 }
 
-
-void paint_walls(t_params *params, t_player *player, t_ray *ray, int col)
+int brightness_adj(int col, float brightness)
 {
-	if (ray->next)
-	{
-		paint_walls(params, player, ray->next, col);
-		free(ray->next);
-	}
-	double pos_x = player->position[1];
-	double pos_y = player->position[0];
+	int r;
+	int g;
+	int b;
+	int color;
+
+	r = (col >> 16) & 0xFF;
+	g = (col >> 8) & 0xFF;
+	b = col & 0xFF;
+	r *= brightness;
+	g *= brightness;
+	b *= brightness;
+	color = ((r << 16) | (g << 8) | b);
+	return color;
+}
+
+void get_wall_dimensions(t_params *params, t_player *player, t_ray *ray, t_wall *wall)
+{
+	wall->pos_x = player->position[1];
+	wall->pos_y = player->position[0];
 	
-	double dist_to_projection_plane = (WIN_WIDTH / 2.0) / (tan(params->fov / 2.0));
-	double ratio = dist_to_projection_plane / ray->perp_wall_dist;
-	double vert_shear = tan(player->vert_angle) * dist_to_projection_plane;
+	wall->dist_to_pp = (WIN_WIDTH / 2.0) / (tan(params->fov / 2.0));
+	wall->ratio = wall->dist_to_pp / ray->perp_wall_dist;
+	wall->vert_shear = tan(player->vert_angle) * wall->dist_to_pp;
 
-	int actual_bottom = ratio * player->height + WIN_HEIGHT / 2 + vert_shear;
-	int actual_top = actual_bottom - ratio;
+	wall->actual_bottom = wall->ratio * player->height + WIN_HEIGHT / 2 + wall->vert_shear;
+	wall->actual_top = wall->actual_bottom - wall->ratio;
 
-	int bottom_of_wall = actual_bottom;
-	if (bottom_of_wall >= WIN_HEIGHT)
-		bottom_of_wall = WIN_HEIGHT - 1;
-	int top_of_wall = actual_top;
-	if (top_of_wall < 0)
-		top_of_wall = 0;
+	wall->bottom_of_wall = wall->actual_bottom;
+	if (wall->bottom_of_wall >= WIN_HEIGHT)
+		wall->bottom_of_wall = WIN_HEIGHT - 1;
+	wall->top_of_wall = wall->actual_top;
+	if (wall->top_of_wall < 0)
+		wall->top_of_wall = 0;
+}
 
-	double texture_slice;
+void get_texture(t_ray *ray, t_wall *wall)
+{
 	if (ray->side_x)
 	{
-		texture_slice = pos_y + ray->dir_y * ray->perp_wall_dist - ray->map_y;
+		wall->texture_slice = wall->pos_y + ray->dir_y * ray->perp_wall_dist - ray->map_y;
 		if (ray->dir_x < 0)
-			texture_slice = 1.0 - texture_slice;
+			wall->texture_slice = 1.0 - wall->texture_slice;
 	}
 	else
 	{
-		texture_slice = pos_x + ray->dir_x * ray->perp_wall_dist - ray->map_x;
+		wall->texture_slice = wall->pos_x + ray->dir_x * ray->perp_wall_dist - ray->map_x;
 		if (ray->dir_y > 0)
-			texture_slice = 1.0 - texture_slice;
+			wall->texture_slice = 1.0 - wall->texture_slice;
 	}
 	
 	ray->img_data = (unsigned int *)ray->img->data;
 
-	int tex_col = texture_slice * (double) ray->img->width;
+	wall->tex_col = wall->texture_slice * (double) ray->img->width;
 
-	double true_line_height = actual_bottom - actual_top;
+	wall->true_line_height = wall->actual_bottom - wall->actual_top;
 
-    double dist = ray->perp_wall_dist;
-	if (dist < 1.0)
-		dist = 1.0;
-    double brightness = 1 / dist;
-	for (int px = 0; px < WIN_HEIGHT; px++)
+    wall->dist = ray->perp_wall_dist;
+	if (wall->dist < 1.0)
+		wall->dist = 1.0;
+    wall->brightness = 1 / wall->dist;
+}
+
+void paint_col(t_params *params, t_ray *ray, t_wall *wall, int px)
+{
+
+	int ceiling_color = params->cclr;
+
+	if (params->lights)
+		ceiling_color = brightness_adj(ceiling_color, wall->brightness);
+	if (!(ray->next))
 	{
-		if (!(ray->next))
-		{
-			if (px < top_of_wall )
-				put_pixel(*params, px, col, params->cclr);
-			else if (px > bottom_of_wall ) // floor
-				put_pixel(*params, px, col, params->fclr);
-		}
-		if (px >= top_of_wall && px <= bottom_of_wall)
-		{
-			double row_slice = (double) (px - actual_top) / true_line_height;
-			int tex_row = row_slice * (double) ray->img->height;
-			int color = ray->img_data[(tex_row * ray->img->size_line)/(ray->img->bpp /8) + tex_col];
-			int r = (color >> 16) & 0xFF;
-			int g = (color >> 8) & 0xFF;
-			int b = color & 0xFF;
-			r *= brightness;
-			g *= brightness;
-			b *= brightness;
-			color = ((r << 16) | (g << 8) | b);
-			if (ray->col == WIN_WIDTH / 2)
-			{
-			    printf("brightness: %f\n", brightness);
-				printf("%x %i || %x %x %x \n", color, color, r, g, b);
-				printf("%x %i || %x %x %x \n", color, color, (int) (r * brightness), (int) (g * brightness), (int)(b * brightness));
-			}
-			put_pixel(*params, px, col, color);
-		}
+		if (px < wall->top_of_wall )
+			put_pixel(*params, px, ray->col, ceiling_color);
+		else if (px > wall->bottom_of_wall ) // floor
+			put_pixel(*params, px, ray->col, params->fclr);
+	}
+	if (px >= wall->top_of_wall && px <= wall->bottom_of_wall)
+	{
+		wall->row_slice = (double) (px - wall->actual_top) / wall->true_line_height;
+		wall->tex_row = wall->row_slice * (double) ray->img->height;
+		wall->color = ray->img_data[(wall->tex_row * ray->img->size_line)/(ray->img->bpp /8) + wall->tex_col];
+		if (params->lights)
+			wall->color = brightness_adj(wall->color, wall->brightness);
+		put_pixel(*params, px, ray->col, wall->color);
 	}
 }
+
+void paint_walls(t_params *params, t_player *player, t_ray *ray)
+{
+	t_wall wall;
+
+	if (ray->next)
+	{
+		paint_walls(params, player, ray->next);
+		free(ray->next);
+	}
+	get_wall_dimensions(params, player, ray, &wall);
+	get_texture(ray, &wall);
+	for (int px = 0; px < WIN_HEIGHT; px++)
+	{
+		paint_col(params, ray, &wall, px);
+	}
+}
+
 
 void draw_walls(t_params *params)
 {
@@ -271,6 +297,6 @@ void draw_walls(t_params *params)
 		reset_ray(&ray, player);
 		direct_ray(&ray, player);
 		dda(params, &ray);
-		paint_walls(params, player, &ray, col);
+		paint_walls(params, player, &ray);
 	}
 }

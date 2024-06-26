@@ -12,15 +12,11 @@
 
 #include "cub3d.h"
 
-//check N NO, S SO, E EA , W WE
-//elem could be N NO, S SO etc. target is NO, SO, EA, WE, F, C
-//check index 0 and 1, this also ensures Map data line doesn't overlap
 int	isvalid_typeid(char *elem, char *target)
 {
-	int len;
+	int	len;
 
 	len = ft_strlen(elem);
-
 	if (len == 1 && elem[0] == target[0])
 		return (1);
 	else if (len == 2 && elem[0] == target[0] && elem[1] == target[1])
@@ -28,45 +24,41 @@ int	isvalid_typeid(char *elem, char *target)
 	return (0);
 }
 
-//colorstr should pass 1) valid digits 2) 3 integers 3)range
 int	update_color(int *color, char *colorstr)
 {
 	char	**rgb;
-	int	irgb[3];
-	int	i;
+	int		irgb[3];
+	int		i;
 
-	if (nondigits(colorstr)) //1) valid digits
+	if (nondigits(colorstr))
 		return (-1);
 	rgb = ft_split(colorstr, ',');
-	if (wcount(rgb) != 3) //2) integer count
+	if (wcount(rgb) != 3)
 		return (-1);
 	i = 0;
 	while (i < 3)
 	{
 		irgb[i] = ft_atoi(rgb[i]);
-		if (irgb[i] < 0 || irgb[i] > 255) //3) range check
-			break;
+		if (irgb[i] < 0 || irgb[i] > 255)
+			break ;
 		i++;
 	}
 	free_strarr(rgb);
 	if (i < 3)
 		return (-1);
-	*color = (irgb[0] << 16) | irgb[1] << 8 | irgb[2]; //valid so update
+	*color = (irgb[0] << 16) | irgb[1] << 8 | irgb[2];
 	return (1);
 }
 
-//Check if N->path, S->path, W->path or E->path has no duplicate value
-//Validate pathstr exists in filesystem
-//if valid, set N->path, S->path ... = pathstr
-int	update_filepath(char **filepath, char *pathstr)//N S W E specific filepath
+int	update_filepath(char **filepath, char *pathstr)
 {
 	t_mlx	*mlx;
 	void	*image;
-	int	tmp;
+	int		tmp;
 
-	if (*filepath != NULL)//if filepath already assigned, duplicate
+	if (*filepath != NULL)
 		return (-1);
-	mlx = mlx_init();//segment to check filepath exists in filesystem
+	mlx = mlx_init();
 	if (!mlx)
 		return (-1);
 	image = mlx_xpm_file_to_image(mlx, pathstr, &tmp, &tmp);
@@ -83,9 +75,6 @@ int	update_filepath(char **filepath, char *pathstr)//N S W E specific filepath
 	return (1);
 }
 
-//For each of the TypeID encountered -
-//validate and update filepath
-//validate and update color
 int	update_path_color(char **elem, t_input *dat)
 {
 	if (isvalid_typeid(elem[0], "NO"))
@@ -105,44 +94,41 @@ int	update_path_color(char **elem, t_input *dat)
 
 int	validate_path_color(char *line, int *vcount, t_input *dat)
 {
-	char 	**elem;
+	char	**elem;
 
-	elem = ft_split2(line, " \n");//delimiter space, \n
+	elem = ft_split2(line, " \n");
 	if (elem == NULL)
 		return (-1);
-	if (wcount(elem) == 1 || wcount(elem) > 2)
+	if (!(wcount(elem) == 0 || wcount(elem) == 2))
 	{
 		free_strarr(elem);
 		return (-1);
 	}
-	else if (wcount(elem) == 2)//wcount == 0 no action
+	else if (wcount(elem) == 2)
 		*vcount += update_path_color(elem, dat);
 	free_strarr(elem);
 	return (1);
 }
 
-//parse part 1. 
-//It should have all 6 Typeids N, S, W, E, F, C
-//(Map line data should not overlap TypeID detected down the line)
 int	parse_path_color(int fd, t_input *dat)
 {
-	int	vcount;
+	int		vcount;
 	char	*line;
 
 	vcount = 0;
 	line = get_next_line(fd, 0);
-	while(vcount < 6 && line) //Until 6 TypeIDs are counted
+	while (vcount < 6 && line)
 	{
 		if (validate_path_color(line, &vcount, dat) == -1)
 		{
-			get_next_line(fd, 1); //to clear the static buffer in gnl
-			break;
+			get_next_line(fd, 1);
+			break ;
 		}
 		free_str(&line);
 		line = get_next_line(fd, 0);
 	}
 	free_str(&line);
-	if (vcount < 6) // NOt have 6 Typeids 
+	if (vcount < 6)
 		return (-1);
-	return(1);
+	return (1);
 }

@@ -175,7 +175,6 @@ int	read_line(int fd, char **line);
 void	free_intarr(int **arr, int size);
 void	free_str(char **str);
 void	free_strarr(char **ptr);
-void	free_strarr2(char **ptr, int len);
 void	free_maplst(t_list **lst);
 void	free_xpmpath(t_input *dat);
 

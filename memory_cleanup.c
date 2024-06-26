@@ -21,7 +21,7 @@ void	free_xpmpath(t_input *dat)
 	if (dat->expm != NULL)
 		free(dat->expm);
 	if (dat->wxpm != NULL)
-		free(dat->wxpm);	
+		free(dat->wxpm);
 	dat->nxpm = NULL;
 	dat->sxpm = NULL;
 	dat->expm = NULL;
@@ -34,7 +34,7 @@ void	free_xpmpath(t_input *dat)
 void	free_intarr(int **arr, int size)
 {
 	int	j;
-	
+
 	j = 0;
 	while (j < size)
 	{
@@ -68,27 +68,6 @@ void	free_str(char **str)
 	*str = NULL;
 }
 
-//used when individual str is malloced
-//if 1 malloc fails, then free all previous mallocs
-//len is count of succesful malloc, to be freed
-void	free_strarr2(char **ptr, int len)
-{
-	int	i;
-
-	i = 0;
-	while (ptr && i < len)
-	{
-		//printf("printf free ptr %s\n",ptr[i]);
-		if (ptr[i])
-			free(ptr[i]);
-		ptr[i] = NULL;
-		i++;
-	}
-	if (ptr)
-		free(ptr);
-	ptr = NULL;
-}
-
 void	free_strarr(char **ptr)
 {
 	int	i;
@@ -96,7 +75,6 @@ void	free_strarr(char **ptr)
 	i = -1;
 	while (ptr && ptr[++i])
 	{
-		//printf("printf free ptr %s\n",ptr[i]);
 		if (ptr[i])
 			free(ptr[i]);
 		ptr[i] = NULL;

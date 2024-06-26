@@ -121,10 +121,7 @@ char	*get_next_line(int fd, int lastcall)
 	buf.len = 0;
 	buf.pos = 0;
 	if (fd < 0 || BUFFER_SIZE <= 0 || lastcall == 1)
-	{
-		printf("Received call to free static\n");
 		return (free_lst(&lst, fd, 0));
-	}
 	if (lst.node != NULL)
 	{
 		output = get_frm_lst_only(&lst, &buf);

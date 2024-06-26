@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-void	fill_tmap(int row[], int col, char *str)
+static void	fill_tmap(int row[], int col, char *str)
 {
 	int	i;
 	int	len;
@@ -41,7 +41,7 @@ void	fill_tmap(int row[], int col, char *str)
 	row[col - 1] = -1;
 }
 
-int	isenclosedwall(int **tmap, t_mapdata *mi, int row, int col)
+static int	isenclosedwall(int **tmap, t_mapdata *mi, int row, int col)
 {
 	if (tmap[row][col] == -1)
 		return (-1);
@@ -60,7 +60,7 @@ int	isenclosedwall(int **tmap, t_mapdata *mi, int row, int col)
 	return (0);
 }
 
-int	**alloc_tmap(int rows, int cols)
+static int	**alloc_tmap(int rows, int cols)
 {
 	int	**tmap;
 	int	i;

@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-int	update_playerspawn(t_mapdata *mi, t_input *dat)
+static int	update_playerspawn(t_mapdata *mi, t_input *dat)
 {
 	t_list	*lst;
 	int		counter;
@@ -37,7 +37,7 @@ int	update_playerspawn(t_mapdata *mi, t_input *dat)
 	return (1);
 }
 
-int	allvalidchars(t_mapdata *mi)
+static int	allvalidchars(t_mapdata *mi)
 {
 	t_list	*lst;
 	int		max;
@@ -56,12 +56,15 @@ int	allvalidchars(t_mapdata *mi)
 	return (0);
 }
 
-int	init_mapdata(t_mapdata *mi, int fd)
+static int	init_mapdata(t_mapdata *mi, int fd)
 {
 	mi->rows = 0;
 	mi->rwidth = 0;
 	if (get_tmaplist(fd, mi) == -1)
+	{
+		get_next_line(fd, 1);
 		return (-1);
+	}
 	return (0);
 }
 

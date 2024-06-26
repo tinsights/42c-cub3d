@@ -60,21 +60,6 @@ static void	make_maparray(t_mapdata *mi, char **arr)
 	}
 }
 
-char	**tmap_to_array(t_mapdata *mi)
-{
-	char	**arr;
-
-	arr = ft_calloc((mi->rows + 1), sizeof(char *));
-	if (arr == NULL)
-	{
-		free_maplst(&mi->lst);
-		return (NULL);
-	}
-	make_maparray(mi, arr);
-	free_maplst(&mi->lst);
-	return (arr);
-}
-
 static int	makelist(t_list	**head, char *line)
 {
 	t_list	*node;
@@ -112,4 +97,19 @@ int	get_tmaplist(int fd, t_mapdata *mi)
 	}
 	mi->lst = head;
 	return (1);
+}
+
+char	**tmap_to_array(t_mapdata *mi)
+{
+	char	**arr;
+
+	arr = ft_calloc((mi->rows + 1), sizeof(char *));
+	if (arr == NULL)
+	{
+		free_maplst(&mi->lst);
+		return (NULL);
+	}
+	make_maparray(mi, arr);
+	free_maplst(&mi->lst);
+	return (arr);
 }

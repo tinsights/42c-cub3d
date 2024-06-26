@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-int	isvalid_typeid(char *elem, char *target)
+static int	isvalid_typeid(char *elem, char *target)
 {
 	int	len;
 
@@ -24,7 +24,7 @@ int	isvalid_typeid(char *elem, char *target)
 	return (0);
 }
 
-int	update_color(int *color, char *colorstr)
+static int	update_color(int *color, char *colorstr, int *vcount)
 {
 	char	**rgb;
 	int		irgb[3];
@@ -47,10 +47,11 @@ int	update_color(int *color, char *colorstr)
 	if (i < 3)
 		return (-1);
 	*color = (irgb[0] << 16) | irgb[1] << 8 | irgb[2];
+	*vcount += 1;
 	return (1);
 }
 
-int	update_filepath(char **filepath, char *pathstr)
+static int	update_filepath(char **filepath, char *pathstr, int *vcount)
 {
 	t_mlx	*mlx;
 	void	*image;
@@ -72,42 +73,37 @@ int	update_filepath(char **filepath, char *pathstr)
 	mlx_destroy_display(mlx);
 	free(mlx);
 	*filepath = ft_strdup(pathstr);
+	*vcount += 1;
 	return (1);
 }
 
-int	update_path_color(char **elem, t_input *dat)
-{
-	if (isvalid_typeid(elem[0], "NO"))
-		return (update_filepath(&dat->nxpm, elem[1]));
-	else if (isvalid_typeid(elem[0], "SO"))
-		return (update_filepath(&dat->sxpm, elem[1]));
-	else if (isvalid_typeid(elem[0], "WE"))
-		return (update_filepath(&dat->wxpm, elem[1]));
-	else if (isvalid_typeid(elem[0], "EA"))
-		return (update_filepath(&dat->expm, elem[1]));
-	else if (isvalid_typeid(elem[0], "F"))
-		return (update_color(&dat->fclr, elem[1]));
-	else if (isvalid_typeid(elem[0], "C"))
-		return (update_color(&dat->cclr, elem[1]));
-	return (-1);
-}
-
-int	validate_path_color(char *line, int *vcount, t_input *dat)
+static int	update_path_color(char *line, int *vcount, t_input *dat)
 {
 	char	**elem;
+	int		outcome;
+	int		count;
 
+	outcome = 1;
 	elem = ft_split2(line, " \n");
 	if (elem == NULL)
 		return (-1);
-	if (!(wcount(elem) == 0 || wcount(elem) == 2))
-	{
-		free_strarr(elem);
-		return (-1);
-	}
-	else if (wcount(elem) == 2)
-		*vcount += update_path_color(elem, dat);
+	count = wcount(elem);
+	if (!(count == 0 || count == 2))
+		outcome = -1;
+	if (outcome == 1 && count == 2 && isvalid_typeid(elem[0], "NO"))
+		outcome = update_filepath(&dat->nxpm, elem[1], vcount);
+	else if (outcome == 1 && count == 2 && isvalid_typeid(elem[0], "SO"))
+		outcome = update_filepath(&dat->sxpm, elem[1], vcount);
+	else if (outcome == 1 && count == 2 && isvalid_typeid(elem[0], "WE"))
+		outcome = update_filepath(&dat->wxpm, elem[1], vcount);
+	else if (outcome == 1 && count == 2 && isvalid_typeid(elem[0], "EA"))
+		outcome = update_filepath(&dat->expm, elem[1], vcount);
+	else if (outcome == 1 && count == 2 && isvalid_typeid(elem[0], "F"))
+		outcome = update_color(&dat->fclr, elem[1], vcount);
+	else if (outcome == 1 && count == 2 && isvalid_typeid(elem[0], "C"))
+		outcome = update_color(&dat->cclr, elem[1], vcount);
 	free_strarr(elem);
-	return (1);
+	return (outcome);
 }
 
 int	parse_path_color(int fd, t_input *dat)
@@ -119,7 +115,7 @@ int	parse_path_color(int fd, t_input *dat)
 	line = get_next_line(fd, 0);
 	while (vcount < 6 && line)
 	{
-		if (validate_path_color(line, &vcount, dat) == -1)
+		if (update_path_color(line, &vcount, dat) == -1)
 		{
 			get_next_line(fd, 1);
 			break ;

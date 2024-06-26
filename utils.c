@@ -25,6 +25,12 @@ void	put_pixel(t_params p, t_uint row, t_uint col, int colour)
 int	close_window(t_params *params)
 {
 	mlx_do_key_autorepeaton(params->mlx->ptr);
+	free_strarr(params->input->map);
+	free(params->input->nxpm);
+	free(params->input->sxpm);
+	free(params->input->expm);
+	free(params->input->wxpm);
+	free(params->input);
 	mlx_destroy_image(params->mlx->ptr, params->mlx->img);
 	mlx_destroy_image(params->mlx->ptr, params->north);
 	mlx_destroy_image(params->mlx->ptr, params->east);

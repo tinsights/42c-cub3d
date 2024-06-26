@@ -34,6 +34,7 @@ int	main(int argc, char *argv[])
 	// return(0);
 	/*---------------------------------------------------*/
 	params.map = dat->map;
+	params.input = dat;
 	params.mwidth = dat->mwidth;
 	params.mheight = dat->mheight;
 	/* -------------------------------------------------------------------------- */
@@ -68,9 +69,9 @@ int	main(int argc, char *argv[])
 	/*                                TEXTURE INIT                                */
 	/* -------------------------------------------------------------------------- */
 	params.inner = mlx_xpm_file_to_image(mlx.ptr, "./incs/hallway.xpm", &width,
-			&height); // extra
+											&height); // extra
 	params.spray = mlx_xpm_file_to_image(mlx.ptr, "./incs/42sg.xpm", &width,
-			&height);    // extra
+											&height); // extra
 	params.door = mlx_xpm_file_to_image(mlx.ptr, "./incs/tunnelv2.xpm", &width,
 			&height);
 	params.north = mlx_xpm_file_to_image(mlx.ptr, dat->nxpm, &width, &height);
@@ -93,10 +94,10 @@ int	main(int argc, char *argv[])
 	mlx_loop(mlx.ptr);
 }
 
-void	draw_walls(t_params *p);
+void		draw_walls(t_params *p);
 
-
-typedef struct s_minimap {
+typedef struct s_minimap
+{
 	int		sq_size;
 	int		mm_size;
 	int		total_size;
@@ -117,13 +118,15 @@ typedef struct s_minimap {
 	int		col_check;
 	int		row_check;
 	char	block;
-} t_minimap;
+}			t_minimap;
 
-void draw_rays(t_params *p, t_minimap mm)
+void	draw_rays(t_params *p, t_minimap mm)
 {
+	double	projection_plane_x;
+
 	for (int ray = -WIN_WIDTH / 2; ray < WIN_WIDTH / 2; ray++)
 	{
-		double projection_plane_x = 2.0 * (double)ray / (WIN_WIDTH - 1);
+		projection_plane_x = 2.0 * (double)ray / (WIN_WIDTH - 1);
 		mm.dir_x = mm.heading_x + projection_plane_x * mm.plane_x;
 		mm.dir_y = mm.heading_y + projection_plane_x * mm.plane_y;
 		mm.heading_px_row = mm.total_size / 2;
@@ -131,12 +134,12 @@ void draw_rays(t_params *p, t_minimap mm)
 		while (mm.heading_px_col < mm.total_size && mm.heading_px_col > 0
 			&& mm.heading_px_row > 0 && mm.heading_px_row < mm.total_size)
 		{
-			mm.col_check = mm.pos_x - mm.mm_size / 2 + (mm.heading_px_col + mm.off_x)
-				/ mm.sq_size;
-			mm.row_check = mm.pos_y - mm.mm_size / 2 + (mm.heading_px_row + mm.off_y)
-				/ mm.sq_size;
-			if (mm.col_check < 0 || mm.row_check < 0 || mm.col_check >= p->mwidth
-				|| mm.row_check >= p->mheight)
+			mm.col_check = mm.pos_x - mm.mm_size / 2 + (mm.heading_px_col
+					+ mm.off_x) / mm.sq_size;
+			mm.row_check = mm.pos_y - mm.mm_size / 2 + (mm.heading_px_row
+					+ mm.off_y) / mm.sq_size;
+			if (mm.col_check < 0 || mm.row_check < 0
+				|| mm.col_check >= p->mwidth || mm.row_check >= p->mheight)
 				break ;
 			mm.block = p->map[mm.row_check][mm.col_check];
 			if (mm.block != '0' && mm.block != 'd' && (p->lights
@@ -148,7 +151,7 @@ void draw_rays(t_params *p, t_minimap mm)
 		}
 	}
 }
-void fill_grid(t_params *p, t_minimap mm)
+void	fill_grid(t_params *p, t_minimap mm)
 {
 	for (int px_col = 0; px_col < mm.total_size; px_col++)
 	{
@@ -157,13 +160,15 @@ void fill_grid(t_params *p, t_minimap mm)
 			if (px_row == 0 || px_row == mm.total_size - 1
 				|| px_col == 0 | px_col == mm.total_size - 1)
 				put_pixel(*p, px_row, px_col, 0x000000);
-			else if ((px_row + mm.off_y) % mm.sq_size == 0 || (px_col + mm.off_x)
-				% mm.sq_size == 0)
+			else if ((px_row + mm.off_y) % mm.sq_size == 0 || (px_col
+					+ mm.off_x) % mm.sq_size == 0)
 				put_pixel(*p, px_row, px_col, 0xffffff);
-			mm.col_check = mm.pos_x - mm.mm_size / 2 + (px_col + mm.off_x) / mm.sq_size;
-			mm.row_check = mm.pos_y - mm.mm_size / 2 + (px_row + mm.off_y) / mm.sq_size;
-			if (mm.col_check < 0 || mm.row_check < 0 || mm.col_check >= p->mwidth
-				|| mm.row_check >= p->mheight)
+			mm.col_check = mm.pos_x - mm.mm_size / 2 + (px_col + mm.off_x)
+				/ mm.sq_size;
+			mm.row_check = mm.pos_y - mm.mm_size / 2 + (px_row + mm.off_y)
+				/ mm.sq_size;
+			if (mm.col_check < 0 || mm.row_check < 0
+				|| mm.col_check >= p->mwidth || mm.row_check >= p->mheight)
 			{
 				put_pixel(*p, px_row, px_col, 0x111111);
 				continue ;
@@ -174,7 +179,8 @@ void fill_grid(t_params *p, t_minimap mm)
 			if (mm.block != '0' && mm.block != 'd')
 				put_pixel(*p, px_row, px_col, 0xff0000);
 			if (px_col > mm.total_size / 2 - 2 && px_col < mm.total_size / 2 + 2
-				&& px_row > mm.total_size / 2 - 2 && px_row < mm.total_size / 2 + 2)
+				&& px_row > mm.total_size / 2 - 2 && px_row < mm.total_size / 2
+				+ 2)
 				put_pixel(*p, px_row, px_col, 0x00ffff);
 		}
 	}
@@ -182,17 +188,16 @@ void fill_grid(t_params *p, t_minimap mm)
 
 void	draw_minimap(t_params *p)
 {
-	t_minimap mm;
+	t_minimap	mm;
+
 	mm.sq_size = 15;
 	mm.mm_size = 8;
 	mm.total_size = mm.sq_size * mm.mm_size;
-	
 	mm.heading = p->player->heading;
 	mm.pos_y = p->player->position[0];
 	mm.pos_x = p->player->position[1];
 	mm.off_y = (p->player->position[0] - mm.pos_y) * mm.sq_size;
 	mm.off_x = (p->player->position[1] - mm.pos_x) * mm.sq_size;
-	// printf("off y: %i off_x : %i\n", off_y, off_x);
 	mm.half_projection_plane_width = tan(p->fov / 2.0);
 	mm.heading_x = sin(mm.heading);
 	mm.heading_y = -cos(mm.heading);
@@ -203,7 +208,6 @@ void	draw_minimap(t_params *p)
 			put_pixel(*p, px_row, px_col, 0xa9a9a9);
 	draw_rays(p, mm);
 	fill_grid(p, mm);
-	
 }
 
 void	look_up_down(t_params *params, int direction)

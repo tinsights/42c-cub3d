@@ -69,10 +69,33 @@ bool	is_wall(char c)
 	return (c == '1' || c == '2' || c == 'D' || c == 'a');
 }
 
+void set_ray_img(t_params *params, t_ray *ray)
+{
+	if (ray->side_x)
+	{
+		if (ray->dir_x > 0)
+			ray->img = params->east;
+		else
+			ray->img = params->west;
+	}
+	else
+	{
+		if (ray->dir_y > 0)
+			ray->img = params->south;
+		else
+			ray->img = params->north;
+	}
+}
+
 void	inner_wall(t_params *params, t_ray *ray)
 {
 	if (is_wall(params->map[ray->map_y][ray->map_x]))
 	{
+		ray->hit = true;
+		if (params->inner)
+			ray->type = inner;
+		else
+			set_ray_img(params, ray);
 		if (ray->dist_x < ray->dist_y)
 		{
 			ray->dist_x += ray->delta_dist_x;
@@ -83,8 +106,6 @@ void	inner_wall(t_params *params, t_ray *ray)
 			ray->dist_y += ray->delta_dist_y;
 			ray->side_x = 0;
 		}
-		ray->hit = true;
-		ray->img = params->inner;
 	}
 }
 
@@ -104,33 +125,33 @@ void	increment_ray(t_ray *ray)
 	}
 }
 
+void check_special(t_params *params, t_ray *ray)
+{
+	if (params->map[ray->map_y][ray->map_x] == 't'
+		|| params->map[ray->map_y][ray->map_x] == 'T')
+	{
+		if (params->spray)
+			ray->img = params->spray;
+		ray->type = spray;
+	}
+	else if (params->map[ray->map_y][ray->map_x] == 'D')
+	{
+		if(params->door)
+			ray->img = params->door;
+		ray->type = spray;
+	}
+	if (params->map[ray->map_y][ray->map_x] == 'd')
+		ray->hit = false;
+}
 void	check_if_wall(t_params *params, t_ray *ray)
 {
 	if (params->map[ray->map_y][ray->map_x] != '0')
 	{
 		ray->hit = true;
-		if (ray->side_x)
-		{
-			if (ray->dir_x > 0)
-				ray->img = params->east;
-			else
-				ray->img = params->west;
-		}
-		else
-		{
-			if (ray->dir_y > 0)
-				ray->img = params->south;
-			else
-				ray->img = params->north;
-		}
+		set_ray_img(params, ray);
 	}
-	if (params->map[ray->map_y][ray->map_x] == 't'
-		|| params->map[ray->map_y][ray->map_x] == 'T')
-		ray->img = params->spray;
-	else if (params->map[ray->map_y][ray->map_x] == 'D')
-		ray->img = params->door;
-	if (params->map[ray->map_y][ray->map_x] == 'd')
-		ray->hit = false;
+	ray->type = wall;
+	check_special(params, ray);
 }
 
 void	cast_to_wall(t_params *params, t_ray *ray)
@@ -173,7 +194,7 @@ void	ray_pierce(t_params *params, t_ray *ray)
 	{
 		next = ft_calloc(1, sizeof(t_ray));
 		extend_ray(ray, next);
-		if (ray->img == params->inner)
+		if (ray->type == inner)
 		{
 			if (ray->side_x)
 				next->map_x += ray->step_x;

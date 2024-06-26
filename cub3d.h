@@ -120,6 +120,8 @@ typedef struct s_params
 	bool				lights;
 }						t_params;
 
+enum e_tex_type{wall, inner, spray, door};
+
 typedef struct s_ray
 {
 	int id;
@@ -153,6 +155,7 @@ typedef struct s_ray
 	t_img *img;
 	unsigned int	*img_data;
 	struct s_ray	*next;
+	enum e_tex_type		type;
 } t_ray;
 
 

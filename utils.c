@@ -36,9 +36,12 @@ int	close_window(t_params *params)
 	mlx_destroy_image(params->mlx->ptr, params->east);
 	mlx_destroy_image(params->mlx->ptr, params->west);
 	mlx_destroy_image(params->mlx->ptr, params->south);
-	mlx_destroy_image(params->mlx->ptr, params->spray);
-	mlx_destroy_image(params->mlx->ptr, params->door);
-	mlx_destroy_image(params->mlx->ptr, params->inner);
+	if (params->spray)
+		mlx_destroy_image(params->mlx->ptr, params->spray);
+	if (params->door)
+		mlx_destroy_image(params->mlx->ptr, params->door);
+	if (params->inner)
+		mlx_destroy_image(params->mlx->ptr, params->inner);
 	mlx_destroy_window(params->mlx->ptr, params->mlx->win);
 	mlx_destroy_display(params->mlx->ptr);
 	free(params->mlx->ptr);
@@ -145,7 +148,7 @@ void	spraypaint(t_params *params)
 		params->map[map_y][map_x] = '2';
 }
 
-void	door(t_params *params)
+void	toggle_door(t_params *params)
 {
 	t_player	*player;
 	double		heading;
@@ -214,7 +217,7 @@ int	key_hook(int keycode, t_params *params)
 	else if (keycode == XK_t)
 		spraypaint(params);
 	else if (keycode == XK_e)
-		door(params);
+		toggle_door(params);
 	else if (keycode == XK_g)
 		player->god = !player->god;
 	else if (keycode == XK_f)

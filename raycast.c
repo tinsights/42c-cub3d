@@ -264,9 +264,9 @@ void	paint_col(t_params *params, t_ray *ray, t_wall *wall, int px)
 	if (!(ray->next))
 	{
 		if (px < wall->top_of_wall)
-			put_pixel(*params, px, ray->col, ceiling_color);
+			put_pixel(params, px, ray->col, ceiling_color);
 		else if (px > wall->bottom_of_wall)
-			put_pixel(*params, px, ray->col, params->fclr);
+			put_pixel(params, px, ray->col, params->fclr);
 	}
 	if (px >= wall->top_of_wall && px <= wall->bottom_of_wall)
 	{
@@ -277,7 +277,7 @@ void	paint_col(t_params *params, t_ray *ray, t_wall *wall, int px)
 			/ (ray->img->bpp / 8) + wall->tex_col];
 		if (params->lights)
 			wall->color = brightness_adj(wall->color, wall->brightness);
-		put_pixel(*params, px, ray->col, wall->color);
+		put_pixel(params, px, ray->col, wall->color);
 	}
 }
 

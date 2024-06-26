@@ -180,14 +180,14 @@ typedef struct s_wall {
 int						key_hook(int keycode, t_params *params);
 int						close_window(t_params *params);
 
-void					put_pixel(t_params p, t_uint row, t_uint col,
+void					put_pixel(t_params *p, t_uint row, t_uint col,
 							int colour);
-void					draw_player(t_params p);
-void					draw_grid(t_params p);
+void					draw_player(t_params *p);
+void					draw_grid(t_params *p);
 int						mouse_move(int x, int y, t_params *params);
 int						mouse_click(int button, int x, int y, t_params *params);
 int						key_release_hook(int keycode, t_params *params);
-void					draw_crosshair(t_params p);
+void					draw_crosshair(t_params *p);
 int						render(t_params *p);
 void 					dda(t_params *params, t_ray *ray);
 void move_player(t_params *params, float direction);

@@ -145,7 +145,7 @@ void	draw_rays(t_params *p, t_minimap mm)
 			if (mm.block != '0' && mm.block != 'd' && (p->lights
 					|| (p->player->height <= 1.1 && p->player->height >= -0.1)))
 				break ;
-			put_pixel(*p, mm.heading_px_row, mm.heading_px_col, 0x550077);
+			put_pixel(p, mm.heading_px_row, mm.heading_px_col, 0x550077);
 			mm.heading_px_row += mm.dir_y;
 			mm.heading_px_col += mm.dir_x;
 		}
@@ -159,10 +159,10 @@ void	fill_grid(t_params *p, t_minimap mm)
 		{
 			if (px_row == 0 || px_row == mm.total_size - 1
 				|| px_col == 0 | px_col == mm.total_size - 1)
-				put_pixel(*p, px_row, px_col, 0x000000);
+				put_pixel(p, px_row, px_col, 0x000000);
 			else if ((px_row + mm.off_y) % mm.sq_size == 0 || (px_col
 					+ mm.off_x) % mm.sq_size == 0)
-				put_pixel(*p, px_row, px_col, 0xffffff);
+				put_pixel(p, px_row, px_col, 0xffffff);
 			mm.col_check = mm.pos_x - mm.mm_size / 2 + (px_col + mm.off_x)
 				/ mm.sq_size;
 			mm.row_check = mm.pos_y - mm.mm_size / 2 + (px_row + mm.off_y)
@@ -170,18 +170,18 @@ void	fill_grid(t_params *p, t_minimap mm)
 			if (mm.col_check < 0 || mm.row_check < 0
 				|| mm.col_check >= p->mwidth || mm.row_check >= p->mheight)
 			{
-				put_pixel(*p, px_row, px_col, 0x111111);
+				put_pixel(p, px_row, px_col, 0x111111);
 				continue ;
 			}
 			mm.block = p->map[mm.row_check][mm.col_check];
 			if (mm.block == 'a')
-				put_pixel(*p, px_row, px_col, 0x880000);
+				put_pixel(p, px_row, px_col, 0x880000);
 			if (mm.block != '0' && mm.block != 'd')
-				put_pixel(*p, px_row, px_col, 0xff0000);
+				put_pixel(p, px_row, px_col, 0xff0000);
 			if (px_col > mm.total_size / 2 - 2 && px_col < mm.total_size / 2 + 2
 				&& px_row > mm.total_size / 2 - 2 && px_row < mm.total_size / 2
 				+ 2)
-				put_pixel(*p, px_row, px_col, 0x00ffff);
+				put_pixel(p, px_row, px_col, 0x00ffff);
 		}
 	}
 }
@@ -205,7 +205,7 @@ void	draw_minimap(t_params *p)
 	mm.plane_y = mm.heading_x * mm.half_projection_plane_width;
 	for (int px_col = 0; px_col < mm.total_size; px_col++)
 		for (int px_row = 0; px_row < mm.total_size; px_row++)
-			put_pixel(*p, px_row, px_col, 0xa9a9a9);
+			put_pixel(p, px_row, px_col, 0xa9a9a9);
 	draw_rays(p, mm);
 	fill_grid(p, mm);
 }
@@ -232,7 +232,7 @@ int	render(t_params *p)
 	// draw_player(*p);
 	move(p);
 	draw_walls(p);
-	draw_crosshair(*p);
+	draw_crosshair(p);
 	draw_minimap(p);
 	mlx_put_image_to_window(p->mlx->ptr, p->mlx->win, p->mlx->img, 0, 0);
 	return (1);

@@ -14,12 +14,12 @@
 
 #define STEP 0.02
 
-void	put_pixel(t_params p, t_uint row, t_uint col, int colour)
+void	put_pixel(t_params *p, t_uint row, t_uint col, int colour)
 {
 	char	*px;
 
-	px = p.mlx->img_addr + row * p.mlx->line_sz + col * (p.mlx->bpp / 8);
-	*(t_uint *)px = mlx_get_color_value(p.mlx->ptr, colour);
+	px = p->mlx->img_addr + row * p->mlx->line_sz + col * (p->mlx->bpp / 8);
+	*(t_uint *)px = mlx_get_color_value(p->mlx->ptr, colour);
 }
 
 int	close_window(t_params *params)
@@ -313,7 +313,7 @@ int	mouse_move(int x, int y, t_params *params)
 	return (1);
 }
 
-void	draw_crosshair(t_params p)
+void	draw_crosshair(t_params *p)
 {
 	int	vert_center;
 	int	horiz_center;

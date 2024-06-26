@@ -36,6 +36,8 @@ int	close_window(t_params *params)
 	mlx_destroy_image(params->mlx->ptr, params->east);
 	mlx_destroy_image(params->mlx->ptr, params->west);
 	mlx_destroy_image(params->mlx->ptr, params->south);
+	mlx_destroy_image(params->mlx->ptr, params->spray);
+	mlx_destroy_image(params->mlx->ptr, params->door);
 	mlx_destroy_image(params->mlx->ptr, params->inner);
 	mlx_destroy_window(params->mlx->ptr, params->mlx->win);
 	mlx_destroy_display(params->mlx->ptr);

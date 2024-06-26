@@ -135,10 +135,10 @@ void draw_rays(t_params *p, t_minimap mm)
 				/ mm.sq_size;
 			mm.row_check = mm.pos_y - mm.mm_size / 2 + (mm.heading_px_row + mm.off_y)
 				/ mm.sq_size;
-			mm.block = p->map[mm.row_check][mm.col_check];
 			if (mm.col_check < 0 || mm.row_check < 0 || mm.col_check >= p->mwidth
 				|| mm.row_check >= p->mheight)
 				break ;
+			mm.block = p->map[mm.row_check][mm.col_check];
 			if (mm.block != '0' && mm.block != 'd' && (p->lights
 					|| (p->player->height <= 1.1 && p->player->height >= -0.1)))
 				break ;

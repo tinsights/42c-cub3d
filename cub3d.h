@@ -16,12 +16,12 @@
 # include "libft.h"
 # include <X11/X.h>
 # include <X11/keysym.h>
+# include <fcntl.h>
 # include <math.h>
 # include <mlx.h>
 # include <mlx_int.h>
 # include <stdbool.h>
-# include <stdio.h> // printf
-# include <fcntl.h>
+# include <stdio.h>
 
 # define WIN_WIDTH 1280
 # define WIN_HEIGHT 800
@@ -35,7 +35,7 @@
 # endif
 
 # ifndef DEBUG
-#  define DEBUG false
+#  define DEBUG 0
 # endif
 
 typedef unsigned int	t_uint;
@@ -43,29 +43,28 @@ typedef unsigned long	t_ulong;
 
 typedef struct s_mapdata
 {
-	t_list	*lst;
-	int	rows; //row size
-	int	rwidth; //same as col size
-} t_mapdata;
-
+	t_list				*lst;
+	int					rows;
+	int					rwidth;
+}						t_mapdata;
 
 typedef struct s_input
 {
-	char	*nxpm;
-	char	*sxpm;
-	char	*expm;
-	char	*wxpm;
-	int	fclr;
-	int	cclr;
-	double	heading;
-	char	nswe;//set to N S W or E
-	int	xpos;//xcoordinate of player
-	int	ypos;//ycoordinate of player
-	double	position[2];//replace xpos, ypos
-	int	mwidth;
-	int	mheight;
-	char	**map;
-} t_input;
+	char				*nxpm;
+	char				*sxpm;
+	char				*expm;
+	char				*wxpm;
+	int					fclr;
+	int					cclr;
+	double				heading;
+	char				nswe;
+	int					xpos;
+	int					ypos;
+	double				position[2];
+	int					mwidth;
+	int					mheight;
+	char				**map;
+}						t_input;
 
 typedef struct s_mlx
 {
@@ -81,16 +80,16 @@ typedef struct s_mlx
 typedef struct s_player
 {
 	double				position[2];
-	double				heading; // in rads
+	double				heading;
 	double				speed;
 	double				height;
 	double				vert_angle;
 	bool				god;
 
-	float					move_ws;
-	float					move_ad;
-	float					move_turn;
-	float					move_tilt;
+	float				move_ws;
+	float				move_ad;
+	float				move_turn;
+	float				move_tilt;
 }						t_player;
 
 typedef struct s_params
@@ -99,122 +98,126 @@ typedef struct s_params
 	t_input				input;
 	t_player			player;
 	int					clicked_px[2];
-	t_img				*inner;				
+	t_img				*inner;
 	t_img				*north;
 	t_img				*south;
 	t_img				*east;
 	t_img				*west;
 	t_img				*spray;
 	t_img				*door;
-	int				fclr;//floor
-	int				cclr;//ceiling
+	int					fclr;
+	int					cclr;
 	double				fov;
-	double				half_plane_width; // to be used
-	int				mwidth;
-	int				mheight;
+	double				half_plane_width;
+	int					mwidth;
+	int					mheight;
 	char				**map;
 	bool				lights;
 }						t_params;
 
-enum e_tex_type{wall, inner, spray, door};
+enum					e_tex_type
+{
+	wall,
+	inner,
+	spray,
+	door
+};
 
 typedef struct s_ray
 {
-	int id;
-	int col;
-	double dir_x;
-	double dir_y;
-	double dist_x;
-	double dist_y;
-	double delta_dist_x;
-	double delta_dist_y;
+	int					id;
+	int					col;
+	double				dir_x;
+	double				dir_y;
+	double				dist_x;
+	double				dist_y;
+	double				delta_dist_x;
+	double				delta_dist_y;
 
-	double projection_plane_x;
-	double perp_wall_dist;
-	
-	double plane_x;
-	double plane_y;
+	double				projection_plane_x;
+	double				perp_wall_dist;
 
-	int map_x;
-	int map_y;
+	double				plane_x;
+	double				plane_y;
 
-	int step_x;
-	int step_y;
+	int					map_x;
+	int					map_y;
+
+	int					step_x;
+	int					step_y;
 
 	double				heading_x;
 	double				heading_y;
 
-	bool hit;
-	bool side_x;
+	bool				hit;
+	bool				side_x;
 
-	int height;
-	t_img *img;
-	unsigned int	*img_data;
-	struct s_ray	*next;
+	int					height;
+	t_img				*img;
+	unsigned int		*img_data;
+	struct s_ray		*next;
 	enum e_tex_type		type;
-} t_ray;
+}						t_ray;
 
+typedef struct s_wall
+{
+	double				pos_x;
+	double				pos_y;
+	double				dist_to_pp;
+	double				ratio;
+	double				vert_shear;
+	int					actual_bottom;
+	int					actual_top;
+	int					bottom_of_wall;
+	int					top_of_wall;
 
-typedef struct s_wall {
-	double pos_x;
-	double pos_y;
-	double dist_to_pp;
-	double ratio;
-	double vert_shear;
-	int actual_bottom;
-	int actual_top;
-	int bottom_of_wall;
-	int top_of_wall;
-
-	double texture_slice;
-	double row_slice;
-	int tex_col;
-	int tex_row;
-	int true_line_height;
-	float dist;
-	int color;
-	double brightness;
-} t_wall;
+	double				texture_slice;
+	double				row_slice;
+	int					tex_col;
+	int					tex_row;
+	int					true_line_height;
+	float				dist;
+	int					color;
+	double				brightness;
+}						t_wall;
 
 typedef struct s_minimap
 {
-	int		sq_size;
-	int		mm_size;
-	int		total_size;
-	double	heading;
-	int		pos_y;
-	int		pos_x;
-	int		off_y;
-	int		off_x;
-	double	half_projection_plane_width;
-	double	heading_x;
-	double	heading_y;
-	double	plane_x;
-	double	plane_y;
-	double	dir_x;
-	double	dir_y;
-	double	heading_px_row;
-	double	heading_px_col;
-	int		col_check;
-	int		row_check;
-	char	block;
-	int		px_col;
-	int		px_row;
-}			t_minimap;
+	int					sq_size;
+	int					mm_size;
+	int					total_size;
+	double				heading;
+	int					pos_y;
+	int					pos_x;
+	int					off_y;
+	int					off_x;
+	double				half_projection_plane_width;
+	double				heading_x;
+	double				heading_y;
+	double				plane_x;
+	double				plane_y;
+	double				dir_x;
+	double				dir_y;
+	double				heading_px_row;
+	double				heading_px_col;
+	int					col_check;
+	int					row_check;
+	char				block;
+	int					px_col;
+	int					px_row;
+}						t_minimap;
 
 typedef struct s_move
 {
-	float	horiz_step;
-	float	vert_step;
-	float	new_height;
-	float	curr_y;
-	float	curr_x;
-	float	heading;
-	float	new_y;
-	float	new_x;
-}			t_move;
-
-
+	float				horiz_step;
+	float				vert_step;
+	float				new_height;
+	float				curr_y;
+	float				curr_x;
+	float				heading;
+	float				new_y;
+	float				new_x;
+}						t_move;
 
 int						key_hook(int keycode, t_params *params);
 int						close_window(t_params *params);
@@ -228,54 +231,44 @@ int						mouse_click(int button, int x, int y, t_params *params);
 int						key_release_hook(int keycode, t_params *params);
 void					draw_crosshair(t_params *p);
 int						render(t_params *p);
-void 					dda(t_params *params, t_ray *ray);
-void move_player(t_params *params, float direction);
-void strafe_player(t_params *params, float direction);
-void rotate_player(t_params *params, float degrees);
+void					dda(t_params *params, t_ray *ray);
+void					move_player(t_params *params, float direction);
+void					strafe_player(t_params *params, float direction);
+void					rotate_player(t_params *params, float degrees);
 
-bool is_wall(char c);
-int brightness_adj(int col, float brightness);
-void	draw_minimap(t_params *p);
+bool					is_wall(char c);
+int						brightness_adj(int col, float brightness);
+void					draw_minimap(t_params *p);
 
+int						parse_path_color(int fd, t_input *dat);
+int						read_line(int fd, char **line);
 
-//texture_color.c
-int	parse_path_color(int fd, t_input *dat);
-int	read_line(int fd, char **line);
+void					free_intarr(int **arr, int size);
+void					free_str(char **str);
+void					free_strarr(char **ptr);
+void					free_maplst(t_list **lst);
+void					free_xpmpath(t_input *dat);
 
-//memory_cleanup.c
-void	free_intarr(int **arr, int size);
-void	free_str(char **str);
-void	free_strarr(char **ptr);
-void	free_maplst(t_list **lst);
-void	free_xpmpath(t_input *dat);
+int						nondigits(char *str);
+int						validchr(char c, char *vchr);
+int						validstr(char *str, char *vchr);
+int						wcount(char **elem);
 
-//parse_utils.c
-int	nondigits(char *str);
-int	validchr(char c, char *vchr);
-int	validstr(char *str, char *vchr);
-int	wcount(char **elem);
+int						parse_map(int fd, t_input *dat);
 
-//map.c
-int	parse_map(int fd, t_input *dat);
+int						remove_nl(char **line);
+int						isemptyline(char *line);
+int						validate_spawn(const char *str, int row, t_input *dat);
 
-//map_utils.c
-int	remove_nl(char **line);
-int	isemptyline(char *line);
-int	validate_spawn(const char *str, int row, t_input *dat);
+int						isvalidborder(t_mapdata *mi, t_input *dat);
 
-//mapborder.c
-int	isvalidborder(t_mapdata *mi, t_input *dat);
+int						get_tmaplist(int fd, t_mapdata *mi);
+char					**tmap_to_array(t_mapdata *mi);
 
-//map_list.c
-int	get_tmaplist(int fd, t_mapdata *mi);
-char	**tmap_to_array(t_mapdata *mi);
-
-
-//print.c
-void	print_mi(t_mapdata *mi);
-void	print_lst(t_list *lst);
-void	print_input(t_input *dat);
-void	print_dblarr(char **arr);
-void	print_intarr(int **arr, int rows, int cols);
+void					print_mi(t_mapdata *mi);
+void					print_lst(t_list *lst);
+void					print_input(t_input *dat);
+void					print_dblarr(char **arr);
+void					print_intarr(int **arr, int rows, int cols);
 
 #endif

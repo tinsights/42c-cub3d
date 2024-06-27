@@ -62,7 +62,7 @@ static int	init_mapdata(t_mapdata *mi, int fd)
 	mi->rwidth = 0;
 	if (get_tmaplist(fd, mi) == -1)
 	{
-		get_next_line(fd, 1);
+		get_next_line(-1);
 		return (-1);
 	}
 	return (0);

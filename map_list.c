@@ -81,18 +81,19 @@ int	get_tmaplist(int fd, t_mapdata *mi)
 	t_list	*head;
 
 	head = NULL;
-	line = get_next_line(fd, 0);
+	line = get_next_line(fd);
 	while (line)
 	{
 		if (makelist(&head, line) == 0)
 			break ;
 		mi->rows++;
-		line = get_next_line(fd, 0);
+		line = get_next_line(fd);
 	}
 	if (line != NULL)
 	{
 		free_maplst(&head);
 		free_str(&line);
+		get_next_line(-1);
 		return (-1);
 	}
 	mi->lst = head;

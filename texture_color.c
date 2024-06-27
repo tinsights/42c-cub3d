@@ -114,12 +114,12 @@ int	parse_path_color(int fd, t_input *dat)
 
 	vcount = 0;
 	line = get_next_line(fd);
-	while(vcount < 6 && line)
+	while (vcount < 6 && line)
 	{
 		if (update_path_color(line, &vcount, dat) == -1)
 		{
 			get_next_line(-1);
-			break;
+			break ;
 		}
 		free_str(&line);
 		line = get_next_line(fd);

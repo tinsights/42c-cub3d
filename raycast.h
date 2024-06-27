@@ -13,7 +13,7 @@
 #ifndef RAYCAST_H
 # define RAYCAST_H
 
-#include "cub3d.h"
+# include "cub3d.h"
 
 void	reset_ray(t_ray *ray, t_player *player);
 void	direct_ray(t_ray *ray, t_player *player);
@@ -30,7 +30,8 @@ void	extend_ray(t_ray *ray, t_ray *next);
 void	ray_pierce(t_params *params, t_ray *ray);
 void	set_ray_img(t_params *params, t_ray *ray);
 void	paint_col(t_params *params, t_ray *ray, t_wall *wall, int px);
-void	get_wall_dimensions(t_params *params, t_player *player, t_ray *ray, t_wall *wall);
+void	get_wall_dimensions(t_params *params, t_player *player, t_ray *ray,
+			t_wall *wall);
 void	get_texture(t_ray *ray, t_wall *wall);
 int		brightness_adj(int col, float brightness);
 

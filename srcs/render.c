@@ -47,7 +47,7 @@ int	render(t_params *p)
 	draw_walls(p);
 	if (WIN_HEIGHT > 8 && WIN_WIDTH > 8)
 		draw_crosshair(p);
-	if (MM_SZ < WIN_HEIGHT && MM_SZ < WIN_WIDTH)
+	if (MM_SQ_SZ * MM_GRID_SZ < WIN_HEIGHT && MM_SQ_SZ * MM_GRID_SZ < WIN_WIDTH)
 		draw_minimap(p);
 	mlx_put_image_to_window(p->mlx.ptr, p->mlx.win, p->mlx.img, 0, 0);
 	return (1);

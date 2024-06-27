@@ -42,7 +42,7 @@ void	check_if_wall(t_params *params, t_ray *ray)
 	}
 	ray->type = wall;
 	if ((ray->map_y > 0 && ray->map_y < params->mheight
-		&& ray->map_x > 0 && ray->map_x < params->mwidth))
+			&& ray->map_x > 0 && ray->map_x < params->mwidth))
 		check_special(params, ray);
 }
 

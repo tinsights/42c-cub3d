@@ -8,6 +8,8 @@ LIBDIR = libft/
 LIBFT = $(LIBDIR)/libft.a
 
 MLXDIR = mlx/
+
+MLX_URL = git@github.com:42Paris/minilibx-linux.git
 MLX =  $(MLXDIR)/libmlx.a
 
 SRCS = main.c utils.c raycast.c parse_input.c \
@@ -23,14 +25,17 @@ OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(LIBFT) $(MLX) $(HDRS) Makefile
+$(NAME): $(MLX) $(OBJS) $(LIBFT) $(HDRS) Makefile
 	cc $(CFLAGS) $(OBJS) $(LIBFLAGS) $(INC) -o $(NAME)
+
+$(MLX):
+	@if [ ! -d $(MLXDIR) ]; then \
+		git clone $(MLX_URL) $(MLXDIR);\
+	fi
+	make -C $(MLXDIR)
 
 $(OBJS): $(SRCS) $(HDRS)
 	cc $(CFLAGS) -c $(SRCS) $(INC)
-	
-$(MLX):
-	make -C $(MLXDIR)
 
 $(LIBFT):
 	make -C $(LIBDIR)
@@ -42,7 +47,7 @@ clean:
 
 fclean: clean
 	$(MAKE) -C $(LIBDIR) fclean
-	#$(MAKE) -C $(MLXDIR) fclean
+	$(MAKE) -C $(MLXDIR) fclean
 	rm -f $(NAME)
 
 re: fclean all

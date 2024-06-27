@@ -11,10 +11,11 @@ MLXDIR = mlx/
 MLX =  $(MLXDIR)/libmlx.a
 
 SRCS = main.c utils.c raycast.c parse_input.c \
-	parse_utils.c texture_color.c map.c map_utils.c\
+	parse_utils.c texture_color.c map.c map_utils.c \
 	memory_cleanup.c \
-	mapborder.c print.c \
-	minimap.c 
+	mapborder.c \
+	minimap.c minimap_utils.c \
+	render.c
 HDRS = cub3d.h
 
 OBJS = $(SRCS:.c=.o)

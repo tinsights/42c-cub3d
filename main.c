@@ -12,6 +12,20 @@
 
 #include "cub3d.h"
 
+void 	get_data(char *mapfile, t_input	*dat);
+void	init_params(t_params *params);
+
+int	main(int argc, char *argv[])
+{
+	t_params	params;
+
+	if (argc != 2)
+		return (0);
+	get_data(argv[1], &(params.input));
+	init_params(&params);
+	mlx_loop(params.mlx.ptr);
+}
+
 void	init_player(t_params *params)
 {
 	params->player.position[0] = params->input.ypos + 0.5;
@@ -76,10 +90,6 @@ void	init_params(t_params *params)
 	init_mlx(params);
 	init_player(params);
 	get_textures(params);
-}
-
-void	init_hooks(t_params *params)
-{
 	mlx_hook(params->mlx.win, ButtonPress, ButtonPressMask, &mouse_click,
 		params);
 	mlx_hook(params->mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook,
@@ -89,47 +99,4 @@ void	init_hooks(t_params *params)
 	mlx_hook(params->mlx.win, KeyPress, KeyPressMask, &key_hook, params);
 	mlx_hook(params->mlx.win, DestroyNotify, 0L, &close_window, params);
 	mlx_loop_hook(params->mlx.ptr, render, params);
-}
-
-int	main(int argc, char *argv[])
-{
-	t_params	params;
-
-	if (argc != 2)
-		return (0);
-	get_data(argv[1], &(params.input));
-	init_params(&params);
-	init_hooks(&params);
-	mlx_loop(params.mlx.ptr);
-}
-
-void	draw_walls(t_params *p);
-
-
-
-
-void	look_up_down(t_params *params, int direction)
-{
-	if (direction > 0 && params->player.vert_angle < M_PI / 6)
-		params->player.vert_angle += M_PI / 180;
-	else if (direction < 0 && params->player.vert_angle > -M_PI / 6)
-		params->player.vert_angle -= M_PI / 180;
-}
-
-void	move(t_params *params)
-{
-	move_player(params, params->player.move_ws);
-	strafe_player(params, params->player.move_ad);
-	rotate_player(params, params->player.move_turn);
-	look_up_down(params, params->player.move_tilt);
-}
-
-int	render(t_params *p)
-{
-	move(p);
-	draw_walls(p);
-	draw_crosshair(p);
-	draw_minimap(p);
-	mlx_put_image_to_window(p->mlx.ptr, p->mlx.win, p->mlx.img, 0, 0);
-	return (1);
 }

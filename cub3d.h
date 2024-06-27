@@ -30,17 +30,13 @@
 #  define FOV 100.0
 # endif
 
+# ifndef STEP
+#  define STEP 0.02
+# endif
+
 # ifndef DEBUG
 #  define DEBUG false
 # endif
-
-/** for developing
- * to be replaced by input validation
- */
-# define MHEIGHT 8
-# define MWIDTH 11
-
-//extern char	map[MHEIGHT][MWIDTH];
 
 typedef unsigned int	t_uint;
 typedef unsigned long	t_ulong;
@@ -206,6 +202,20 @@ typedef struct s_minimap
 	int		px_row;
 }			t_minimap;
 
+typedef struct s_move
+{
+	float	horiz_step;
+	float	vert_step;
+	float	new_height;
+	float	curr_y;
+	float	curr_x;
+	float	heading;
+	float	new_y;
+	float	new_x;
+}			t_move;
+
+
+
 int						key_hook(int keycode, t_params *params);
 int						close_window(t_params *params);
 
@@ -227,11 +237,6 @@ bool is_wall(char c);
 int brightness_adj(int col, float brightness);
 void	draw_minimap(t_params *p);
 
-
-
-
-//parse_input.c
-void 	get_data(char *mapfile, t_input	*dat);
 
 //texture_color.c
 int	parse_path_color(int fd, t_input *dat);

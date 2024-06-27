@@ -66,7 +66,6 @@ static int	update_filepath(char **filepath, char *pathstr, int *vcount)
 	if (image == NULL)
 	{
 		mlx_destroy_display(mlx);
-		mlx_destroy_display(mlx);
 		free(mlx);
 		return (-1);
 	}

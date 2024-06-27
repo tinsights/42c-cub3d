@@ -19,6 +19,7 @@ SRCS = main.c utils.c raycast.c parse_input.c \
 	minimap.c minimap_utils.c \
 	move.c hooks.c features.c render.c \
 	raycast_utils.c dda_utils.c paint_utils.c
+
 HDRS = cub3d.h raycast.h
 
 OBJS = $(SRCS:.c=.o)
@@ -46,8 +47,7 @@ clean:
 	rm -f $(OBJS)
 
 fclean: clean
-	$(MAKE) -C $(LIBDIR) fclean
-	$(MAKE) -C $(MLXDIR) fclean
+	$(MAKE) -C $(LIBDIR) clean
 	rm -f $(NAME)
 
 re: fclean all

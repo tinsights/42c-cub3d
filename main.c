@@ -12,8 +12,9 @@
 
 #include "cub3d.h"
 
-void 	get_data(char *mapfile, t_input	*dat);
+void	get_data(char *mapfile, t_input	*dat);
 void	init_params(t_params *params);
+int		render(t_params *p);
 
 int	main(int argc, char *argv[])
 {

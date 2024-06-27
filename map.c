@@ -91,6 +91,7 @@ int	maplist(int fd, t_mapdata *mi)
 	{
 		free_maplst(&head);
 		free_str(&line);
+		line = get_next_line(-1);
 		return (-1);
 	}
 	mi->lst = head;

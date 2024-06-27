@@ -15,8 +15,9 @@ SRCS = main.c utils.c raycast.c parse_input.c \
 	memory_cleanup.c \
 	mapborder.c \
 	minimap.c minimap_utils.c \
-	render.c
-HDRS = cub3d.h
+	move.c hooks.c features.c render.c \
+	raycast_utils.c dda_utils.c paint_utils.c
+HDRS = cub3d.h raycast.h
 
 OBJS = $(SRCS:.c=.o)
 

@@ -14,7 +14,9 @@
 
 bool	is_wall(char c)
 {
-	return (c == '1' || c == '2' || c == 'D' || c == 'a');
+	return (c == '1' || c == '2'
+	|| c == 'D' || c == 'a'
+	|| c == 't' || c== 'T');
 }
 
 void	inner_wall(t_params *params, t_ray *ray)

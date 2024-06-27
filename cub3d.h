@@ -99,9 +99,9 @@ typedef struct s_player
 
 typedef struct s_params
 {
-	t_mlx				*mlx;
-	t_input				*input;
-	t_player			*player;
+	t_mlx				mlx;
+	t_input				input;
+	t_player			player;
 	int					clicked_px[2];
 	t_img				*inner;				
 	t_img				*north;
@@ -125,7 +125,7 @@ enum e_tex_type{wall, inner, spray, door};
 typedef struct s_ray
 {
 	int id;
-	int col; //pixel col;
+	int col;
 	double dir_x;
 	double dir_y;
 	double dist_x;
@@ -163,8 +163,8 @@ typedef struct s_wall {
 	double pos_x;
 	double pos_y;
 	double dist_to_pp;
-	double ratio; // no need ?
-	double vert_shear; // no need?
+	double ratio;
+	double vert_shear;
 	int actual_bottom;
 	int actual_top;
 	int bottom_of_wall;
@@ -179,6 +179,32 @@ typedef struct s_wall {
 	int color;
 	double brightness;
 } t_wall;
+
+typedef struct s_minimap
+{
+	int		sq_size;
+	int		mm_size;
+	int		total_size;
+	double	heading;
+	int		pos_y;
+	int		pos_x;
+	int		off_y;
+	int		off_x;
+	double	half_projection_plane_width;
+	double	heading_x;
+	double	heading_y;
+	double	plane_x;
+	double	plane_y;
+	double	dir_x;
+	double	dir_y;
+	double	heading_px_row;
+	double	heading_px_col;
+	int		col_check;
+	int		row_check;
+	char	block;
+	int		px_col;
+	int		px_row;
+}			t_minimap;
 
 int						key_hook(int keycode, t_params *params);
 int						close_window(t_params *params);

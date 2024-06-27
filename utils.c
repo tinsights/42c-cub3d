@@ -18,33 +18,32 @@ void	put_pixel(t_params *p, t_uint row, t_uint col, int colour)
 {
 	char	*px;
 
-	px = p->mlx->img_addr + row * p->mlx->line_sz + col * (p->mlx->bpp / 8);
-	*(t_uint *)px = mlx_get_color_value(p->mlx->ptr, colour);
+	px = p->mlx.img_addr + row * p->mlx.line_sz + col * (p->mlx.bpp / 8);
+	*(t_uint *)px = mlx_get_color_value(p->mlx.ptr, colour);
 }
 
 int	close_window(t_params *params)
 {
-	mlx_do_key_autorepeaton(params->mlx->ptr);
-	free_strarr(params->input->map);
-	free(params->input->nxpm);
-	free(params->input->sxpm);
-	free(params->input->expm);
-	free(params->input->wxpm);
-	free(params->input);
-	mlx_destroy_image(params->mlx->ptr, params->mlx->img);
-	mlx_destroy_image(params->mlx->ptr, params->north);
-	mlx_destroy_image(params->mlx->ptr, params->east);
-	mlx_destroy_image(params->mlx->ptr, params->west);
-	mlx_destroy_image(params->mlx->ptr, params->south);
+	mlx_do_key_autorepeaton(params->mlx.ptr);
+	free_strarr(params->input.map);
+	free(params->input.nxpm);
+	free(params->input.sxpm);
+	free(params->input.expm);
+	free(params->input.wxpm);
+	mlx_destroy_image(params->mlx.ptr, params->mlx.img);
+	mlx_destroy_image(params->mlx.ptr, params->north);
+	mlx_destroy_image(params->mlx.ptr, params->east);
+	mlx_destroy_image(params->mlx.ptr, params->west);
+	mlx_destroy_image(params->mlx.ptr, params->south);
 	if (params->spray)
-		mlx_destroy_image(params->mlx->ptr, params->spray);
+		mlx_destroy_image(params->mlx.ptr, params->spray);
 	if (params->door)
-		mlx_destroy_image(params->mlx->ptr, params->door);
+		mlx_destroy_image(params->mlx.ptr, params->door);
 	if (params->inner)
-		mlx_destroy_image(params->mlx->ptr, params->inner);
-	mlx_destroy_window(params->mlx->ptr, params->mlx->win);
-	mlx_destroy_display(params->mlx->ptr);
-	free(params->mlx->ptr);
+		mlx_destroy_image(params->mlx.ptr, params->inner);
+	mlx_destroy_window(params->mlx.ptr, params->mlx.win);
+	mlx_destroy_display(params->mlx.ptr);
+	free(params->mlx.ptr);
 	exit(1);
 	return (1);
 }
@@ -53,7 +52,7 @@ void	rotate_player(t_params *params, float degrees)
 {
 	t_player	*player;
 
-	player = params->player;
+	player = &(params->player);
 	player->heading += M_PI / 180 * degrees;
 }
 
@@ -61,7 +60,7 @@ bool	explorable(t_params *params, double y, double x)
 {
 	if (x < 0 || x > params->mwidth || y < 0 || y > params->mheight)
 		return (false);
-	return (params->player->god || !is_wall(params->map[(int)y][(int)x]));
+	return (params->player.god || !is_wall(params->map[(int)y][(int)x]));
 }
 
 typedef struct s_move
@@ -81,7 +80,7 @@ void	move_player(t_params *params, float direction)
 	t_player	*player;
 	t_move		move;
 
-	player = params->player;
+	player = &(params->player);
 	move.horiz_step = STEP * cos(player->vert_angle);
 	move.vert_step = STEP * -sin(player->vert_angle);
 	move.new_height = player->height + move.vert_step * direction;
@@ -109,7 +108,7 @@ void	strafe_player(t_params *params, float direction)
 	t_player	*player;
 	t_move		move;
 
-	player = params->player;
+	player = &(params->player);
 	move.curr_y = player->position[0];
 	move.curr_x = player->position[1];
 	move.heading = player->heading;
@@ -134,7 +133,7 @@ void	spraypaint(t_params *params)
 	int			map_x;
 	int			map_y;
 
-	player = params->player;
+	player = &(params->player);
 	heading = player->heading;
 	map_x = player->position[1] + sin(heading);
 	map_y = player->position[0] - cos(heading);
@@ -155,7 +154,7 @@ void	toggle_door(t_params *params)
 	int			map_x;
 	int			map_y;
 
-	player = params->player;
+	player = &(params->player);
 	heading = player->heading;
 	map_x = player->position[1] + sin(heading);
 	map_y = player->position[0] - cos(heading);
@@ -176,36 +175,36 @@ void	translate_player(t_player *player, float delta)
 void	move_keys(int keycode, t_params *params)
 {
 	if (keycode == XK_w)
-		params->player->move_ws = -1;
+		params->player.move_ws = -1;
 	else if (keycode == XK_a)
-		params->player->move_ad = -1;
+		params->player.move_ad = -1;
 	else if (keycode == XK_s)
-		params->player->move_ws = 1;
+		params->player.move_ws = 1;
 	else if (keycode == XK_d)
-		params->player->move_ad = 1;
+		params->player.move_ad = 1;
 	else if (keycode == XK_Left)
-		params->player->move_turn = -1;
+		params->player.move_turn = -1;
 	else if (keycode == XK_Right)
-		params->player->move_turn = 1;
+		params->player.move_turn = 1;
 	else if (keycode == XK_KP_Add)
 		params->fov += M_PI / 30;
 	else if (keycode == XK_KP_Subtract)
 		params->fov -= M_PI / 30;
 	else if (keycode == XK_Up)
-		params->player->move_tilt = 1;
+		params->player.move_tilt = 1;
 	else if (keycode == XK_Down)
-		params->player->move_tilt = -1;
+		params->player.move_tilt = -1;
 	else if (keycode == XK_Control_L)
-		translate_player(params->player, -0.25);
+		translate_player(&(params->player), -0.25);
 	else if (keycode == XK_space)
-		translate_player(params->player, 0.25);
+		translate_player(&(params->player), 0.25);
 }
 
 int	key_hook(int keycode, t_params *params)
 {
 	t_player	*player;
 
-	player = params->player;
+	player = &(params->player);
 	if (keycode == XK_Escape)
 		return (close_window(params));
 	else if (keycode == XK_w || keycode == XK_W || keycode == XK_a
@@ -228,21 +227,21 @@ int	key_hook(int keycode, t_params *params)
 int	key_release_hook(int keycode, t_params *params)
 {
 	if (keycode == XK_w)
-		params->player->move_ws = 0;
+		params->player.move_ws = 0;
 	else if (keycode == XK_a)
-		params->player->move_ad = 0;
+		params->player.move_ad = 0;
 	else if (keycode == XK_s)
-		params->player->move_ws = 0;
+		params->player.move_ws = 0;
 	else if (keycode == XK_d)
-		params->player->move_ad = 0;
+		params->player.move_ad = 0;
 	else if (keycode == XK_Left)
-		params->player->move_turn = 0;
+		params->player.move_turn = 0;
 	else if (keycode == XK_Right)
-		params->player->move_turn = 0;
+		params->player.move_turn = 0;
 	else if (keycode == XK_Up)
-		params->player->move_tilt = 0;
+		params->player.move_tilt = 0;
 	else if (keycode == XK_Down)
-		params->player->move_tilt = 0;
+		params->player.move_tilt = 0;
 	return (1);
 }
 
@@ -254,7 +253,7 @@ void	build_wall(t_params *params)
 	int			map_y;
 	char		grid;
 
-	player = params->player;
+	player = &(params->player);
 	heading = player->heading;
 	map_x = player->position[1] + sin(heading);
 	map_y = player->position[0] - cos(heading);
@@ -304,12 +303,12 @@ int	mouse_move(int x, int y, t_params *params)
 	double		heading_delta;
 	double		vert_delta;
 
-	player = params->player;
+	player = &(params->player);
 	x_delta = x - params->clicked_px[0];
 	y_delta = y - params->clicked_px[1];
 	heading_delta = (double)x_delta / WIN_WIDTH * tan(params->fov / 2.0);
 	vert_delta = (double)y_delta / WIN_WIDTH * tan(params->fov / 2.0);
-	params->player->heading += 4.0 * heading_delta;
+	params->player.heading += 4.0 * heading_delta;
 	player->vert_angle -= 4.0 * vert_delta;
 	params->clicked_px[0] = x;
 	params->clicked_px[1] = y;

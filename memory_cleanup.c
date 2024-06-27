@@ -26,8 +26,6 @@ void	free_xpmpath(t_input *dat)
 	dat->sxpm = NULL;
 	dat->expm = NULL;
 	dat->wxpm = NULL;
-	if (dat)
-		free(dat);
 	dat = NULL;
 }
 

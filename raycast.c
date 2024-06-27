@@ -69,7 +69,7 @@ bool	is_wall(char c)
 	return (c == '1' || c == '2' || c == 'D' || c == 'a');
 }
 
-void set_ray_img(t_params *params, t_ray *ray)
+void	set_ray_img(t_params *params, t_ray *ray)
 {
 	if (ray->side_x)
 	{
@@ -93,7 +93,7 @@ void	inner_wall(t_params *params, t_ray *ray)
 	{
 		ray->hit = true;
 		if (params->inner)
-			ray->type = inner;
+			ray->img = params->inner;
 		else
 			set_ray_img(params, ray);
 		if (ray->dist_x < ray->dist_y)
@@ -125,7 +125,7 @@ void	increment_ray(t_ray *ray)
 	}
 }
 
-void check_special(t_params *params, t_ray *ray)
+void	check_special(t_params *params, t_ray *ray)
 {
 	if (params->map[ray->map_y][ray->map_x] == 't'
 		|| params->map[ray->map_y][ray->map_x] == 'T')
@@ -136,13 +136,14 @@ void check_special(t_params *params, t_ray *ray)
 	}
 	else if (params->map[ray->map_y][ray->map_x] == 'D')
 	{
-		if(params->door)
+		if (params->door)
 			ray->img = params->door;
-		ray->type = spray;
+		ray->type = door;
 	}
 	if (params->map[ray->map_y][ray->map_x] == 'd')
 		ray->hit = false;
 }
+
 void	check_if_wall(t_params *params, t_ray *ray)
 {
 	if (params->map[ray->map_y][ray->map_x] != '0')
@@ -194,7 +195,7 @@ void	ray_pierce(t_params *params, t_ray *ray)
 	{
 		next = ft_calloc(1, sizeof(t_ray));
 		extend_ray(ray, next);
-		if (ray->type == inner)
+		if (ray->img == params->inner)
 		{
 			if (ray->side_x)
 				next->map_x += ray->step_x;
@@ -209,8 +210,8 @@ void	dda(t_params *params, t_ray *ray)
 {
 	inner_wall(params, ray);
 	cast_to_wall(params, ray);
-	if (!params->lights && (params->player->height > 1.0
-			|| params->player->height < 0))
+	if (!params->lights && (params->player.height > 1.0
+			|| params->player.height < 0))
 		ray_pierce(params, ray);
 }
 
@@ -325,7 +326,7 @@ void	draw_walls(t_params *params)
 	t_ray		ray;
 	int			col;
 
-	player = params->player;
+	player = &(params->player);
 	ray.heading_x = sin(player->heading);
 	ray.heading_y = -cos(player->heading);
 	params->half_plane_width = tan(params->fov / 2.0);

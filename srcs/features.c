@@ -54,24 +54,29 @@ void	build_wall(t_params *params)
 {
 	t_player	*player;
 	double		heading;
-	int			map_x;
-	int			map_y;
+	float		map_x;
+	float		map_y;
 	char		grid;
 
 	player = &(params->player);
 	heading = player->heading;
 	map_x = player->position[1] + sin(heading);
 	map_y = player->position[0] - cos(heading);
-	grid = params->map[map_y][map_x];
-	if (grid == '0')
+	if (params->map[(int) map_y][(int)map_x] == '0')
 	{
 		map_x += sin(heading);
 		map_y -= cos(heading);
+		grid = params->map[(int) map_y][(int)map_x];
+		if (is_wall(grid) && grid != '2')
+		{
+			map_x -= sin(heading);
+			map_y += cos(heading);
+		}
 	}
-	if (params->map[map_y][map_x] == '0')
-		params->map[map_y][map_x] = '2';
-	else if (params->map[map_y][map_x] == '2')
-		params->map[map_y][map_x] = '0';
+	if (params->map[(int) map_y][(int)map_x] == '0')
+		params->map[(int) map_y][(int)map_x] = '2';
+	else if (params->map[(int) map_y][(int)map_x] == '2')
+		params->map[(int) map_y][(int)map_x] = '0';
 }
 
 void	translate_player(t_player *player, float delta)

@@ -49,7 +49,7 @@ clean:
 	rm -f $(OBJS)
 
 fclean: clean
-	$(MAKE) -C $(LIBDIR) clean
+	$(MAKE) -C $(LIBDIR) fclean
 	rm -f $(NAME)
 
 re: fclean all

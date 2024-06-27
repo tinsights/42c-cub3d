@@ -12,34 +12,12 @@
 
 #include "cub3d.h"
 
-void	init_params(t_params *params)
+void	init_player(t_params *params)
 {
-	int			width;
-	int			height;
-	
-	params->map = params->input.map;
-	params->mwidth = params->input.mwidth;
-	params->mheight = params->input.mheight;
-	/* -------------------------------------------------------------------------- */
-	/*                                  MLX INIT                                  */
-	/* -------------------------------------------------------------------------- */
-	// params->mlx = &mlx;
-	params->mlx.ptr = mlx_init();
-	params->mlx.win = mlx_new_window(params->mlx.ptr, WIN_WIDTH, WIN_HEIGHT, "cub3d");
-	params->mlx.img = mlx_new_image(params->mlx.ptr, WIN_WIDTH, WIN_HEIGHT);
-	if (!params->mlx.ptr || !params->mlx.win || !params->mlx.img)
-		ft_putstr_fd("Error initialising mlx\n", 2);
-	params->mlx.img_addr = mlx_get_data_addr(params->mlx.img, &params->mlx.bpp, &params->mlx.line_sz,
-			&params->mlx.endian);
-	/* -------------------------------------------------------------------------- */
-	/*                           PLAYER AND PARAMS INIT                           */
-	/* -------------------------------------------------------------------------- */
-	params->fov = FOV / 180.0 * M_PI;
-	params->lights = false;
 	params->player.position[0] = params->input.ypos + 0.5;
 	params->player.position[1] = params->input.xpos + 0.5;
 	params->player.heading = params->input.heading;
-	params->player.height = 0.5; // 10
+	params->player.height = 0.5;
 	params->player.vert_angle = 0.0;
 	params->player.speed = 1.0;
 	params->player.god = false;
@@ -47,55 +25,106 @@ void	init_params(t_params *params)
 	params->player.move_ws = 0;
 	params->player.move_tilt = 0;
 	params->player.move_turn = 0;
-	/* -------------------------------------------------------------------------- */
-	/*                                TEXTURE INIT                                */
-	/* -------------------------------------------------------------------------- */
-	params->inner = mlx_xpm_file_to_image(params->mlx.ptr, "./incs/hallway.xpm", &width,
-											&height);
-	params->spray = mlx_xpm_file_to_image(params->mlx.ptr, "./incs/42sg.xpm", &width,
-											&height);
-	params->door = mlx_xpm_file_to_image(params->mlx.ptr, "./incs/tunnelv2.xpm", &width,
-			&height);
-	params->north = mlx_xpm_file_to_image(params->mlx.ptr, params->input.nxpm, &width, &height);
-	params->south = mlx_xpm_file_to_image(params->mlx.ptr, params->input.sxpm, &width, &height);
-	params->east = mlx_xpm_file_to_image(params->mlx.ptr, params->input.expm, &width, &height);
-	params->west = mlx_xpm_file_to_image(params->mlx.ptr, params->input.wxpm, &width, &height);
+}
+
+void	init_mlx(t_params *params)
+{
+	params->mlx.ptr = mlx_init();
+	params->mlx.win = mlx_new_window(params->mlx.ptr, WIN_WIDTH, WIN_HEIGHT,
+			"cub3d");
+	params->mlx.img = mlx_new_image(params->mlx.ptr, WIN_WIDTH, WIN_HEIGHT);
+	if (!params->mlx.ptr || !params->mlx.win || !params->mlx.img)
+	{
+		ft_putstr_fd("Error initialising mlx\n", 2);
+		exit(EXIT_FAILURE);
+	}
+	params->mlx.img_addr = mlx_get_data_addr(params->mlx.img, &params->mlx.bpp,
+			&params->mlx.line_sz, &params->mlx.endian);
+}
+
+void	get_textures(t_params *params)
+{
+	int	height;
+	int	width;
+
+	params->inner = mlx_xpm_file_to_image(params->mlx.ptr, "./incs/hallway.xpm",
+			&width, &height);
+	params->spray = mlx_xpm_file_to_image(params->mlx.ptr, "./incs/42sg.xpm",
+			&width, &height);
+	params->door = mlx_xpm_file_to_image(params->mlx.ptr, "./incs/tunnelv2.xpm",
+			&width, &height);
+	params->north = mlx_xpm_file_to_image(params->mlx.ptr, params->input.nxpm,
+			&width, &height);
+	params->south = mlx_xpm_file_to_image(params->mlx.ptr, params->input.sxpm,
+			&width, &height);
+	params->east = mlx_xpm_file_to_image(params->mlx.ptr, params->input.expm,
+			&width, &height);
+	params->west = mlx_xpm_file_to_image(params->mlx.ptr, params->input.wxpm,
+			&width, &height);
 	params->fclr = params->input.fclr;
 	params->cclr = params->input.cclr;
+}
+
+void	init_params(t_params *params)
+{
+	params->map = params->input.map;
+	params->mwidth = params->input.mwidth;
+	params->mheight = params->input.mheight;
+	params->fov = FOV / 180.0 * M_PI;
+	params->lights = false;
+	init_mlx(params);
+	init_player(params);
+	get_textures(params);
 }
 
 int	main(int argc, char *argv[])
 {
 	t_params	params;
 
-
-
 	if (argc != 2)
 		return (0);
 	get_data(argv[1], &(params.input));
-
 	init_params(&params);
-	/* -------------------------------------------------------------------------- */
-	/*                              MLX HOOK AND LOOP                             */
-	/* -------------------------------------------------------------------------- */
-	mlx_do_key_autorepeatoff(params.mlx.ptr); // does this do anything?
-	mlx_hook(params.mlx.win, ButtonPress, ButtonPressMask, &mouse_click, &params);
-	mlx_hook(params.mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook, &params);
-	mlx_hook(params.mlx.win, MotionNotify, Button2MotionMask, &mouse_move, &params);
-	mlx_hook(params.mlx.win, KeyPress, KeyPressMask, &key_hook, (void *)&params);
+	mlx_do_key_autorepeatoff(params.mlx.ptr);
+	mlx_hook(params.mlx.win, ButtonPress, ButtonPressMask, &mouse_click,
+		&params);
+	mlx_hook(params.mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook,
+		&params);
+	mlx_hook(params.mlx.win, MotionNotify, Button2MotionMask, &mouse_move,
+		&params);
+	mlx_hook(params.mlx.win, KeyPress, KeyPressMask, &key_hook,
+		(void *)&params);
 	mlx_hook(params.mlx.win, DestroyNotify, 0L, &close_window, (void *)&params);
 	render(&params);
 	mlx_loop_hook(params.mlx.ptr, render, &params);
 	mlx_loop(params.mlx.ptr);
 }
 
-void		draw_walls(t_params *p);
+void	draw_walls(t_params *p);
+
+bool	hit_wall(t_params *p, t_minimap *mm)
+{
+	mm->col_check = mm->pos_x - mm->mm_size / 2 + (mm->heading_px_col
+			+ mm->off_x) / mm->sq_size;
+	mm->row_check = mm->pos_y - mm->mm_size / 2 + (mm->heading_px_row
+			+ mm->off_y) / mm->sq_size;
+	if (mm->col_check < 0 || mm->row_check < 0
+		|| mm->col_check >= p->mwidth || mm->row_check >= p->mheight)
+		return (true);
+	mm->block = p->map[mm->row_check][mm->col_check];
+	if (mm->block != '0' && mm->block != 'd' && (p->lights
+			|| (p->player.height <= 1.1 && p->player.height >= -0.1)))
+		return (true);
+	return (false);
+}
 
 void	draw_rays(t_params *p, t_minimap *mm)
 {
 	double	projection_plane_x;
+	int		ray;
 
-	for (int ray = -WIN_WIDTH / 2; ray < WIN_WIDTH / 2; ray++)
+	ray = -WIN_WIDTH / 2;
+	while (ray < WIN_WIDTH / 2)
 	{
 		projection_plane_x = 2.0 * (double)ray / (WIN_WIDTH - 1);
 		mm->dir_x = mm->heading_x + projection_plane_x * mm->plane_x;
@@ -105,29 +134,21 @@ void	draw_rays(t_params *p, t_minimap *mm)
 		while (mm->heading_px_col < mm->total_size && mm->heading_px_col > 0
 			&& mm->heading_px_row > 0 && mm->heading_px_row < mm->total_size)
 		{
-			mm->col_check = mm->pos_x - mm->mm_size / 2 + (mm->heading_px_col
-					+ mm->off_x) / mm->sq_size;
-			mm->row_check = mm->pos_y - mm->mm_size / 2 + (mm->heading_px_row
-					+ mm->off_y) / mm->sq_size;
-			if (mm->col_check < 0 || mm->row_check < 0
-				|| mm->col_check >= p->mwidth || mm->row_check >= p->mheight)
-				break ;
-			mm->block = p->map[mm->row_check][mm->col_check];
-			if (mm->block != '0' && mm->block != 'd' && (p->lights
-					|| (p->player.height <= 1.1 && p->player.height >= -0.1)))
+			if (hit_wall(p, mm))
 				break ;
 			put_pixel(p, mm->heading_px_row, mm->heading_px_col, 0x550077);
 			mm->heading_px_row += mm->dir_y;
 			mm->heading_px_col += mm->dir_x;
 		}
+		ray++;
 	}
 }
 
 void	paint_player(t_params *p, t_minimap *mm)
 {
-	if (mm->px_col > mm->total_size / 2 - 2 && mm->px_col < mm->total_size / 2 + 2
-	&& mm->px_row > mm->total_size / 2 - 2 && mm->px_row < mm->total_size / 2
-	+ 2)
+	if (mm->px_col > mm->total_size / 2 - 2 && mm->px_col < mm->total_size / 2
+		+ 2 && mm->px_row > mm->total_size / 2 - 2
+		&& mm->px_row < mm->total_size / 2 + 2)
 		put_pixel(p, mm->px_row, mm->px_col, 0x00ffff);
 }
 
@@ -146,8 +167,8 @@ bool	unbounded(t_params *p, t_minimap *mm)
 		/ mm->sq_size;
 	mm->row_check = mm->pos_y - mm->mm_size / 2 + (mm->px_row + mm->off_y)
 		/ mm->sq_size;
-	if (mm->col_check < 0 || mm->row_check < 0
-		|| mm->col_check >= p->mwidth || mm->row_check >= p->mheight)
+	if (mm->col_check < 0 || mm->row_check < 0 || mm->col_check >= p->mwidth
+		|| mm->row_check >= p->mheight)
 	{
 		put_pixel(p, mm->px_row, mm->px_col, 0x111111);
 		return (true);
@@ -164,6 +185,7 @@ void	paint_grid(t_params *p, t_minimap *mm)
 			+ mm->off_x) % mm->sq_size == 0)
 		put_pixel(p, mm->px_row, mm->px_col, 0xffffff);
 }
+
 void	fill_grid(t_params *p, t_minimap *mm)
 {
 	mm->px_col = -1;

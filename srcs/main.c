@@ -63,11 +63,11 @@ void	get_textures(t_params *params)
 	int	height;
 	int	width;
 
-	params->inner = mlx_xpm_file_to_image(params->mlx.ptr, "./incs/hallway.xpm",
+	params->inner = mlx_xpm_file_to_image(params->mlx.ptr, INNER_TEXTURE,
 			&width, &height);
-	params->spray = mlx_xpm_file_to_image(params->mlx.ptr, "./incs/42sg.xpm",
+	params->spray = mlx_xpm_file_to_image(params->mlx.ptr, SPRAY_TEXTURE,
 			&width, &height);
-	params->door = mlx_xpm_file_to_image(params->mlx.ptr, "./incs/tunnelv2.xpm",
+	params->door = mlx_xpm_file_to_image(params->mlx.ptr, DOOR_TEXTURE,
 			&width, &height);
 	params->north = mlx_xpm_file_to_image(params->mlx.ptr, params->input.nxpm,
 			&width, &height);

@@ -38,6 +38,10 @@
 #  define DEBUG 0
 # endif
 
+# define INNER_TEXTURE "./incs/textures/hallway.xpm"
+# define DOOR_TEXTURE "./incs/textures/tunnelv2.xpm"
+# define SPRAY_TEXTURE "./incs/textures/42sg.xpm"
+
 typedef unsigned int	t_uint;
 typedef unsigned long	t_ulong;
 

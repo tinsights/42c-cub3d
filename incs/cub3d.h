@@ -25,6 +25,9 @@
 
 # define WIN_WIDTH 1280
 # define WIN_HEIGHT 800
+# define MM_SQ_SZ 15
+# define MM_GRID_SZ 8
+# define MM_SZ MM_SQ_SZ * MM_GRID_SZ
 
 # ifndef FOV
 #  define FOV 100.0

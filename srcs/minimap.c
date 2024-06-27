@@ -63,7 +63,7 @@ void	fill_grid(t_params *p, t_minimap *mm)
 
 void	init_minimap(t_params *p, t_minimap *mm)
 {
-	mm->sq_size = 20;
+	mm->sq_size = 15;
 	mm->mm_size = 8;
 	mm->total_size = mm->sq_size * mm->mm_size;
 	mm->heading = p->player.heading;

@@ -33,13 +33,17 @@ void	check_special(t_params *params, t_ray *ray)
 
 void	check_if_wall(t_params *params, t_ray *ray)
 {
-	if (params->map[ray->map_y][ray->map_x] != '0')
+	if (ray->map_y < 0 || ray->map_y >= params->mheight
+		|| ray->map_x < 0 || ray->map_x >= params->mwidth
+		|| params->map[ray->map_y][ray->map_x] != '0')
 	{
 		ray->hit = true;
 		set_ray_img(params, ray);
 	}
 	ray->type = wall;
-	check_special(params, ray);
+	if ((ray->map_y > 0 && ray->map_y < params->mheight
+		&& ray->map_x > 0 && ray->map_x < params->mwidth))
+		check_special(params, ray);
 }
 
 void	cast_to_wall(t_params *params, t_ray *ray)

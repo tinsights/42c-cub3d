@@ -130,16 +130,16 @@ int	parse_path_color(int fd, t_input *dat)
 	char	*line;
 
 	vcount = 0;
-	line = get_next_line(fd, 0);
+	line = get_next_line(fd);
 	while(vcount < 6 && line) //Until 6 TypeIDs are counted
 	{
 		if (validate_path_color(line, &vcount, dat) == -1)
 		{
-			get_next_line(fd, 1); //to clear the static buffer in gnl
+			get_next_line(-1); //to clear the static buffer in gnl
 			break;
 		}
 		free_str(&line);
-		line = get_next_line(fd, 0);
+		line = get_next_line(fd);
 	}
 	free_str(&line);
 	if (vcount < 6) // NOt have 6 Typeids 

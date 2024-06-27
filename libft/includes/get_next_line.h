@@ -24,7 +24,6 @@
 int		gnl_strlen(const char *s);
 char	*gnl_calloc(int n);
 void	gnl_bzero(char *s, int size);
-//char	*get_next_line(int fd);
-char	*get_next_line(int fd, int lastcall);
+char	*get_next_line(int fd);
 
 #endif

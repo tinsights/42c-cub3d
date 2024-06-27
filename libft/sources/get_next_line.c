@@ -12,7 +12,6 @@
 
 #include "get_next_line.h"
 #include "libft.h"
-#include <stdio.h>
 
 int	init(char **store, char **buff, char **result)
 {
@@ -90,14 +89,13 @@ int	meat_and_potatoes(char **buff, char **store, char **result)
 	return (0);
 }
 
-//char	*get_next_line(int fd)
-char	*get_next_line(int fd, int lastcall)
+char	*get_next_line(int fd)
 {
 	char		*buff;
 	char		*result;
 	static char	*store;
-printf("TEST TINESH gnl [%d]>>>>>>>>>>>\n",lastcall);
-	if (fd < 0 || !init(&store, &buff, &result) || lastcall)//to clear store when cub3d invalid
+
+	if (fd < 0 || !init(&store, &buff, &result))
 	{
 		ft_free((void **) &store);
 		return (NULL);
@@ -119,37 +117,3 @@ printf("TEST TINESH gnl [%d]>>>>>>>>>>>\n",lastcall);
 	free(result);
 	return (NULL);
 }
-
-// #include <stdio.h>
-// int	main(void)
-// {
-// 	int fd;
-
-// 	fd = open("file.txt", O_RDONLY);
-
-// 	char *result = get_next_line(fd);
-// 	printf("s1: %s", result);
-// 	free(result);
-
-// 	result = get_next_line(fd);
-// 	printf("s2: %s", result);
-// 	if (result)
-// 		free(result);
-
-// 	result = get_next_line(fd);
-// 	printf("s3: %s", result);
-// 	if (result)
-// 		free(result);
-
-// 	result = get_next_line(fd);
-// 	printf("s4: %s", result);
-// 	if (result)
-// 		free(result);
-
-// 	result = get_next_line(fd);
-// 	printf("s5: %s", result);
-// 	if (result)
-// 		free(result);
-
-// 	close(fd);
-// }

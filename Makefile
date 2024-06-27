@@ -12,10 +12,10 @@ MLX =  $(MLXDIR)/libmlx.a
 
 SRCS = main.c utils.c raycast.c parse_input.c \
 	parse_utils.c texture_color.c map.c map_utils.c\
-	memory_cleanup.c get_next_line/get_next_line.c \
-	mapborder.c print.c\
-		get_next_line/get_next_line_utils.c
-HDRS = cub3d.h ./get_next_line/get_next_line.h
+	memory_cleanup.c \
+	mapborder.c print.c \
+	minimap.c 
+HDRS = cub3d.h
 
 OBJS = $(SRCS:.c=.o)
 
@@ -24,11 +24,8 @@ all: $(NAME)
 $(NAME): $(OBJS) $(LIBFT) $(MLX) $(HDRS) Makefile
 	cc $(CFLAGS) $(OBJS) $(LIBFLAGS) $(INC) -o $(NAME)
 
-#$(OBJS): $(SRCS) $(HDRS)
-#	cc $(CFLAGS) -c $(SRCS) $(INC)
-
-%.o: %.c $(HDRS)
-	cc $(CFLAGS) -c $< $(INC) -o $@
+$(OBJS): $(SRCS) $(HDRS)
+	cc $(CFLAGS) -c $(SRCS) $(INC)
 	
 $(MLX):
 	make -C $(MLXDIR)

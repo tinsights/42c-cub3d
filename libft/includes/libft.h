@@ -30,7 +30,6 @@ typedef struct s_list
 
 int		ft_isalpha(int c);
 int		ft_isdigit(int c);
-//int		ft_alldigit(const char *str);
 int		ft_isalnum(int c);
 int		ft_isascii(int c);
 int		ft_isspace(int c);
@@ -75,8 +74,7 @@ void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 int		ft_printf(const char *str, ...);
-//char	*get_next_line(int fd);
-char	*get_next_line(int fd, int lastcall);
+char	*get_next_line(int fd);
 char	**ft_split2(char *str, char *charset);
 void	ft_free(void **ptr);
 

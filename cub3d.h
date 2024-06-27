@@ -225,6 +225,8 @@ void rotate_player(t_params *params, float degrees);
 
 bool is_wall(char c);
 int brightness_adj(int col, float brightness);
+void	draw_minimap(t_params *p);
+
 
 
 

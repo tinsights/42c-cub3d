@@ -72,7 +72,7 @@ int	maplist(int fd, t_mapdata *mi)
 	t_list	*node;
 	
 	head = NULL;
-	line = get_next_line(fd, 0);
+	line = get_next_line(fd);
 	while(line)
 	{
 
@@ -85,7 +85,7 @@ int	maplist(int fd, t_mapdata *mi)
 			break;
 		ft_lstadd_back(&head, node);
 		mi->rows++;
-		line = get_next_line(fd, 0);
+		line = get_next_line(fd);
 	}
 	if (line != NULL) //meaning eof not reached, some error encountered in between
 	{

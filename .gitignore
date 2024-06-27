@@ -1,5 +1,5 @@
 .vscode/
 *.o
 *.a
-mlx
+mlx/
 cub3d

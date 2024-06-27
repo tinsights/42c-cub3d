@@ -13,7 +13,7 @@ MLX =  $(MLXDIR)/libmlx.a
 SRCS = main.c utils.c raycast.c parse_input.c \
 	parse_utils.c texture_color.c map.c map_utils.c \
 	memory_cleanup.c \
-	mapborder.c \
+	mapborder.c map_list.c \
 	minimap.c minimap_utils.c \
 	move.c hooks.c features.c render.c \
 	raycast_utils.c dda_utils.c paint_utils.c

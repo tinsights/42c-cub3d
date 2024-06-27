@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-void	error_exit(int fd, char *str, int p_err)
+static void	error_exit(int fd, char *str, int p_err)
 {
 	write(1, "Error", 5);
 	write(1, "\n", 1);
@@ -28,7 +28,7 @@ void	error_exit(int fd, char *str, int p_err)
 	exit(EXIT_FAILURE);
 }
 
-void	init_input(t_input *dat)
+static void	init_input(t_input *dat)
 {
 	dat->nxpm = NULL;
 	dat->sxpm = NULL;
@@ -44,26 +44,21 @@ void	init_input(t_input *dat)
 	dat->map = NULL;
 }
 
-//start of parsing text file contents
-//a) texture and color segment is validated and data struct updated
-//b) map portion is validated and data struct updated
-void 	get_data(char *mapfile, t_input	*dat)
+void	get_data(char *mapfile, t_input	*dat)
 {
 	int	fd;
-	
+
 	init_input(dat);
 	fd = open(mapfile, O_RDONLY);
 	if (fd == -1)
 		error_exit(-1, "Open", 1);
 	if (parse_path_color(fd, dat) == -1)
 	{
-		//dat->map is NOT created, no free(dat->map) required
 		free_xpmpath(dat);
 		error_exit(fd, "Invalid Typeid", 0);
 	}
-	if (parse_map(fd, dat) == -1) 
+	if (parse_map(fd, dat) == -1)
 	{
-		//dat->map is NOT created, no free(dat->map) required
 		free_xpmpath(dat);
 		error_exit(fd, "Invalid Map", 0);
 	}

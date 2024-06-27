@@ -246,7 +246,6 @@ int	read_line(int fd, char **line);
 void	free_intarr(int **arr, int size);
 void	free_str(char **str);
 void	free_strarr(char **ptr);
-void	free_strarr2(char **ptr, int len);
 void	free_maplst(t_list **lst);
 void	free_xpmpath(t_input *dat);
 
@@ -266,6 +265,11 @@ int	validate_spawn(const char *str, int row, t_input *dat);
 
 //mapborder.c
 int	isvalidborder(t_mapdata *mi, t_input *dat);
+
+//map_list.c
+int	get_tmaplist(int fd, t_mapdata *mi);
+char	**tmap_to_array(t_mapdata *mi);
+
 
 //print.c
 void	print_mi(t_mapdata *mi);

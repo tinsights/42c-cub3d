@@ -34,8 +34,8 @@ static void	init_input(t_input *dat)
 	dat->sxpm = NULL;
 	dat->expm = NULL;
 	dat->wxpm = NULL;
-	dat->fclr = 0;
-	dat->cclr = 0;
+	dat->fclr = -1;
+	dat->cclr = -1;
 	dat->heading = 0;
 	dat->xpos = 0;
 	dat->ypos = 0;

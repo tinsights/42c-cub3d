@@ -12,6 +12,23 @@
 
 #include "cub3d.h"
 
+void	make_maparray(t_mapdata *mi, char **arr);
+
+static char	**tmap_to_array(t_mapdata *mi)
+{
+	char	**arr;
+
+	arr = ft_calloc((mi->rows + 1), sizeof(char *));
+	if (arr == NULL)
+	{
+		free_maplst(&mi->lst);
+		return (NULL);
+	}
+	make_maparray(mi, arr);
+	free_maplst(&mi->lst);
+	return (arr);
+}
+
 static int	update_playerspawn(t_mapdata *mi, t_input *dat)
 {
 	t_list	*lst;
@@ -76,11 +93,11 @@ int	parse_map(int fd, t_input *dat)
 	isvalid = 1;
 	if (init_mapdata(&mi, fd) == -1)
 		return (-1);
-	if (allvalidchars(&mi) == -1)
+	if (isvalid && allvalidchars(&mi) == -1)
 		isvalid = 0;
-	if (update_playerspawn(&mi, dat) == -1)
+	if (isvalid && update_playerspawn(&mi, dat) == -1)
 		isvalid = 0;
-	if (isvalidborder(&mi, dat) == -1)
+	if (isvalid && isvalidborder(&mi, dat) == -1)
 		isvalid = 0;
 	if (!isvalid)
 	{

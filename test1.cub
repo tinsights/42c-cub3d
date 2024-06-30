@@ -1,15 +1,16 @@
 F  30,60,130
 
-NO  ./incs/textures2/north.xpm
-SO  ./incs/textures2/south.xpm
+NO  ./incs/textures/north.xpm
+SO  ./incs/textures/south.xpm
 
-EA  ./incs/textures2/east.xpm  
-WE  ./incs/textures2/west.xpm  
+EA  ./incs/textures/east.xpm  
+WE  ./incs/textures/west.xpm  
 C  255,220,0
+
 
 111111111111  11
 100011000000001
 100000000    1         100
-10000N00000001         111
+10000W00000001         111
 10000000000111
 1111111111111111

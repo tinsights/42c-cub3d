@@ -1,9 +1,9 @@
 F  220,100,0
-NO  ./incs/textures2/north.xpm
-SO  ./incs/textures2/south.xpm
+NO  ./incs/textures/north.xpm
+SO  ./incs/textures/south.xpm
 
-EA  ./incs/textures2/east.xpm  
-WE  ./incs/textures2/west.xpm  
+EA  ./incs/textures/east.xpm  
+WE  ./incs/textures/west.xpm  
 C  0,255,225
 
         1111111111111111111111111

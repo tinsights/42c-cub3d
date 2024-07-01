@@ -30,7 +30,7 @@ static int	update_color(int *color, char *colorstr, int *vcount)
 	int		irgb[3];
 	int		i;
 
-	if (nondigits(colorstr))
+	if (*color != -1 || nondigits(colorstr))
 		return (-1);
 	rgb = ft_split(colorstr, ',');
 	if (wcount(rgb) != 3)
@@ -121,7 +121,8 @@ int	parse_path_color(int fd, t_input *dat)
 			break ;
 		}
 		free_str(&line);
-		line = get_next_line(fd);
+		if (vcount != 6)
+			line = get_next_line(fd);
 	}
 	free_str(&line);
 	if (vcount < 6)

@@ -269,12 +269,5 @@ int						validate_spawn(const char *str, int row, t_input *dat);
 int						isvalidborder(t_mapdata *mi, t_input *dat);
 
 int						get_tmaplist(int fd, t_mapdata *mi);
-char					**tmap_to_array(t_mapdata *mi);
-
-void					print_mi(t_mapdata *mi);
-void					print_lst(t_list *lst);
-void					print_input(t_input *dat);
-void					print_dblarr(char **arr);
-void					print_intarr(int **arr, int rows, int cols);
 
 #endif

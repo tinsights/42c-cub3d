@@ -38,7 +38,7 @@ static char	*getstr(char *str, int rwidth)
 	return (arr);
 }
 
-static void	make_maparray(t_mapdata *mi, char **arr)
+void	make_maparray(t_mapdata *mi, char **arr)
 {
 	t_list	*head;
 	t_list	*next;
@@ -60,7 +60,7 @@ static void	make_maparray(t_mapdata *mi, char **arr)
 	}
 }
 
-static int	makelist(t_list	**head, char *line)
+static int	makelist(t_list	**head, char *line, int *rows)
 {
 	t_list	*node;
 
@@ -72,6 +72,7 @@ static int	makelist(t_list	**head, char *line)
 	if (node == NULL)
 		return (0);
 	ft_lstadd_back(head, node);
+	*rows += 1;
 	return (1);
 }
 
@@ -82,11 +83,15 @@ int	get_tmaplist(int fd, t_mapdata *mi)
 
 	head = NULL;
 	line = get_next_line(fd);
+	while (line && isemptyline(line))
+	{
+		free_str(&line);
+		line = get_next_line(fd);
+	}
 	while (line)
 	{
-		if (makelist(&head, line) == 0)
+		if (makelist(&head, line, &mi->rows) == 0)
 			break ;
-		mi->rows++;
 		line = get_next_line(fd);
 	}
 	if (line != NULL)
@@ -98,19 +103,4 @@ int	get_tmaplist(int fd, t_mapdata *mi)
 	}
 	mi->lst = head;
 	return (1);
-}
-
-char	**tmap_to_array(t_mapdata *mi)
-{
-	char	**arr;
-
-	arr = ft_calloc((mi->rows + 1), sizeof(char *));
-	if (arr == NULL)
-	{
-		free_maplst(&mi->lst);
-		return (NULL);
-	}
-	make_maparray(mi, arr);
-	free_maplst(&mi->lst);
-	return (arr);
 }

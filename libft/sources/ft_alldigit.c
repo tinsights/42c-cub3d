@@ -17,7 +17,7 @@ int	ft_isdigit(int c)
 
 int	ft_alldigit(const char *str)
 {
-	while(*str)
+	while (*str)
 	{
 		if (!ft_isdigit(*str))
 			return (0);

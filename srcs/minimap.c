@@ -63,8 +63,8 @@ void	fill_grid(t_params *p, t_minimap *mm)
 
 void	init_minimap(t_params *p, t_minimap *mm)
 {
-	mm->sq_size = 15;
-	mm->mm_size = 8;
+	mm->sq_size = 15; // should be macros
+	mm->mm_size = 10; // should be macros
 	mm->total_size = mm->sq_size * mm->mm_size;
 	mm->heading = p->player.heading;
 	mm->pos_y = p->player.position[0];

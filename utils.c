@@ -146,7 +146,7 @@ void strafe_player(t_params *params, int direction)
 
 double FOV = (76.0 / 180.0 * M_PI); // degrees? 66? 60?
 
-
+#include <stdbool.h>
 
 void draw_ray(t_params *p)
 {
@@ -159,6 +159,7 @@ void draw_ray(t_params *p)
 
 	double rightX = -forwardY * projection_plane_width;
 	double rightY = forwardX * projection_plane_width;
+
 
 	for (int i = -WIN_WIDTH / 2; i < WIN_WIDTH / 2; i++)
 	{
@@ -186,6 +187,8 @@ void draw_ray(t_params *p)
 		double deltaDistX = (rayDirX == 0) ? INFINITY : fabs(1 / rayDirX );
 		double deltaDistY = (rayDirY == 0) ? INFINITY : fabs(1 / rayDirY );
 		double perpWallDist;
+
+		bool	portal = false;
 
 		int stepX;
 		int stepY;
@@ -232,6 +235,13 @@ void draw_ray(t_params *p)
 			{
 				mapX = 12;
 				mapY = 5;
+				portal = true;
+			}
+			else if (side && map[mapY][mapX] == -2)
+			{
+				mapX = 5;
+				mapY = 2;
+				portal = true;
 			}
 			else if (map[mapY][mapX] != 0)
 			{
@@ -332,9 +342,9 @@ void draw_ray(t_params *p)
 		for (int px = 0; px < WIN_HEIGHT; px++)
 		{
 			// color = color *(1 - ((double) px / (trueBottomOfWall)))
-			if (px < topOfWall )
+			if (px < topOfWall)
 				put_pixel(*p, px, i + WIN_WIDTH / 2, 0x888888);
-			else if (px> bottomOfWall )
+			else if (px > bottomOfWall)
 				put_pixel(*p, px, i + WIN_WIDTH / 2, 0x333333);
 			else
 				put_pixel(*p, px, i + WIN_WIDTH / 2, color);

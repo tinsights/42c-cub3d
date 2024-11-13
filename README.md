@@ -1,4 +1,4 @@
-# Cub3D Project
+# Cub3D
 
 ## Overview
 

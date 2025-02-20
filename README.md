@@ -24,7 +24,7 @@ To build and run Cub3D, you will need:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/cub3d.git
+   git clone https://github.com/tinsights/cub3d.git
    cd cub3d
    ```
 

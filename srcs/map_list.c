@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_list.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sthiagar <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tjegades <tjegades@student.42singapore.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 20:58:20 by sthiagar          #+#    #+#             */
-/*   Updated: 2024/06/25 20:58:31 by sthiagar         ###   ########.fr       */
+/*   Updated: 2025/02/20 17:25:29 by tjegades         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,10 @@
 static char	*getstr(char *str, int rwidth)
 {
 	int		len;
-	int		bal;
 	int		i;
 	char	*arr;
 
 	len = ft_strlen(str);
-	bal = rwidth - len;
 	arr = ft_calloc(rwidth + 1, sizeof(char));
 	if (arr == NULL)
 		return (NULL);

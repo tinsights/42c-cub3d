@@ -1,8 +1,17 @@
 NAME = cub3D
 
-CFLAGS = -g -Wall -Werror -Wextra -O3
+CFLAGS = -Wall -Werror -Wextra -O3
 LIBFLAGS = -Lmlx -lmlx -lXext -lX11 -lm -Llibft -lft
 INC = -Imlx -Ilibft/includes -Iincs
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	# might be version dependent, unsure
+	INC += -I/opt/X11/include
+	LIBFLAGS += -L/opt/X11/lib
+	CFLAGS += -Wno-deprecated-non-prototype
+endif
+
 
 LIBDIR = libft/
 LIBFT = $(LIBDIR)/libft.a

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjegades <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tjegades <tjegades@student.42singapore.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 13:10:14 by tjegades          #+#    #+#             */
-/*   Updated: 2024/05/21 13:10:15 by tjegades         ###   ########.fr       */
+/*   Updated: 2025/02/20 21:07:51 by tjegades         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ typedef struct s_params
 	t_mlx				mlx;
 	t_input				input;
 	t_player			player;
-	int					clicked_px[2];
+	int					curr_px[2];
 	t_img				*inner;
 	t_img				*north;
 	t_img				*south;
@@ -119,6 +119,7 @@ typedef struct s_params
 	int					mheight;
 	char				**map;
 	bool				lights;
+	bool				mouse_move;
 }						t_params;
 
 enum					e_tex_type

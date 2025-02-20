@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjegades <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tjegades <tjegades@student.42singapore.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 12:48:47 by tjegades          #+#    #+#             */
-/*   Updated: 2024/05/06 12:49:17 by tjegades         ###   ########.fr       */
+/*   Updated: 2025/02/20 21:13:22 by tjegades         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,11 +91,13 @@ void	init_params(t_params *params)
 	init_mlx(params);
 	init_player(params);
 	get_textures(params);
+	mlx_mouse_move(params->mlx.ptr, params->mlx.win, WIN_WIDTH / 2, WIN_HEIGHT / 2);
+	mlx_mouse_hide(params->mlx.ptr, params->mlx.win);
 	mlx_hook(params->mlx.win, ButtonPress, ButtonPressMask, &mouse_click,
 		params);
 	mlx_hook(params->mlx.win, KeyRelease, KeyReleaseMask, &key_release_hook,
 		params);
-	mlx_hook(params->mlx.win, MotionNotify, Button2MotionMask, &mouse_move,
+	mlx_hook(params->mlx.win, MotionNotify, PointerMotionMask, &mouse_move,
 		params);
 	mlx_hook(params->mlx.win, KeyPress, KeyPressMask, &key_hook, params);
 	mlx_hook(params->mlx.win, DestroyNotify, 0L, &close_window, params);

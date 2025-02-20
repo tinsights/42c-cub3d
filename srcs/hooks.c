@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hooks.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjegades <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tjegades <tjegades@student.42singapore.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/27 15:20:08 by tjegades          #+#    #+#             */
-/*   Updated: 2024/06/27 15:20:09 by tjegades         ###   ########.fr       */
+/*   Updated: 2025/02/20 21:13:36 by tjegades         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,8 +94,8 @@ int	mouse_click(int button, int x, int y, t_params *params)
 {
 	if (button == 2)
 	{
-		params->clicked_px[0] = x;
-		params->clicked_px[1] = y;
+		params->curr_px[0] = x;
+		params->curr_px[1] = y;
 	}
 	else if (button == 4)
 		params->fov -= M_PI / 30;
@@ -114,14 +114,24 @@ int	mouse_move(int x, int y, t_params *params)
 	double		heading_delta;
 	double		vert_delta;
 
-	player = &(params->player);
-	x_delta = x - params->clicked_px[0];
-	y_delta = y - params->clicked_px[1];
-	heading_delta = (double)x_delta / WIN_WIDTH * tan(params->fov / 2.0);
-	vert_delta = (double)y_delta / WIN_WIDTH * tan(params->fov / 2.0);
-	params->player.heading += 4.0 * heading_delta;
-	player->vert_angle -= 4.0 * vert_delta;
-	params->clicked_px[0] = x;
-	params->clicked_px[1] = y;
+	if (params->mouse_move) {
+		params->mouse_move = false;
+		player = &(params->player);
+		x_delta = x - params->curr_px[0];
+		y_delta = y - params->curr_px[1];
+		heading_delta = (double)x_delta / WIN_WIDTH * tan(params->fov / 2.0);
+		vert_delta = (double)y_delta / WIN_WIDTH * tan(params->fov / 2.0);
+		player->heading += 4.0 * heading_delta;
+		player->vert_angle -= 4.0 * vert_delta;
+		if (player->vert_angle > M_PI_4)
+        	player->vert_angle = M_PI_4;
+    	if (player->vert_angle < -M_PI_4)
+        	player->vert_angle = -M_PI_4;
+		mlx_mouse_move(params->mlx.ptr, params->mlx.win, WIN_WIDTH / 2, WIN_HEIGHT / 2);
+	} else if ((x == WIN_WIDTH / 2) && (y == WIN_HEIGHT / 2)) {
+		params->mouse_move = true;
+	}
+	params->curr_px[0] = x;
+	params->curr_px[1] = y;
 	return (1);
 }

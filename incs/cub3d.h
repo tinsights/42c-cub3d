@@ -6,7 +6,7 @@
 /*   By: tjegades <tjegades@student.42singapore.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 13:10:14 by tjegades          #+#    #+#             */
-/*   Updated: 2025/02/20 21:07:51 by tjegades         ###   ########.fr       */
+/*   Updated: 2025/02/20 21:47:40 by tjegades         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # define WIN_HEIGHT 800
 # define MM_SQ_SZ 15
 # define MM_GRID_SZ 8
+# define MM_PADDING 10
 
 # ifndef FOV
 #  define FOV 100.0

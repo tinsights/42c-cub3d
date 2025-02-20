@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minimap.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjegades <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tjegades <tjegades@student.42singapore.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/27 14:10:59 by tjegades          #+#    #+#             */
-/*   Updated: 2024/06/27 14:11:00 by tjegades         ###   ########.fr       */
+/*   Updated: 2025/02/20 21:46:14 by tjegades         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	draw_rays(t_params *p, t_minimap *mm)
 		{
 			if (hit_wall(p, mm))
 				break ;
-			put_pixel(p, mm->heading_px_row, mm->heading_px_col, 0x550077);
+			put_pixel(p, mm->heading_px_row + MM_PADDING, mm->heading_px_col + MM_PADDING, 0xe0e0e0);
 			mm->heading_px_row += mm->dir_y;
 			mm->heading_px_col += mm->dir_x;
 		}
@@ -85,7 +85,7 @@ void	paint_mm(t_params *p, t_minimap *mm)
 	{
 		mm->px_row = -1;
 		while (++mm->px_row < mm->total_size)
-			put_pixel(p, mm->px_row, mm->px_col, 0xa9a9a9);
+			put_pixel(p, mm->px_row + MM_PADDING, mm->px_col + MM_PADDING, 0xa9a9a9);
 	}
 }
 

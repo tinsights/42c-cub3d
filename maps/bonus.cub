@@ -1,13 +1,10 @@
  NO  ./incs/textures/tube.xpm
  SO  ./incs/textures/sakura.xpm
-
  EA  ./incs/textures/seeds.xpm
  WE  ./incs/textures/square.xpm
 
-
-C  123,123,123
-F  128,5,10
-
+C 137,174,179
+F 128,128,128
 
 11111111111111111111111
 1000000000101000000000D

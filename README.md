@@ -4,6 +4,20 @@
 
 Cub3D is a simple raycasting engine implemented in C, inspired by classic first-person shooter games like Wolfenstein 3D. This project demonstrates the principles of 3D rendering using raycasting techniques, allowing users to explore a 3D environment created from 2D map data.
 
+The player can look around with the mouse and keyboard, open doors, and place / destroy new blocks:
+
+https://github.com/user-attachments/assets/0978e505-234b-4b75-8576-b7b9b1d8ea3a
+
+The player can toggle lights, giving a depth to the playing area.:
+
+https://github.com/user-attachments/assets/9e75ae0c-6495-45e3-8739-c3fe73d49094
+
+The player can also toggle god mode, and fly up, above and through walls:
+
+https://github.com/user-attachments/assets/4d11cffc-dbe2-451d-bd80-7d34b0be68f6
+
+
+
 ## Features
 
 - **Raycasting Engine**: Utilizes raycasting to render a 3D perspective from a 2D map.

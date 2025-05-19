@@ -6,7 +6,7 @@
 /*   By: tjegades <tjegades@student.42singapore.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/27 15:27:25 by tjegades          #+#    #+#             */
-/*   Updated: 2025/02/20 20:48:49 by tjegades         ###   ########.fr       */
+/*   Updated: 2025/05/19 19:57:32 by tjegades         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,14 @@ void	draw_crosshair(t_params *p)
 	vert_center = WIN_HEIGHT / 2;
 	horiz_center = WIN_WIDTH / 2;
 	half_crosshair_length = 8;
-	i = vert_center - half_crosshair_length;
-	while (i < vert_center + half_crosshair_length)
-		put_pixel(p, i++, horiz_center, 0x888800);
-	i = horiz_center - half_crosshair_length;
-	while (i < horiz_center + half_crosshair_length)
-		put_pixel(p, vert_center, i++, 0x888800);
+	for (int width = -1; width < 2; width ++) {
+		i = vert_center - half_crosshair_length;
+		while (i < vert_center + half_crosshair_length)
+			put_pixel(p, i++, horiz_center + width, 0xffffff);
+		i = horiz_center - half_crosshair_length;
+		while (i < horiz_center + half_crosshair_length)
+			put_pixel(p, vert_center + width, i++, 0xffffff);
+	}
 }
 
 int	render(t_params *p)

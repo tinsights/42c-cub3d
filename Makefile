@@ -12,6 +12,10 @@ ifeq ($(UNAME_S),Darwin)
 	CFLAGS += -Wno-deprecated-non-prototype
 endif
 
+ifdef WSL_DISTRO_NAME
+CFLAGS += -Wno-all
+endif
+
 
 LIBDIR = libft/
 LIBFT = $(LIBDIR)/libft.a
